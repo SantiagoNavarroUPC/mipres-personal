@@ -55,7 +55,12 @@ export default function DialogoCrearUsuario({
     const rolId = Number(newRoleId)
 
     if (!usuario) {
-      toast({ title: "Usuario requerido", description: "Ingrese el usuario", variant: "destructive" })
+      toast({ title: "Número de identificación requerido", description: "Ingrese el número de identificación", variant: "destructive" })
+      return
+    }
+
+    if (!/^\d+$/.test(usuario)) {
+      toast({ title: "Número de identificación inválido", description: "Debe contener solo dígitos", variant: "destructive" })
       return
     }
 
@@ -132,16 +137,17 @@ export default function DialogoCrearUsuario({
 
         <div className="space-y-4">
           <div className="space-y-1.5 text-left">
-            <Label htmlFor="admin-usuario" className="text-foreground">Usuario</Label>
+            <Label htmlFor="admin-usuario" className="text-foreground">Número de identificación</Label>
             <div className="relative">
               <span className="pointer-events-none absolute left-2 top-1/2 inline-flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-md bg-[#E6F7F5] dark:bg-primary/20">
                 <User className="h-4 w-4 text-[#0f766e]" />
               </span>
               <Input
                 id="admin-usuario"
+                inputMode="numeric"
                 value={newUsuario}
-                onChange={(event) => setNewUsuario(event.target.value)}
-                placeholder="Usuario"
+                onChange={(event) => setNewUsuario(event.target.value.replace(/\D/g, ""))}
+                placeholder="Número de identificación"
                 disabled={creatingUser}
                 className="border-[#E6F7F5] bg-background pl-11 text-foreground placeholder:text-muted-foreground focus-visible:ring-[#0f766e] dark:border-primary/35"
               />

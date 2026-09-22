@@ -25,24 +25,16 @@ function toBool(value: unknown, fallback = false): boolean {
 export function normalizeUsuario(input: unknown): UsuarioMipres {
   const raw = (input ?? {}) as Record<string, unknown>
 
-  const nombre = toStr(raw.nombre)
-  const apellido = toStr(raw.apellido)
-  const nombreCompleto = toStr(raw.nombre_completo) || `${nombre} ${apellido}`.trim()
-
   const rolRaw = (raw.rol ?? {}) as Record<string, unknown>
 
   return {
     id_usuario_mipres: toStr(raw.id_usuario_mipres),
-    nombre,
-    apellido,
-    email: toStr(raw.email),
-    nombre_completo: nombreCompleto,
+    numero_identificacion: toStr(raw.numero_identificacion),
     rol: {
       consecutivo_rol: Number(rolRaw.consecutivo_rol ?? 0),
       rol_nombre: toStr(rolRaw.rol_nombre),
     },
-    usuario_activo: toBool(raw.usuario_activo, toBool(raw.sw_activo, false)),
-    sw_activo: toBool(raw.sw_activo, toBool(raw.usuario_activo, false)),
+    usuario_activo: toBool(raw.usuario_activo, false),
   }
 }
 
@@ -73,7 +65,6 @@ export function extractRoles(payload: unknown): RolUsuarioSimple[] {
 export function buildActualizarUsuarioPayload(usuarioActivo: boolean) {
   return {
     usuario_activo: usuarioActivo,
-    sw_activo: usuarioActivo,
   }
 }
 

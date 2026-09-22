@@ -8,13 +8,9 @@ export interface RolUsuario {
 
 export interface UsuarioMipres {
   id_usuario_mipres: string
-  nombre: string
-  apellido: string
-  email: string
-  nombre_completo: string
+  numero_identificacion: string
   rol: RolUsuario
   usuario_activo: boolean
-  sw_activo: boolean
 }
 
 export interface RolesApiResponse {
@@ -88,7 +84,6 @@ export async function patchUsuarioActivo(
     },
     body: JSON.stringify({
       usuario_activo: usuarioActivo,
-      sw_activo: usuarioActivo,
     }),
     cache: "no-store",
   })

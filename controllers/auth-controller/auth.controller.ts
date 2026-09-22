@@ -15,8 +15,6 @@ function getRegisterMessageByStatus(status?: number): string {
       return "Usuario registrado exitosamente en MIPRES"
     case 400:
       return "Datos inválidos"
-    case 404:
-      return "Usuario no encontrado en sistema administrativo"
     case 409:
       return "Usuario ya registrado"
     default:

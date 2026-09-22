@@ -27,7 +27,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { useToast } from "@/hooks/use-toast"
 import { fetchWithAuth } from "@/lib/auth"
-import { Mail, Shield, RefreshCw, AlertCircle, UserCog, Plus, Settings, Eye, EyeOff, KeyRound } from "lucide-react"
+import { IdCard, Shield, RefreshCw, AlertCircle, UserCog, Plus, Settings, Eye, EyeOff, KeyRound } from "lucide-react"
 import DialogoCrearUsuario from "@/components/component-usuarios/UsuariosModalCrear"
 
 type Role = {
@@ -37,13 +37,9 @@ type Role = {
 
 type User = {
 	id_usuario_mipres: string
-	nombre: string
-	apellido: string
-	email: string
-	nombre_completo: string
+	numero_identificacion: string
 	rol: Role
 	usuario_activo: boolean
-	sw_activo: boolean
 }
 
 function sortUsersByRol(data: User[]): User[] {
@@ -142,7 +138,6 @@ export default function UsuariosTable({ authToken }: UsuariosTableProps) {
 					"Content-Type": "application/json",
 				},
 				body: JSON.stringify({
-					usuario_activo: nextRoleId,
 					consecutivo_rol: nextRoleId,
 				}),
 			})
@@ -284,7 +279,7 @@ export default function UsuariosTable({ authToken }: UsuariosTableProps) {
 							Restablecer contraseña
 						</DialogTitle>
 						<DialogDescription>
-							{resetUser ? `Usuario: ${resetUser.nombre_completo || `${resetUser.nombre} ${resetUser.apellido}`}` : ""}
+							{resetUser ? `Usuario: ${resetUser.numero_identificacion}` : ""}
 						</DialogDescription>
 					</DialogHeader>
 
@@ -349,12 +344,11 @@ export default function UsuariosTable({ authToken }: UsuariosTableProps) {
 											<Shield className="h-5 w-5 text-primary" />
 										</div>
 										<div className="flex-1">
-											<p className="text-sm font-semibold text-foreground truncate">
-												{u.nombre_completo || `${u.nombre} ${u.apellido}`}
-											</p>
-											<div className="flex items-center gap-1 mt-1">
-												<Mail className="h-3.5 w-3.5 text-muted-foreground" />
-												<p className="text-xs text-muted-foreground truncate">{u.email}</p>
+											<div className="flex items-center gap-1">
+												<IdCard className="h-3.5 w-3.5 text-muted-foreground" />
+												<p className="text-sm font-semibold text-foreground truncate">
+													{u.numero_identificacion}
+												</p>
 											</div>
 										</div>
 									</div>
