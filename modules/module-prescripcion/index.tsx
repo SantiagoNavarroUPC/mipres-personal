@@ -1,0 +1,5 @@
+export { PrescripcionHeader } from "./PrescripcionHeader"
+export { PrescripcionSearchDate } from "./PrescripcionSearchDate"
+export { PrescripcionSearchPatient } from "./PrescripcionSearchPatient"
+export { PrescripcionSearchNumber } from "./PrescripcionSearchNumber"
+export { PrescripcionSearchNovedades } from "./PrescripcionSearchNovedades"

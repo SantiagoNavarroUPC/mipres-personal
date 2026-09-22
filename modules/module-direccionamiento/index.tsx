@@ -1,0 +1,5 @@
+export { DireccionamientoHeader } from "./DireccionamientoHeader"
+export { DireccionamientoSearchDate } from "./DireccionamientoSearchDate"
+export { DireccionamientoSearchPatient } from "./DireccionamientoSearchPatient"
+export { DireccionamientoSearchPrescription } from "./DireccionamientoSearchPrescription"
+export { DireccionamientoAnular } from "./DireccionamientoAnular"

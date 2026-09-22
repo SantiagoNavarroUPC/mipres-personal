@@ -1,0 +1,1 @@
+export type { Direccionamiento, DireccionamientoResponse} from "./direccionamiento"

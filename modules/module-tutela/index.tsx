@@ -1,0 +1,5 @@
+export { TutelaHeader } from "./TutelaHeader"
+export { TutelaSearchDate } from "./TutelaSearchDate"
+export { TutelaSearchPatient } from "./TutelaSearchPatient"
+export { TutelaSearchNumber } from "./TutelaSearchNumber"
+export { TutelaSearchNovedades } from "./TutelaSearchNovedades"

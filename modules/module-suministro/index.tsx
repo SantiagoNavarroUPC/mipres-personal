@@ -1,0 +1,5 @@
+export {SuministroHeader} from "./SuministroHeader"
+export {SuministroSearchDate} from "./SuministroSearchDate"
+export {SuministroSearchPrescription} from "./SuministroSearchPrescription"
+export {SuministroSearchPaciente} from "./SuministroSearchPaciente"
+export {SuministroTable} from "../../components/mipres/component-suministro/SuministroTable"

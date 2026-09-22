@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MIPRES - Formulario de Prescripcion</title>
+  <style>
+    /* Reset completo para evitar herencia de estilos */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      color: inherit;
+      font: inherit;
+    }
+
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 12px;
+      color: #000000;
+      background: #ffffff;
+      padding: 22px;
+    }
+
+    .form-container {
+      min-width: 1100px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .small {
+      font-size: 10px;
+    }
+
+    .value {
+      font-weight: normal;
+      display: inline-block;
+      margin-left: 4px;
+      word-break: break-word;
+    }
+
+    .key-value-table td {
+      vertical-align: top;
+    }
+
+    .no-data {
+      color: #555555;
+      font-style: italic;
+      text-align: center;
+      padding: 8px;
+    }
+
+    @media print {
+      body {
+        padding: 0;
+      }
+      .hidden-empty {
+        display: none;
+      }
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    td {
+      border: 1px solid #000000;
+      padding: 6px 5px;
+      vertical-align: middle;
+    }
+
+    .section-title {
+      text-align: center;
+      font-weight: bold;
+      font-size: 13px;
+      background-color: #f0f0f0;
+      padding: 9px 5px;
+      height: 34px;
+      line-height: 16px;
+    }
+
+    .bold {
+      font-weight: bold;
+    }
+
+    .center {
+      text-align: center;
+    }
+
+    .vtop {
+      vertical-align: top;
+    }
+
+    /* HEADER TABLE */
+    .header-table td.logo-cell {
+      width: 180px;
+      text-align: center;
+      vertical-align: middle;
+    }
+
+    .header-table td.logo-cell img {
+      width: 120px;
+      height: auto;
+    }
+
+    .header-table td.title-cell {
+      text-align: center;
+      vertical-align: middle;
+      font-size: 18px;
+      font-weight: bold;
+    }
+
+    .header-table td.info-cell {
+      width: 250px;
+      padding: 7px 6px;
+      font-weight: bold;
+    }
+
+    /* PRESTADOR TABLE */
+    .prestador-table {
+      border-top: none;
+    }
+    .prestador-table td {
+      border-top: none;
+    }
+    .prestador-table tr:first-child td {
+      border-top: 1px solid #000;
+    }
+
+    /* PACIENTE TABLE */
+    .paciente-table {
+      border-top: none;
+    }
+
+    /* MEDICAMENTOS TABLE */
+    .medicamentos-table {
+      border-top: none;
+    }
+
+    /* Ajuste especial para fila de productos nutricionales */
+    #nutricionales-body td {
+      min-width: 90px;
+      max-width: 220px;
+      word-break: break-word;
+    }
+
+    .medicamentos-table .header-row td {
+      text-align: center;
+      font-weight: bold;
+      vertical-align: top;
+      padding: 6px 5px;
+    }
+
+    .medicamentos-table .empty-row td {
+      height: 30px;
+    }
+
+    .cantidades-sub {
+      font-weight: normal;
+      font-size: 11px;
+    }
+
+    /* PROFESIONAL TABLE */
+    .profesional-table {
+      border-top: none;
+    }
+
+    /* Remove duplicate borders between tables */
+    .no-top-border {
+      border-top: none !important;
+    }
+
+    .no-top-border td:first-child,
+    .no-top-border td {
+      border-top: none;
+    }
+
+    /* Ensure connected table borders */
+    table + table {
+      margin-top: -1px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="form-container">
+
+  <!-- ==================== HEADER ==================== -->
+  <table class="header-table">
+    <tbody>
+      <tr>
+        <td class="logo-cell" rowspan="2">
+          <img src="/logo.png" alt="Logo" onerror="this.style.display='none'">
+        </td>
+        <td class="title-cell" rowspan="2">MIPRES</td>
+        <td class="info-cell">Fecha y Hora de Expedici&oacute;n: <span id="FPrescripcion" class="value"></span> <span id="HPrescripcion" class="value"></span></td>
+      </tr>
+      <tr>
+        <td class="info-cell">Nro. Prescripci&oacute;n: <span id="NoPrescripcion" class="value"></span></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- ==================== DATOS DEL PRESTADOR ==================== -->
+  <table class="prestador-table">
+    <tbody>
+      <tr>
+        <td colspan="3" class="section-title">DATOS DEL PRESTADOR</td>
+      </tr>
+      <tr>
+        <td class="bold" style="width: 33%;">Departamento: <span id="DepartamentoIPS" class="value">N/A</span></td>
+        <td class="bold" style="width: 33%;">Municipio: <span id="MunicipioIPS" class="value"></span></td>
+        <td class="bold" style="width: 34%;">C&oacute;digo Habilitaci&oacute;n: <span id="CodHabIPS" class="value"></span></td>
+      </tr>
+      <tr>
+        <td class="bold">Documento de Identificaci&oacute;n: <span id="PrestadorDoc" class="value"></span></td>
+        <td class="bold" colspan="2">Nombre Prestador de Servicios de Salud: <span id="NombreIPS" class="value">N/A</span></td>
+      </tr>
+      <tr>
+        <td class="bold">Direcci&oacute;n: <span id="DirSedeIPS" class="value"></span></td>
+        <td class="bold" colspan="2">Tel&eacute;fono: <span id="TelSedeIPS" class="value"></span></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- ==================== DATOS DEL PACIENTE ==================== -->
+  <table class="paciente-table">
+    <tbody>
+      <tr>
+        <td colspan="5" class="section-title">DATOS DEL PACIENTE</td>
+      </tr>
+      <tr>
+        <td class="bold" style="width: 20%;">Documento de Identificaci&oacute;n:<br><span id="PacienteDoc" class="value"></span></td>
+        <td class="bold" style="width: 20%;">Primer Apellido:<br><span id="PAPaciente" class="value"></span></td>
+        <td class="bold" style="width: 20%;">Segundo Apellido:<br><span id="SAPaciente" class="value"></span></td>
+        <td class="bold" style="width: 20%;">Primer Nombre:<br><span id="PNPaciente" class="value"></span></td>
+        <td class="bold" style="width: 20%;">Segundo Nombre:<br><span id="SNPaciente" class="value"></span></td>
+      </tr>
+      <tr>
+        <td class="bold">N&uacute;mero Historia Cl&iacute;nica: <span id="NoHistoriaClinica" class="value">N/A</span></td>
+        <td class="bold">Diagn&oacute;stico Principal: <span id="CodDxPpal" class="value"></span></td>
+        <td class="bold">Usuario R&eacute;gimen: <span id="tipoRegimen" class="value"></span></td>
+        <td class="bold" colspan="2">&Aacute;mbito atenci&oacute;n: <span id="AmbitoAtencion" class="value"></span></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- ==================== MEDICAMENTOS ==================== -->
+  <table class="medicamentos-table">
+    <tbody>
+      <tr>
+        <td colspan="9" class="section-title">MEDICAMENTOS</td>
+      </tr>
+      <tr class="header-row">
+        <td style="width: 9%;">Tipo prestaci&oacute;n</td>
+        <td style="width: 12%;">Nombre</td>
+        <td style="width: 8%;">Dosis</td>
+        <td style="width: 11%;">V&iacute;a Administraci&oacute;n</td>
+        <td style="width: 11%;">Frecuencia Administraci&oacute;n</td>
+        <td style="width: 11%;">Indicaciones Especiales</td>
+        <td style="width: 10%;">Duraci&oacute;n Tratamiento</td>
+        <td style="width: 11%;">Recomendaciones</td>
+        <td style="width: 11%;">
+          Cantidades<br>
+          Farmac&eacute;uticas<br>
+          <span class="cantidades-sub">Nro / Letras / Unidad</span>
+        </td>
+      </tr>
+    </tbody>
+    <tbody id="medicamentos-body"></tbody>
+  </table>
+
+  <table class="medicamentos-table">
+    <tbody>
+      <tr>
+        <td colspan="6" class="section-title">PROCEDIMIENTOS</td>
+      </tr>
+      <tr class="header-row">
+        <td style="width: 8%;">Estado Junta</td>
+        <td style="width: 13%;">CUPS</td>
+        <td style="width: 17%;">Descripci&oacute;n</td>
+        <td style="width: 13%;">Cantidad</td>
+        <td style="width: 13%;">Duraci&oacute;n Tratamiento</td>
+        <td style="width: 18%;">Justificaci&oacute;n No PBS</td>
+        <td style="width: 18%;">Recomendaciones</td>
+      </tr>
+    </tbody>
+    <tbody id="procedimientos-body"></tbody>
+  </table>
+
+  <table class="medicamentos-table">
+    <tbody>
+      <tr>
+        <td colspan="6" class="section-title">DISPOSITIVOS M&Eacute;DICOS</td>
+      </tr>
+      <tr class="header-row">
+        <td style="width: 8%;">Estado Junta</td>
+        <td style="width: 13%;">C&oacute;digo</td>
+        <td style="width: 15%;">Cantidad</td>
+        <td style="width: 15%;">Frecuencia</td>
+        <td style="width: 15%;">Duraci&oacute;n Tratamiento</td>
+        <td style="width: 17%;">Justificaci&oacute;n No PBS</td>
+        <td style="width: 17%;">Estado</td>
+      </tr>
+    </tbody>
+    <tbody id="dispositivos-body"></tbody>
+  </table>
+
+  <table class="medicamentos-table">
+    <tbody>
+      <tr>
+        <td colspan="8" class="section-title">PRODUCTOS NUTRICIONALES</td>
+      </tr>
+      <tr class="header-row">
+        <td style="width: 8%;">Estado Junta</td>
+        <td style="width: 18%;">Descripci&oacute;n</td>
+        <td style="width: 10%;">Dosis</td>
+        <td style="width: 11%;">V&iacute;a</td>
+        <td style="width: 11%;">Frecuencia</td>
+        <td style="width: 14%;">Duraci&oacute;n Tratamiento</td>
+        <td style="width: 14%;">Justificaci&oacute;n No PBS</td>
+        <td style="width: 14%;">Cant. Total</td>
+      </tr>
+    </tbody>
+    <tbody id="nutricionales-body"></tbody>
+  </table>
+
+  <table class="medicamentos-table">
+    <tbody>
+      <tr>
+        <td colspan="9" class="section-title">SERVICIOS COMPLEMENTARIOS</td>
+      </tr>
+      <tr class="header-row">
+        <td style="width: 7%;">Estado Junta</td>
+        <td style="width: 11%;">C&oacute;digo</td>
+        <td style="width: 13%;">Descripci&oacute;n</td>
+        <td style="width: 8%;">Cantidad</td>
+        <td style="width: 11%;">Frecuencia</td>
+        <td style="width: 11%;">Duraci&oacute;n Trat.</td>
+        <td style="width: 9%;">Tipo Transp.</td>
+        <td style="width: 15%;">Acompa&ntilde;ante</td>
+        <td style="width: 15%;">Justificaci&oacute;n / Indicaciones</td>
+      </tr>
+    </tbody>
+    <tbody id="servicios-body"></tbody>
+  </table>
+
+  <!-- ==================== PROFESIONAL TRATANTE ==================== -->
+  <table class="profesional-table">
+    <tbody>
+      <tr>
+        <td colspan="2" class="section-title">PROFESIONAL TRATANTE</td>
+      </tr>
+      <tr>
+        <td class="bold" style="width: 50%;">Documento de Identificaci&oacute;n: <span id="ProfesionalDoc" class="value"></span></td>
+        <td class="bold" style="width: 50%;">Nombre: <span id="ProfesionalNombre" class="value"></span></td>
+      </tr>
+      <tr>
+        <td class="bold">Registro Profesional: <span id="RegProfS" class="value"></span></td>
+        <td class="bold">Codver: <span id="Codver" class="value">N/A</span></td>
+      </tr>
+    </tbody>
+  </table>
+
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const safe = (value) => {
+      if (value === null || value === undefined || value === '') return 'N/A';
+      return String(value);
+    };
+
+    const mapBinario = (value) => {
+      if (value === null || value === undefined) return 'N/A';
+      if (Number(value) === 1) return 'SI';
+      if (Number(value) === 0) return 'NO';
+      return safe(value);
+    };
+
+    const pdfConstants = window.__PDF_CONSTANTS__ || {};
+    const ESTADOS_TECNOLOGIAS = pdfConstants.ESTADOS_TECNOLOGIAS || {
+      1: 'No requiere junta de profesionales',
+      2: 'Requiere junta de profesionales y pendiente evaluación',
+      3: 'Evaluada por la junta de profesionales y fue aprobada',
+      4: 'Evaluada por la junta de profesionales y no fue aprobada',
+    };
+    const UNIDADES_DOSIS = pdfConstants.UNIDADES_DOSIS || [
+      { codigo: '0005', nombre: 'AgU' },
+      { codigo: '0010', nombre: 'Bq' },
+      { codigo: '0018', nombre: 'billon CFU' },
+      { codigo: '0021', nombre: 'billon de organismos' },
+      { codigo: '0032', nombre: 'm3' },
+      { codigo: '0046', nombre: 'Gtt' },
+      { codigo: '0047', nombre: 'unidades ELISA' },
+      { codigo: '0053', nombre: 'GBq' },
+      { codigo: '0062', nombre: 'g' },
+      { codigo: '0072', nombre: 'UI' },
+      { codigo: '0082', nombre: 'KUI' },
+      { codigo: '0098', nombre: 'LfU' },
+      { codigo: '0100', nombre: 'l' },
+      { codigo: '0120', nombre: 'MBq' },
+      { codigo: '0128', nombre: 'm' },
+      { codigo: '0137', nombre: 'µg' },
+      { codigo: '0148', nombre: 'µmol' },
+      { codigo: '0151', nombre: 'mCi' },
+      { codigo: '0159', nombre: 'mEq' },
+      { codigo: '0168', nombre: 'mg' },
+      { codigo: '0176', nombre: 'ml' },
+      { codigo: '0179', nombre: 'mmol' },
+      { codigo: '0184', nombre: 'millon UFC' },
+      { codigo: '0187', nombre: 'millon UI' },
+      { codigo: '0188', nombre: 'millon de organismos' },
+      { codigo: '0203', nombre: 'ng' },
+      { codigo: '0212', nombre: 'ppm' },
+      { codigo: '0245', nombre: 'unidad de tuberculina' },
+      { codigo: '0247', nombre: 'U' },
+      { codigo: '0257', nombre: 'vg' },
+      { codigo: '9000', nombre: 'Dosis' },
+      { codigo: '9011', nombre: 'DL50' },
+    ];
+
+    const UNIDADES_TIEMPO = {
+      1: "Minuto(s)",
+      2: "Hora(s)",
+      3: "Día(s)",
+      4: "Semana(s)",
+      5: "Mes(es)",
+      6: "Año",
+      8: "Unica",
+    };
+
+    const getUnidadTiempo = (codigo) => {
+      const cod = Number(codigo);
+      return UNIDADES_TIEMPO[cod] || codigo;
+    };
+
+    const VIA_ADMINISTRACION = {
+      1: "Oral",
+      2: "Sonda",
+    };
+
+    const getViaAdminstracion = (codigo) => {
+      const cod = Number(codigo);
+      return VIA_ADMINISTRACION[cod] || codigo;
+    };
+
+    const getNombreUnidadDosis = (value) => {
+      const raw = value === null || value === undefined ? '' : String(value).trim();
+      if (!raw) return 'N/A';
+
+      const normalized = /^\d+$/.test(raw) ? raw.padStart(4, '0') : raw;
+      const found = UNIDADES_DOSIS.find((item) => item.codigo === normalized || item.codigo === raw);
+      return found?.nombre || raw;
+    };
+
+    const getEstadoJunta = (value) => {
+      const raw = value === null || value === undefined ? '' : String(value).trim();
+      if (!raw) return 'N/A';
+
+      return ESTADOS_TECNOLOGIAS[Number(raw)] || raw;
+    };
+
+    const getCodigoProducto = (prod) => {
+      const candidates = [
+        'codigo_mipres',
+      ];
+
+      for (const key of candidates) {
+        if (prod && prod[key] !== undefined && prod[key] !== null) {
+          const value = String(prod[key]).trim();
+          if (value) return value;
+        }
+      }
+
+      const desc = prod && prod.DescProdNutr !== undefined && prod.DescProdNutr !== null
+        ? String(prod.DescProdNutr).trim()
+        : '';
+
+      return /^\d+$/.test(desc) ? desc : undefined;
+    };
+
+    const getNombreProductoNutricional = (prod) => {
+      const nombre = prod?.nombre_comercial || prod?.nombreComercial || prod?.nom_comercial || prod?.nomComercial;
+      return nombre ? String(nombre).trim() : undefined;
+    };
+
+    const getDescripcionProductoNutricional = (prod) => {
+      const codigo = getCodigoProducto(prod);
+      const nombre = getNombreProductoNutricional(prod);
+      if (codigo && nombre) return `${codigo} - ${nombre}`;
+      if (codigo) return codigo;
+      if (nombre) return nombre;
+      return safe(prod?.DescProdNutr || prod?.DescPN || prod?.DescProd || prod?.Desc);
+    };
+
+    const rootData = window.prescripcion || window.prescripcionData || (window.__DATA__ && window.__DATA__.prescripcion) || null;
+    const prescripcion = rootData && rootData.prescripcion ? rootData.prescripcion : rootData;
+
+    if (!prescripcion) {
+      const body = document.getElementById('detalle-campos-body');
+      if (body) {
+        body.innerHTML = '<tr><td colspan="2" class="no-data">No se recibieron datos de prescripción. Asigne un objeto en window.prescripcion o window.prescripcionData.</td></tr>';
+      }
+      return;
+    }
+
+    const setText = (id, value) => {
+      const el = document.getElementById(id);
+      if (el) el.textContent = safe(value);
+    };
+
+    setText('NoPrescripcion', prescripcion.NoPrescripcion);
+    setText('FPrescripcion', prescripcion.FPrescripcion);
+    setText('HPrescripcion', prescripcion.HPrescripcion);
+    setText('CodHabIPS', prescripcion.CodHabIPS);
+    setText('MunicipioIPS', prescripcion.municipioIPS || `${safe(prescripcion.CodDANEMunIPS)} - Municipio`);
+    setText('DepartamentoIPS', prescripcion.departamentoIPS || 'N/A');
+    setText('DirSedeIPS', prescripcion.DirSedeIPS);
+    setText('TelSedeIPS', prescripcion.TelSedeIPS);
+    setText('PrestadorDoc', `${safe(prescripcion.TipoIDIPS)} ${safe(prescripcion.NroIDIPS)}`);
+    setText('NombreIPS', prescripcion.nombreIPS || 'N/A');
+    setText('PacienteDoc', `${safe(prescripcion.TipoIDPaciente)} ${safe(prescripcion.NroIDPaciente)}`);
+    setText('PAPaciente', prescripcion.PAPaciente);
+    setText('SAPaciente', prescripcion.SAPaciente);
+    setText('PNPaciente', prescripcion.PNPaciente);
+    setText('SNPaciente', prescripcion.SNPaciente);
+    setText('CodDxPpal', prescripcion.CodDxPpal);
+    setText('tipoRegimen', prescripcion.tipoRegimen);
+    setText('AmbitoAtencion', prescripcion.ambitoAtencionNombre || safe(prescripcion.CodAmbAte));
+    setText('ProfesionalDoc', `${safe(prescripcion.TipoIDProf)} ${safe(prescripcion.NumIDProf)}`);
+    setText('ProfesionalNombre', `${safe(prescripcion.PNProfS)} ${safe(prescripcion.SNProfS)} ${safe(prescripcion.PAProfS)} ${safe(prescripcion.SAProfS)}`.replace(/\s+/g, ' ').trim());
+    setText('RegProfS', prescripcion.RegProfS);
+
+    const renderRows = (tbodyId, rows, columns) => {
+      const tbody = document.getElementById(tbodyId);
+      if (!tbody) return;
+
+      const hasData = Array.isArray(rows) && rows.length > 0;
+
+      if (!hasData) {
+        tbody.innerHTML = `<tr class="empty-row"><td colspan="${columns.length}" class="no-data">Sin registros</td></tr>`;
+        // Ocultar la tabla completa en impresión si no hay datos
+        const table = tbody.closest('table');
+        if (table) {
+          table.classList.add('hidden-empty');
+        }
+        return;
+      }
+
+      tbody.innerHTML = rows.map((row) => {
+        const cells = columns.map((col) => `<td>${safe(typeof col === 'function' ? col(row) : row[col])}</td>`).join('');
+        return `<tr>${cells}</tr>`;
+      }).join('');
+    };
+
+    renderRows('medicamentos-body', prescripcion.medicamentos, [
+      'TipoMed',
+      'DescMedPrinAct',
+      (r) => `${safe(r.Dosis)} ${getNombreUnidadDosis(r.DosisUM)}`,
+      'CodVA',
+      (r) => `${safe(r.NoFAdmon)} / ${getUnidadTiempo(r.CodFreAdmon)}`,
+      'IndEsp',
+      (r) => `${safe(r.CanTrat)} / ${getUnidadTiempo(r.DurTrat)}`,
+      'IndRec',
+      (r) => `${safe(r.CantTotalF)} / Forma de empaque: ${safe(r.UFCantTotalF)}`,
+    ]);
+
+    renderRows('procedimientos-body', prescripcion.procedimientos, [
+      (r) => getEstadoJunta(r.EstJM),
+      'CodCUPS',
+      'DescPro',
+      (r) => `${safe(r.Cant)} / ${safe(r.CantTotal)}`,
+      (r) => `${safe(r.Cant)} / ${getUnidadTiempo(r.CodPerDurTrat)}`,
+      'JustNoPBS',
+      'IndRec',
+    ]);
+
+    renderRows('dispositivos-body', prescripcion.dispositivos, [
+      (r) => getEstadoJunta(r.EstJM),
+      'CodDisp',
+      (r) => `${safe(r.Cant)} / ${safe(r.CantTotal)}`,
+      (r) => `${safe(r.CadaFreUso)} / ${getUnidadTiempo(r.CodFreUso)}`,
+      (r) => `${safe(r.Cant)} / ${getUnidadTiempo(r.CodPerDurTrat)}`,
+      'JustNoPBS',
+      'EstJM',
+    ]);
+
+    renderRows('nutricionales-body', prescripcion.productosNutricionales, [
+      (r) => getEstadoJunta(r.EstJM),
+      (r) => getDescripcionProductoNutricional(r),
+      (r) => `${safe(r.Dosis)} ${getNombreUnidadDosis(r.DosisUM)}`,
+      (r) => getViaAdminstracion(r.CodViaAdmon),
+      (r) => `${safe(r.NoFAdmon)} / ${getUnidadTiempo(r.CodFreAdmon)}`,
+      (r) => `${safe(r.CanTrat)} / ${getUnidadTiempo(r.DurTrat)}`,
+      'JustNoPB',
+      (r) => `${safe(r.CantTotalF)} / Forma de empaque: ${safe(r.forma || r.FormaEmpaque || r.FormaEmpaquePN || r.UFCantTotalF)}`,
+    ]);
+
+    renderRows('servicios-body', prescripcion.serviciosComplementarios, [
+      (r) => getEstadoJunta(r.EstJM),
+      'CodSerComp',
+      'DescSerComp',
+      (r) => `${safe(r.Cant)} / ${safe(r.CantTotal)}`,
+      (r) => `${safe(r.CadaFreUso)} / ${getUnidadTiempo(r.CodFreUso)}`,
+      (r) => `${safe(r.Cant)} / ${getUnidadTiempo(r.CodPerDurTrat)}`,
+      'TipoTrans',
+      (r) => Number(r.ReqAcom) === 1 ? `${safe(r.NombAcomAlb)} (${safe(r.NroIDAcomAlb)})` : 'No',
+      (r) => `${safe(r.JustNoPBSSC)} / ${safe(r.IndRec)}`,
+    ]);
+  });
+</script>
+
+</body>
+</html>

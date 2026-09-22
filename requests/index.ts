@@ -1,0 +1,11 @@
+// Exportación de todos los requests
+export * from "./auth.request"
+export * from "./mipres-sispro/token.request"
+export * from "./mipres-sispro/prescripcion.request"
+export { DEFAULT_HEADERS as NODIRECCIONAMIENTO_DEFAULT_HEADERS } from "./mipres-sispro/no-direccionamiento.request"
+export { DEFAULT_HEADERS as TUTELA_DEFAULT_HEADERS }from "./mipres-sispro/tutelas.request"
+export { DEFAULT_HEADERS as DIRECCIONAMIENTO_DEFAULT_HEADERS } from "./mipres-sispro/direccionamiento.request"
+export { DEFAULT_HEADERS as REPORTEENTREGA_DEFAULT_HEADERS } from "./mipres-sispro/reporte-entrega.request"
+export { DEFAULT_HEADERS as PRESCRIPCIONTECNOLOGIAS_DEFAULT_HEADERS } from "./mipres-sispro/prescripcion-tecnologias.request"
+export { DEFAULT_HEADERS as SUMINISTRO_DEFAULT_HEADERS } from "./mipres-sispro/suministro.request"
+export * from "./backend/reportes.requests"
