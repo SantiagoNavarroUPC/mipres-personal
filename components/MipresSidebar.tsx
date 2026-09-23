@@ -14,7 +14,9 @@ import {
   ChevronRight,
   ArrowLeft,
   Users,
-  Receipt
+  Receipt,
+  CalendarClock,
+  Truck
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import type { MipresModule } from "@/app/mipres/page"
@@ -35,6 +37,8 @@ const ICON_MAP: Record<string, React.ElementType> = {
   direccionamiento: ArrowRight,
   tutelas: ClipboardList,
   no_direccionamiento: ArrowLeft,
+  programacion: CalendarClock,
+  entrega: Truck,
   reporte_entrega: ClipboardCheck,
   suministro: Package,
   facturacion: Receipt,

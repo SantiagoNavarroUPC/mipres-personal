@@ -14,6 +14,8 @@ export const MODULOS = [
   { id: "direccionamiento", label: "Direccionamiento", description: "Gestión de direccionamientos" },
   { id: "tutelas", label: "Tutelas", description: "Gestión de tutelas" },
   { id: "no_direccionamiento", label: "No Direccionamiento", description: "Gestión de no direccionamientos" },
+  { id: "programacion", label: "Programación", description: "Gestión de programaciones" },
+  { id: "entrega", label: "Entrega", description: "Gestión de entregas" },
   { id: "reporte_entrega", label: "Reporte de Entrega", description: "Reporte de entrega de tecnologías" },
   { id: "suministro", label: "Suministros", description: "Gestión de suministros" },
   { id: "facturacion", label: "Facturación", description: "Gestión de Facturacion" },

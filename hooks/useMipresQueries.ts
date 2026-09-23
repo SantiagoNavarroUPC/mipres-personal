@@ -6,6 +6,8 @@ import type { Direccionamiento } from "@/models/mipres-sispro/direccionamiento"
 import type { NoDireccionamiento } from "@/models/mipres-sispro/no_direccionamiento/no_direccionamiento"
 import type { ReporteEntrega } from "@/models/mipres-sispro/reporte-entrega/reporte-entrega"
 import type { Suministro } from "@/models/mipres-sispro/suministro/suministro"
+import type { Programacion } from "@/models/mipres-sispro/programacion/programacion"
+import type { Entrega } from "@/models/mipres-sispro/entrega/entrega"
 import type { Tutela } from "@/models/mipres-sispro/tutela/tutela"
 import type { MipresCredentials } from "@/models/credentials.model"
 
@@ -882,6 +884,160 @@ export function useMipresQueryClient() {
                 ? String(sum.ID)
                 : `${sum.NoPrescripcionAsociada || ""}-${sum.ConTecAsociada || ""}`
               map.set(key, sum)
+            })
+
+            return Array.from(map.values())
+          } catch (error) {
+            clearTimeout(timeoutId)
+            throw error
+          }
+        },
+        staleTime: 5 * 60 * 1000,
+        gcTime: 10 * 60 * 1000,
+        retry: 1,
+        retryDelay: 1000,
+      })
+    },
+
+    fetchProgramaciones: async (
+      credentials: MipresCredentials,
+      tipo: "fecha" | "paciente" | "prescripcion" | "rango",
+      params: {
+        fecha?: string
+        fechaInicio?: string
+        fechaFin?: string
+        tipoDoc?: string
+        numDoc?: string
+        noPrescripcion?: string
+      }
+    ): Promise<Programacion[]> => {
+      const queryKey = [
+        "programaciones",
+        credentials.nit,
+        credentials.tokenAccesoSubsidiado,
+        credentials.tokenAccesoContributivo,
+        tipo,
+        params,
+      ]
+
+      return queryClient.fetchQuery({
+        queryKey,
+        queryFn: async () => {
+          const queryParams = new URLSearchParams({
+            nit: credentials.nit,
+            tokenAccesoSubsidiado: credentials.tokenAccesoSubsidiado || "",
+            tokenAccesoContributivo: credentials.tokenAccesoContributivo || "",
+            tipo,
+            ...(params.fecha && { fecha: params.fecha }),
+            ...(params.fechaInicio && { fechaInicio: params.fechaInicio }),
+            ...(params.fechaFin && { fechaFin: params.fechaFin }),
+            ...(params.tipoDoc && { tipoDoc: params.tipoDoc }),
+            ...(params.numDoc && { numDoc: params.numDoc }),
+            ...(params.noPrescripcion && { noPrescripcion: params.noPrescripcion }),
+          })
+
+          const controller = new AbortController()
+          const timeoutId = setTimeout(() => controller.abort(), tipo === "rango" ? 24 * 60 * 60 * 1000 : 30000)
+
+          try {
+            const response = await fetch(`/api/mipres/programacion?${queryParams.toString()}`, {
+              signal: controller.signal,
+            })
+            clearTimeout(timeoutId)
+
+            const result: ApiResponse<Programacion> = await response.json()
+
+            if (!result.success) {
+              throw new Error(result.error || "Error al consultar programaciones")
+            }
+
+            const items: Programacion[] = Array.isArray(result.data)
+              ? result.data
+              : result.data ? [result.data] : []
+
+            const map = new Map<string, Programacion>()
+            items.forEach((item) => {
+              const key = item.ID
+                ? String(item.ID)
+                : `${item.IDProgramacion || ""}-${item.NoPrescripcion || ""}-${item.TipoTec || ""}-${item.ConTec ?? 0}-${item.NoEntrega ?? 0}`
+              map.set(key, item)
+            })
+
+            return Array.from(map.values())
+          } catch (error) {
+            clearTimeout(timeoutId)
+            throw error
+          }
+        },
+        staleTime: 5 * 60 * 1000,
+        gcTime: 10 * 60 * 1000,
+        retry: 1,
+        retryDelay: 1000,
+      })
+    },
+
+    fetchEntregas: async (
+      credentials: MipresCredentials,
+      tipo: "fecha" | "paciente" | "prescripcion" | "rango",
+      params: {
+        fecha?: string
+        fechaInicio?: string
+        fechaFin?: string
+        tipoDoc?: string
+        numDoc?: string
+        noPrescripcion?: string
+      }
+    ): Promise<Entrega[]> => {
+      const queryKey = [
+        "entregas",
+        credentials.nit,
+        credentials.tokenAccesoSubsidiado,
+        credentials.tokenAccesoContributivo,
+        tipo,
+        params,
+      ]
+
+      return queryClient.fetchQuery({
+        queryKey,
+        queryFn: async () => {
+          const queryParams = new URLSearchParams({
+            nit: credentials.nit,
+            tokenAccesoSubsidiado: credentials.tokenAccesoSubsidiado || "",
+            tokenAccesoContributivo: credentials.tokenAccesoContributivo || "",
+            tipo,
+            ...(params.fecha && { fecha: params.fecha }),
+            ...(params.fechaInicio && { fechaInicio: params.fechaInicio }),
+            ...(params.fechaFin && { fechaFin: params.fechaFin }),
+            ...(params.tipoDoc && { tipoDoc: params.tipoDoc }),
+            ...(params.numDoc && { numDoc: params.numDoc }),
+            ...(params.noPrescripcion && { noPrescripcion: params.noPrescripcion }),
+          })
+
+          const controller = new AbortController()
+          const timeoutId = setTimeout(() => controller.abort(), tipo === "rango" ? 24 * 60 * 60 * 1000 : 30000)
+
+          try {
+            const response = await fetch(`/api/mipres/entrega?${queryParams.toString()}`, {
+              signal: controller.signal,
+            })
+            clearTimeout(timeoutId)
+
+            const result: ApiResponse<Entrega> = await response.json()
+
+            if (!result.success) {
+              throw new Error(result.error || "Error al consultar entregas")
+            }
+
+            const items: Entrega[] = Array.isArray(result.data)
+              ? result.data
+              : result.data ? [result.data] : []
+
+            const map = new Map<string, Entrega>()
+            items.forEach((item) => {
+              const key = item.ID
+                ? String(item.ID)
+                : `${item.IDEntrega || ""}-${item.NoPrescripcion || ""}-${item.TipoTec || ""}-${item.ConTec ?? 0}-${item.NoEntrega ?? 0}`
+              map.set(key, item)
             })
 
             return Array.from(map.values())

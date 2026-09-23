@@ -8,4 +8,6 @@ export { DEFAULT_HEADERS as DIRECCIONAMIENTO_DEFAULT_HEADERS } from "./mipres-si
 export { DEFAULT_HEADERS as REPORTEENTREGA_DEFAULT_HEADERS } from "./mipres-sispro/reporte-entrega.request"
 export { DEFAULT_HEADERS as PRESCRIPCIONTECNOLOGIAS_DEFAULT_HEADERS } from "./mipres-sispro/prescripcion-tecnologias.request"
 export { DEFAULT_HEADERS as SUMINISTRO_DEFAULT_HEADERS } from "./mipres-sispro/suministro.request"
+export { DEFAULT_HEADERS as PROGRAMACION_DEFAULT_HEADERS } from "./mipres-sispro/programacion.request"
+export { DEFAULT_HEADERS as ENTREGA_DEFAULT_HEADERS } from "./mipres-sispro/entrega.request"
 export * from "./backend/reportes.requests"

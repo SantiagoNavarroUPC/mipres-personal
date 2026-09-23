@@ -1,0 +1,5 @@
+export {EntregaHeader} from "./EntregaHeader"
+export {EntregaSearchDate} from "./EntregaSearchDate"
+export {EntregaSearchPrescription} from "./EntregaSearchPrescription"
+export {EntregaSearchPaciente} from "./EntregaSearchPaciente"
+export {EntregaTable} from "../../components/mipres/component-entrega/EntregaTable"

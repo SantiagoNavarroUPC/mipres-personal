@@ -13,6 +13,8 @@ import {
   Settings,
   ArrowLeft,
   Users,
+  CalendarClock,
+  Truck,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Switch } from "@/components/ui/switch"
@@ -160,6 +162,8 @@ export function PermisosModal({
                 direccionamiento: ArrowRight,
                 tutelas: ClipboardList,
                 no_direccionamiento: ArrowLeft,
+                programacion: CalendarClock,
+                entrega: Truck,
                 reporte_entrega: ClipboardCheck,
                 suministro: Package,
                 usuarios: Users,

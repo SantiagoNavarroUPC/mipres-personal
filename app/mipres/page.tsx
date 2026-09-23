@@ -8,6 +8,8 @@ import { PrescripcionModule } from "@/modules/PrescripcionModule"
 import { DireccionamientoModule } from "@/modules/DireccionamientoModule"
 import { NoDireccionamientoModule } from "@/modules/NoDireccionamientoModule"
 import { SuministroModule } from "@/modules/SuministroModule"
+import { ProgramacionModule } from "@/modules/ProgramacionModule"
+import { EntregaModule } from "@/modules/EntregaModule"
 import { TutelasModule } from "@/modules/TutelaModule"
 import { ConfiguracionModule } from "@/modules/ConfiguracionModule"
 import { UsuariosModule } from "@/modules/UsuariosModule"
@@ -20,7 +22,7 @@ import { obtenerPermisosPorRol } from "@/requests/Backend/permisos.requests"
 import type { Permiso } from "@/models/permisos.model"
 import { MODULOS } from "@/models/permisos.model"
 
-export type MipresModule = "prescripcion" | "direccionamiento" | "no_direccionamiento" | "reporte_entrega" | "suministro" | "facturacion" | "tutelas" | "configuracion" | "usuarios" | "informes"
+export type MipresModule = "prescripcion" | "direccionamiento" | "no_direccionamiento" | "programacion" | "entrega" | "reporte_entrega" | "suministro" | "facturacion" | "tutelas" | "configuracion" | "usuarios" | "informes"
 
 export type { MipresCredentials } from "@/models/credentials.model"
 
@@ -135,6 +137,8 @@ function MipresContent() {
       moduleParam === "prescripcion" ||
       moduleParam === "direccionamiento" ||
       moduleParam === "no_direccionamiento" ||
+      moduleParam === "programacion" ||
+      moduleParam === "entrega" ||
       moduleParam === "suministro" ||
       moduleParam === "facturacion" ||
       moduleParam === "tutelas" ||
@@ -185,6 +189,10 @@ function MipresContent() {
         return <DireccionamientoModule credentials={credentials} />
       case "no_direccionamiento":
         return <NoDireccionamientoModule credentials={credentials} />
+      case "programacion":
+        return <ProgramacionModule credentials={credentials} />
+      case "entrega":
+        return <EntregaModule credentials={credentials} />
       case "reporte_entrega":
         return <ReporteEntregaModule credentials={credentials} />
       case "suministro":

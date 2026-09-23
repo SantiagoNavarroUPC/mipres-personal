@@ -6,6 +6,8 @@ export * from "./mipres-controller/no-direccionamiento-controller/no-direccionam
 export * from "./mipres-controller/tutela-controller/tutela.controller"
 export * from "./mipres-controller/reporte-entrega-controller/reporte-entrega.controller"
 export * from "./mipres-controller/suministro-controller/suministro.controller"
+export * from "./mipres-controller/programacion-controller/programacion.controller"
+export * from "./mipres-controller/entrega-controller/entrega.controller"
 export * from "./usuarios-controller/usuarios.controller"
 export * from "./reportes-controller/reportes.controller"
 export * from "./permisos-controller/permisos.controller"
