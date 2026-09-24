@@ -3,12 +3,14 @@
 import { Badge } from "@/components/ui/badge"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { CalendarClock, AlertCircle } from "lucide-react"
+import { useEmpresaActual } from "@/lib/use-empresa-actual"
 
 interface ProgramacionHeaderProps {
   isConfigured: boolean
 }
 
 export function ProgramacionHeader({ isConfigured }: ProgramacionHeaderProps) {
+  const { esIPS } = useEmpresaActual()
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
@@ -20,7 +22,7 @@ export function ProgramacionHeader({ isConfigured }: ProgramacionHeaderProps) {
             Programaciones
           </h2>
           <p className="text-muted-foreground">
-            Gestión de programaciones para EPS
+            Gestión de programaciones para {esIPS ? "IPS" : "EPS"}
           </p>
         </div>
         <div className="flex items-center gap-2">

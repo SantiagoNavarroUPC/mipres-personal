@@ -15,6 +15,15 @@ export interface MipresCredentials {
   documentoUsuario?: string
   rolMipres?: RolMipres
   rol_nombre?: string
+  // Empresa (mipres.empresa) asignada al usuario logueado (ya no una única
+  // "empresa actual" por variable de entorno: cada usuario tiene la suya).
+  nombreEmpresa?: string
+  direccionEmpresa?: string
+  municipioEmpresa?: string
+  municipioCodigoEmpresa?: string
+  departamentoEmpresa?: string
+  departamentoCodigoEmpresa?: string
+  idTipoEmpresa?: number
 }
 
 export interface TokenResponse {
@@ -37,6 +46,7 @@ export interface AuthRegisterRequest {
   usuario: string
   password: string
   rol_mipres?: number
+  id_empresa: number
 }
 
 export interface AuthLoginApiResponse {
@@ -47,6 +57,14 @@ export interface AuthLoginApiResponse {
   usuario: string
   rol_mipres: number
   rol_nombre?: string
+  nit?: string
+  nombre_empresa?: string
+  direccion_empresa?: string
+  municipio_empresa?: string
+  municipio_codigo_empresa?: string
+  departamento_empresa?: string
+  departamento_codigo_empresa?: string
+  id_tipo_empresa?: number
 }
 
 export interface AuthSession {
@@ -57,6 +75,17 @@ export interface AuthSession {
   usuario: string
   rolMipres: RolMipres
   rolNombre?: string
+  // Empresa (mipres.empresa) asignada al usuario, tal como la devuelve el
+  // backend (login/refresh). Sin esto, el NIT/nombre de empresa nunca llega
+  // al cliente y la card de Configuración/el header quedan sin datos.
+  nit?: string
+  nombreEmpresa?: string
+  direccionEmpresa?: string
+  municipioEmpresa?: string
+  municipioCodigoEmpresa?: string
+  departamentoEmpresa?: string
+  departamentoCodigoEmpresa?: string
+  idTipoEmpresa?: number
 }
 
 export interface AuthLoginResult {

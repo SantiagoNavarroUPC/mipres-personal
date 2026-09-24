@@ -156,6 +156,7 @@ export async function fetchAuthRegister(payload: AuthRegisterRequest): Promise<{
           typeof payload.rol_mipres === "number" && Number.isFinite(payload.rol_mipres) && payload.rol_mipres > 0
             ? payload.rol_mipres
             : 3,
+        id_empresa: payload.id_empresa,
       }),
       cache: "no-store",
     })

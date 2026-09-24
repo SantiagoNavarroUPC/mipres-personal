@@ -66,6 +66,14 @@ export async function autenticarUsuario(payload: AuthLoginRequest): Promise<Auth
         usuario: result.data.usuario,
         rolMipres,
         rolNombre,
+        nit: result.data.nit,
+        nombreEmpresa: result.data.nombre_empresa,
+        direccionEmpresa: result.data.direccion_empresa,
+        municipioEmpresa: result.data.municipio_empresa,
+        municipioCodigoEmpresa: result.data.municipio_codigo_empresa,
+        departamentoEmpresa: result.data.departamento_empresa,
+        departamentoCodigoEmpresa: result.data.departamento_codigo_empresa,
+        idTipoEmpresa: result.data.id_tipo_empresa,
       },
       status: result.status,
     }
@@ -121,6 +129,14 @@ export async function renovarSesion(refreshToken: string): Promise<AuthLoginResu
         usuario: result.data.usuario,
         rolMipres,
         rolNombre,
+        nit: result.data.nit,
+        nombreEmpresa: result.data.nombre_empresa,
+        direccionEmpresa: result.data.direccion_empresa,
+        municipioEmpresa: result.data.municipio_empresa,
+        municipioCodigoEmpresa: result.data.municipio_codigo_empresa,
+        departamentoEmpresa: result.data.departamento_empresa,
+        departamentoCodigoEmpresa: result.data.departamento_codigo_empresa,
+        idTipoEmpresa: result.data.id_tipo_empresa,
       },
       status: result.status,
     }
@@ -185,6 +201,7 @@ export async function registrarUsuarioMipres(payload: AuthRegisterRequest): Prom
       typeof payload.rol_mipres === "number" && Number.isFinite(payload.rol_mipres) && payload.rol_mipres > 0
         ? payload.rol_mipres
         : 3
+    const idEmpresa = payload.id_empresa
 
     if (!usuario || !password) {
       return {
@@ -194,7 +211,15 @@ export async function registrarUsuarioMipres(payload: AuthRegisterRequest): Prom
       }
     }
 
-    const result = await fetchAuthRegister({ usuario, password, rol_mipres: rolMipres })
+    if (!Number.isFinite(idEmpresa) || idEmpresa <= 0) {
+      return {
+        success: false,
+        error: "Empresa es requerida",
+        status: 400,
+      }
+    }
+
+    const result = await fetchAuthRegister({ usuario, password, rol_mipres: rolMipres, id_empresa: idEmpresa })
 
     if (!result.success) {
       return {

@@ -12,6 +12,13 @@ type Credentials = {
   contrasena?: string
   rolMipres?: number
   rol_nombre?: string | null
+  nombreEmpresa?: string | null
+  direccionEmpresa?: string | null
+  municipioEmpresa?: string | null
+  municipioCodigoEmpresa?: string | null
+  departamentoEmpresa?: string | null
+  departamentoCodigoEmpresa?: string | null
+  idTipoEmpresa?: number | null
   authToken?: string
   refreshToken?: string | null
   expiresAt?: number // Timestamp en ms cuando expira el access token
@@ -164,6 +171,14 @@ async function tryRefresh(): Promise<boolean> {
       documentoUsuario: data.usuario || creds.documentoUsuario,
       rolMipres: data.rol_mipres ?? creds.rolMipres,
       rol_nombre: data.rol_nombre ?? creds.rol_nombre,
+      nit: data.nit ?? creds.nit,
+      nombreEmpresa: data.nombre_empresa ?? creds.nombreEmpresa,
+      direccionEmpresa: data.direccion_empresa ?? creds.direccionEmpresa,
+      municipioEmpresa: data.municipio_empresa ?? creds.municipioEmpresa,
+      municipioCodigoEmpresa: data.municipio_codigo_empresa ?? creds.municipioCodigoEmpresa,
+      departamentoEmpresa: data.departamento_empresa ?? creds.departamentoEmpresa,
+      departamentoCodigoEmpresa: data.departamento_codigo_empresa ?? creds.departamentoCodigoEmpresa,
+      idTipoEmpresa: data.id_tipo_empresa ?? creds.idTipoEmpresa,
       expiresAt: Date.now() + expiresInSeconds * 1000,
       // El backend rota el refresh token en cada renovacion; si por algun
       // motivo no llega uno nuevo, se conserva el actual como fallback.

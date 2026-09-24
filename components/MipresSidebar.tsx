@@ -13,7 +13,7 @@ import {
   Settings,
   ChevronRight,
   ArrowLeft,
-  Users,
+  Wrench,
   Receipt,
   CalendarClock,
   Truck
@@ -42,7 +42,7 @@ const ICON_MAP: Record<string, React.ElementType> = {
   reporte_entrega: ClipboardCheck,
   suministro: Package,
   facturacion: Receipt,
-  usuarios: Users,
+  usuarios: Wrench,
   informes: FileBarChart,
   configuracion: Settings,
 }

@@ -23,6 +23,7 @@ export async function POST(request: NextRequest) {
         ? body.rol_descripcion.trim()
         : ""
     const estado = typeof body?.estado === "boolean" ? body.estado : true
+    const idTipoEmpresa = Number(body?.id_tipo_empresa)
 
     if (!nombre) {
       return NextResponse.json(
@@ -30,7 +31,13 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       )
     }
-    const result = await crearRol(nombre, descripcion || null, estado, authToken)
+    if (![1, 2, 3].includes(idTipoEmpresa)) {
+      return NextResponse.json(
+        { success: false, message: "id_tipo_empresa es requerido (1=IPS, 2=EPS, 3=AMBAS)" },
+        { status: 400 }
+      )
+    }
+    const result = await crearRol(nombre, descripcion || null, estado, idTipoEmpresa, authToken)
     if (!result.success) {
       return NextResponse.json(
         { success: false, message: result.error || "No se pudo crear el rol" },

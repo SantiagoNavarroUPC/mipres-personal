@@ -17,7 +17,7 @@ import {
 import type { MipresCredentials } from "@/models/credentials.model"
 import { secureStorageRemoveItem } from "@/lib/secure-storage"
 import { NotificationBell } from "./NotificationBell"
-import { IPS_DUSAKAWI } from "@/lib/config/organizacion"
+import { useEmpresaActual } from "@/lib/use-empresa-actual"
 
 interface MipresHeaderProps {
   credentials: MipresCredentials
@@ -27,6 +27,7 @@ interface MipresHeaderProps {
 export function MipresHeader({ credentials, onToggleSidebar }: MipresHeaderProps) {
   const router = useRouter()
   const { resolvedTheme, setTheme } = useTheme()
+  const { esIPS } = useEmpresaActual()
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
@@ -111,7 +112,7 @@ export function MipresHeader({ credentials, onToggleSidebar }: MipresHeaderProps
           <div className="flex items-center gap-3">
             <div className="min-w-0">
               <h1 className="text-lg sm:text-xl font-bold tracking-tight">MIPRES</h1>
-              <p className="hidden sm:block text-xs text-appbar-foreground/80 truncate">Sistema de Prescripciones de {IPS_DUSAKAWI.nombreIPS}</p>
+              <p className="hidden sm:block text-xs text-appbar-foreground/80 truncate">Sistema de Prescripciones de {credentials.nombreEmpresa || "MIPRES"}</p>
             </div>
           </div>
         </div>
@@ -126,7 +127,7 @@ export function MipresHeader({ credentials, onToggleSidebar }: MipresHeaderProps
             variant={isConfigured ? "secondary" : "destructive"}
             className="hidden sm:flex"
           >
-            {isConfigured ? `NIT EPS: ${credentials.nit}` : "Sin Validar Token"}
+            {isConfigured ? `NIT ${esIPS ? "IPS" : "EPS"}: ${credentials.nit}` : "Sin Validar Token"}
           </Badge>
           <Button
             variant="ghost"

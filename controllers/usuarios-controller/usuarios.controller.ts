@@ -19,6 +19,7 @@ export async function crearRol(
   nombre: string,
   descripcion: string | null,
   estado: boolean,
+  idTipoEmpresa: number,
   authToken: string
 ): Promise<CrearRolResult> {
   const token = authToken.trim()
@@ -36,7 +37,14 @@ export async function crearRol(
       error: "nombre es requerido",
     }
   }
-  const response = await crearRolRequest(nombre.trim(), descripcion, estado, token)
+  if (![1, 2, 3].includes(idTipoEmpresa)) {
+    return {
+      success: false,
+      status: 400,
+      error: "id_tipo_empresa es requerido (1=IPS, 2=EPS, 3=AMBAS)",
+    }
+  }
+  const response = await crearRolRequest(nombre.trim(), descripcion, estado, idTipoEmpresa, token)
   if (!response.success) {
     return {
       success: false,

@@ -3,12 +3,14 @@
 import { Badge } from "@/components/ui/badge"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { ClipboardList, AlertCircle } from "lucide-react"
+import { useEmpresaActual } from "@/lib/use-empresa-actual"
 
 interface TutelaHeaderProps {
   isConfigured: boolean
 }
 
 export function TutelaHeader({ isConfigured }: TutelaHeaderProps) {
+  const { esIPS } = useEmpresaActual()
   return (
     <>
       <div className="flex items-center justify-between">
@@ -20,7 +22,7 @@ export function TutelaHeader({ isConfigured }: TutelaHeaderProps) {
             Tutelas
           </h2>
           <p className="text-muted-foreground">
-            Consulta de tutelas MIPRES para EPS/IPS
+            Consulta de tutelas MIPRES para {esIPS ? "IPS" : "EPS"}
           </p>
         </div>
         <div className="flex items-center gap-2">

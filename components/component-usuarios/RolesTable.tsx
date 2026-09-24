@@ -17,6 +17,13 @@ interface RoleItem {
 	rol_nombre: string
 	rol_descripcion?: string
 	estado?: boolean
+	id_tipo_empresa?: number
+}
+
+const TIPO_EMPRESA_LABEL: Record<number, string> = {
+	1: "IPS",
+	2: "EPS",
+	3: "Ambas",
 }
 
 interface RolesTableProps {
@@ -172,6 +179,7 @@ export default function RolesTable({ credentials }: RolesTableProps) {
 				onOpenChange={setPermisosModalOpen}
 				rolId={selectedRolForPermisos?.consecutivo_rol ?? 0}
 				rolNombre={selectedRolForPermisos?.rol_nombre ?? ""}
+				rolTipoEmpresa={selectedRolForPermisos?.id_tipo_empresa}
 				credentials={credentials}
 			/>
 
@@ -219,6 +227,11 @@ export default function RolesTable({ credentials }: RolesTableProps) {
 										<p className="mt-1 text-xs text-muted-foreground">
 											{role.rol_descripcion?.trim() || "Sin descripción"}
 										</p>
+										{role.id_tipo_empresa ? (
+											<span className="mt-1 inline-block rounded-full bg-muted px-2 py-0.5 text-[10px] font-medium text-muted-foreground">
+												{TIPO_EMPRESA_LABEL[role.id_tipo_empresa] ?? role.id_tipo_empresa}
+											</span>
+										) : null}
 									</div>
 									<div className="flex flex-col items-end gap-8 pt-6">
 										<div className="flex items-center gap-2">

@@ -33,6 +33,14 @@ import DialogoCrearUsuario from "@/components/component-usuarios/UsuariosModalCr
 type Role = {
 	consecutivo_rol: number
 	rol_nombre: string
+	id_tipo_empresa: number
+}
+
+type Empresa = {
+	id_empresa: number
+	nombre: string
+	nit: string
+	id_tipo_empresa: number
 }
 
 type User = {
@@ -57,8 +65,10 @@ interface UsuariosTableProps {
 export default function UsuariosTable({ authToken }: UsuariosTableProps) {
 	const [users, setUsers] = useState<User[]>([])
 	const [roles, setRoles] = useState<Role[]>([])
+	const [empresas, setEmpresas] = useState<Empresa[]>([])
 	const [loading, setLoading] = useState(false)
 	const [loadingRoles, setLoadingRoles] = useState(false)
+	const [loadingEmpresas, setLoadingEmpresas] = useState(false)
 	const [updatingRole, setUpdatingRole] = useState(false)
 	const [updatingId, setUpdatingId] = useState<string | null>(null)
 	const [openCreateUser, setOpenCreateUser] = useState(false)
@@ -120,6 +130,26 @@ export default function UsuariosTable({ authToken }: UsuariosTableProps) {
 			toast({ title: "Error", description: String(error), variant: "destructive" })
 		} finally {
 			setLoadingRoles(false)
+		}
+	}
+
+	async function loadEmpresas() {
+		if (empresas.length > 0) return
+		setLoadingEmpresas(true)
+		try {
+			const res = await fetchWithAuth("/api/empresa/asignables")
+			const body = await res.json()
+			if (res.ok && body && Array.isArray(body.data)) {
+				setEmpresas(body.data as Empresa[])
+			} else {
+				setEmpresas([])
+				toast({ title: "No se pudieron cargar empresas", description: body?.message || "Respuesta inesperada", variant: "destructive" })
+			}
+		} catch (error) {
+			setEmpresas([])
+			toast({ title: "Error", description: String(error), variant: "destructive" })
+		} finally {
+			setLoadingEmpresas(false)
 		}
 	}
 
@@ -247,7 +277,7 @@ export default function UsuariosTable({ authToken }: UsuariosTableProps) {
 				<Button
 					onClick={async () => {
 						setOpenCreateUser(true)
-						await loadRoles()
+						await Promise.all([loadRoles(), loadEmpresas()])
 					}}
 					size="icon"
 					variant="ghost"
@@ -265,6 +295,8 @@ export default function UsuariosTable({ authToken }: UsuariosTableProps) {
 				onOpenChange={setOpenCreateUser}
 				roles={roles}
 				loadingRoles={loadingRoles}
+				empresas={empresas}
+				loadingEmpresas={loadingEmpresas}
 				onCreated={async () => {
 					setCurrentPage(1)
 					await fetchUsers()

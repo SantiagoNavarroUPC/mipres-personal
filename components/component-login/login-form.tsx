@@ -2,33 +2,44 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { User, Lock, Eye, EyeOff, Loader2, UserPlus } from "lucide-react"
+import { User, Lock, Eye, EyeOff, Loader2 } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
 import { secureStorageRemoveItem, secureStorageSetItem } from "@/lib/secure-storage"
 
-const TOKEN_SUBSIDIADO = process.env.NEXT_PUBLIC_TOKEN_SUBSIDIADO
-const TOKEN_CONTRIBUTIVO = process.env.NEXT_PUBLIC_TOKEN_CONTRIBUTIVO
-const NIT_EPSI = process.env.NEXT_PUBLIC_NIT_EPSI
+// El NIT y el tipo de empresa (IPS/EPS) ya no vienen de NEXT_PUBLIC_NIT_EPSI/
+// NEXT_PUBLIC_NIT_IPS/NEXT_PUBLIC_TIPO_USUARIO: cada usuario tiene su propia
+// empresa (mipres.usuario_mipres.id_empresa), y /api/auth/login ya devuelve
+// nit/nombre_empresa/id_tipo_empresa de esa empresa. Para IPS el token sigue
+// siendo un secreto por variable de entorno (ya viene validado, no hay
+// intercambio). Para EPS, las credenciales (fuente + token de acceso ya
+// validado) se guardan por empresa en la BD (ver ConfiguracionModule) y se
+// cargan aquí mismo tras el login, para que el header no pida revalidar cada
+// sesión si ya estaban guardadas.
+const TOKEN_VALIDADO = process.env.NEXT_PUBLIC_TOKEN_VALIDADO
 
-async function generarTokenAcceso(nit: string, token: string) {
-  const response = await fetch("/api/mipres/generar-token", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ nit, token }),
-  })
+interface CredencialesMipresDb {
+  token_subsidiado: string | null
+  token_contributivo: string | null
+  token_subsidiado_validado: string | null
+  token_contributivo_validado: string | null
+}
 
-  const payload = await response.json().catch(() => null)
-
-  return {
-    success: Boolean(response.ok && payload?.success),
-    tokenAcceso: typeof payload?.tokenAcceso === "string" ? payload.tokenAcceso : "",
-    error: payload?.error || payload?.message || (response.ok ? "" : "No se pudo generar el token"),
+async function obtenerCredencialesMipres(authToken: string): Promise<CredencialesMipresDb | null> {
+  try {
+    const response = await fetch("/api/empresa/mis-credenciales-mipres", {
+      headers: { Authorization: `Bearer ${authToken}` },
+    })
+    const payload = await response.json().catch(() => null)
+    if (!response.ok || !payload?.success) return null
+    return payload.data as CredencialesMipresDb
+  } catch {
+    return null
   }
 }
 
-export function LoginForm({ onCreateAccount }: { onCreateAccount?: () => void }) {
+export function LoginForm() {
   const router = useRouter()
   const [usuario, setUsuario] = useState("")
   const [contrasena, setContrasena] = useState("")
@@ -55,17 +66,32 @@ export function LoginForm({ onCreateAccount }: { onCreateAccount?: () => void })
         return
       }
 
-      const nit = String(NIT_EPSI || "").trim()
-      const [resultadoSubsidiado, resultadoContributivo] = nit && TOKEN_SUBSIDIADO && TOKEN_CONTRIBUTIVO
-        ? await Promise.all([
-            generarTokenAcceso(nit, TOKEN_SUBSIDIADO),
-            generarTokenAcceso(nit, TOKEN_CONTRIBUTIVO),
-          ])
-        : [{ success: false, tokenAcceso: "", error: "" }, { success: false, tokenAcceso: "", error: "" }]
+      // IPS: el NIT y el token ya vienen validados (TOKEN_VALIDADO), no hay
+      // intercambio contra MIPRES. EPS: las credenciales (fuente + token de
+      // acceso ya validado) ya deben estar guardadas en la BD para esta
+      // empresa (Configuración > Credenciales/Validación); si no lo están,
+      // el header quedará "Sin Validar Token" hasta que se guarden ahí.
+      const nit = String(data.nit || "").trim()
+      const esIPS = data.id_tipo_empresa === 1
 
-      const tokenAccesoSubsidiado = resultadoSubsidiado.tokenAcceso || ""
-      const tokenAccesoContributivo = resultadoContributivo.tokenAcceso || ""
-      const tokenAcceso = tokenAccesoSubsidiado || tokenAccesoContributivo || ""
+      let tokenSubsidiado = ""
+      let tokenContributivo = ""
+      let tokenAccesoSubsidiado = ""
+      let tokenAccesoContributivo = ""
+      let tokenAcceso = ""
+
+      if (esIPS) {
+        tokenAcceso = String(TOKEN_VALIDADO || "").trim()
+        tokenAccesoSubsidiado = tokenAcceso
+        tokenAccesoContributivo = tokenAcceso
+      } else {
+        const credencialesMipres = await obtenerCredencialesMipres(data.token)
+        tokenSubsidiado = credencialesMipres?.token_subsidiado || ""
+        tokenContributivo = credencialesMipres?.token_contributivo || ""
+        tokenAccesoSubsidiado = credencialesMipres?.token_subsidiado_validado || ""
+        tokenAccesoContributivo = credencialesMipres?.token_contributivo_validado || ""
+        tokenAcceso = tokenAccesoSubsidiado || tokenAccesoContributivo || ""
+      }
 
       // El backend firma el JWT con una duración corta (ver JWT_EXPIRES_IN en
       // api-dusakawi); usar ese valor real evita que el cliente crea tener
@@ -93,12 +119,19 @@ export function LoginForm({ onCreateAccount }: { onCreateAccount?: () => void })
           documentoUsuario: data.usuario,
           rolMipres: data.rol_mipres,
           rol_nombre: data.rol_nombre ?? null,
+          nombreEmpresa: data.nombre_empresa ?? null,
+          direccionEmpresa: data.direccion_empresa ?? null,
+          municipioEmpresa: data.municipio_empresa ?? null,
+          municipioCodigoEmpresa: data.municipio_codigo_empresa ?? null,
+          departamentoEmpresa: data.departamento_empresa ?? null,
+          departamentoCodigoEmpresa: data.departamento_codigo_empresa ?? null,
+          idTipoEmpresa: data.id_tipo_empresa ?? null,
           authToken: data.token,
           refreshToken: data.refreshToken || null,
           expiresAt,
           refreshExpiresAt,
-          tokenSubsidiado: TOKEN_SUBSIDIADO,
-          tokenContributivo: TOKEN_CONTRIBUTIVO,
+          tokenSubsidiado: esIPS ? tokenAcceso : tokenSubsidiado,
+          tokenContributivo: esIPS ? tokenAcceso : tokenContributivo,
           tokenAccesoSubsidiado,
           tokenAccesoContributivo,
         })
@@ -180,19 +213,6 @@ export function LoginForm({ onCreateAccount }: { onCreateAccount?: () => void })
           "Ingresar"
         )}
       </Button>
-
-      {onCreateAccount && (
-        <Button
-          type="button"
-          variant="ghost"
-          className="h-9 w-full text-sm text-muted-foreground hover:text-foreground"
-          onClick={onCreateAccount}
-          disabled={isLoading}
-        >
-          <UserPlus className="size-4" />
-          Crear cuenta nueva
-        </Button>
-      )}
     </form>
   )
 }

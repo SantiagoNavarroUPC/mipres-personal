@@ -41,6 +41,7 @@ export async function crearRolRequest(
   nombre: string,
   descripcion: string | null,
   estado: boolean,
+  idTipoEmpresa: number,
   authToken: string
 ): Promise<RequestResult<CrearRolApiResponse>> {
   const response = await fetch(`${DUSAKAWI_API_URL}/api/usuarios/roles`, {
@@ -53,6 +54,7 @@ export async function crearRolRequest(
       nombre,
       descripcion: descripcion ?? null,
       estado,
+      id_tipo_empresa: idTipoEmpresa,
     }),
     cache: "no-store",
   });

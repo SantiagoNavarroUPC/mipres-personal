@@ -3,6 +3,7 @@ import {
   fetchProgramacionPorFecha,
   fetchProgramacionPorPaciente,
   fetchProgramacionPorPrescripcion,
+  putProgramacion,
   type TipoConsultaProgramacion,
 } from "@/requests/mipres-sispro/programacion.request"
 import {
@@ -42,6 +43,44 @@ function extractProgramaciones(raw: any): any[] {
       ...item,
       ID: item.ID || item.IDProgramacion,
     }))
+}
+
+/**
+ * Registrar Programación
+ */
+export async function registrarProgramacion(
+  credentials: MipresCredentials,
+  payload: unknown
+): Promise<{ success: boolean; data?: unknown; error?: string; details?: unknown }> {
+  try {
+    const token = getTokenAcceso(credentials)
+
+    if (!credentials.nit || !token) {
+      return { success: false, error: "NIT y token de acceso son requeridos" }
+    }
+
+    if (!payload || typeof payload !== "object") {
+      return { success: false, error: "Datos de programación requeridos" }
+    }
+
+    const result = await putProgramacion(credentials.nit, token, payload)
+
+    if (result.success) {
+      return { success: true, data: result.data }
+    }
+
+    return {
+      success: false,
+      error: result.error || "Error al registrar programación",
+      details: result.data,
+    }
+  } catch (error) {
+    return {
+      success: false,
+      error: "Error en el registro de programación",
+      details: error instanceof Error ? error.message : "Error desconocido",
+    }
+  }
 }
 
 /**

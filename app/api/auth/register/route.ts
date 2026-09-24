@@ -25,6 +25,7 @@ export async function POST(request: Request) {
       typeof body?.rol_mipres === "number"
         ? body.rol_mipres
         : Number(body?.rol_mipres)
+    const idEmpresa = Number(body?.id_empresa)
 
     if (!usuario || !password) {
       return NextResponse.json(
@@ -33,10 +34,18 @@ export async function POST(request: Request) {
       )
     }
 
+    if (!Number.isInteger(idEmpresa) || idEmpresa <= 0) {
+      return NextResponse.json(
+        { message: "Empresa es requerida" },
+        { status: 400 }
+      )
+    }
+
     const result = await registrarUsuarioMipres({
       usuario,
       password,
       rol_mipres: Number.isFinite(rolMipres) && rolMipres > 0 ? rolMipres : 3,
+      id_empresa: idEmpresa,
     })
 
     if (!result.success) {

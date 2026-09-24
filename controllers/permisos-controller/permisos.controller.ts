@@ -1,5 +1,5 @@
-import { obtenerPermisosPorRol, actualizarPermiso, agregarPermiso } from "@/requests/Backend/permisos.requests"
-import type { Permiso, PermisosResponse } from "@/models/permisos.model"
+import { obtenerPermisosPorRol, actualizarPermiso, agregarPermiso, obtenerModulos } from "@/requests/Backend/permisos.requests"
+import type { Permiso, PermisosResponse, ModuloApp } from "@/models/permisos.model"
 
 export interface ObtenerPermisosResult {
   success: boolean
@@ -23,6 +23,45 @@ export interface CrearPermisoResult {
   data?: Permiso
   status?: number
   error?: string
+}
+
+export interface ObtenerModulosResult {
+  success: boolean
+  message?: string
+  data?: ModuloApp[]
+  status?: number
+  error?: string
+}
+
+/**
+ * Obtiene el listado real de módulos (mipres.modulos_app)
+ */
+export async function obtenerModulosController(authToken?: string): Promise<ObtenerModulosResult> {
+  try {
+    if (!authToken || !String(authToken).trim()) {
+      return {
+        success: false,
+        status: 401,
+        error: "Token de autorización requerido",
+      }
+    }
+
+    const modulos = await obtenerModulos(authToken)
+
+    return {
+      success: true,
+      status: 200,
+      message: "Módulos obtenidos exitosamente",
+      data: modulos,
+    }
+  } catch (error) {
+    console.error("Error en obtenerModulosController:", error)
+    return {
+      success: false,
+      status: 500,
+      error: error instanceof Error ? error.message : "Error interno del servidor",
+    }
+  }
 }
 
 /**
@@ -76,7 +115,7 @@ export async function obtenerPermisosPorRolController(
  */
 export async function actualizarPermisoController(
   consecutivoRol: number,
-  moduloId: string,
+  moduloId: number,
   activo: boolean,
   authToken?: string
 ): Promise<ActualizarPermisoResult> {
@@ -90,7 +129,7 @@ export async function actualizarPermisoController(
       }
     }
 
-    if (!moduloId || typeof moduloId !== "string" || !moduloId.trim()) {
+    if (!Number.isFinite(moduloId) || moduloId <= 0) {
       return {
         success: false,
         status: 400,
@@ -129,7 +168,7 @@ export async function actualizarPermisoController(
  */
 export async function crearPermisoController(
   consecutivoRol: number,
-  moduloId: string,
+  moduloId: number,
   activo: boolean = true,
   authToken?: string
 ): Promise<CrearPermisoResult> {
@@ -143,7 +182,7 @@ export async function crearPermisoController(
       }
     }
 
-    if (!moduloId || typeof moduloId !== "string" || !moduloId.trim()) {
+    if (!Number.isFinite(moduloId) || moduloId <= 0) {
       return {
         success: false,
         status: 400,

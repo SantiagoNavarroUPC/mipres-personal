@@ -5,6 +5,7 @@ export interface RolUsuarioSimple {
   rol_nombre: string
   rol_descripcion?: string
   estado?: boolean
+  id_tipo_empresa?: number
 }
 
 function toStr(value: unknown): string {
@@ -52,6 +53,7 @@ export function normalizeRol(input: unknown): RolUsuarioSimple {
     rol_nombre: toStr(raw.rol_nombre) || toStr(raw.nombre),
     rol_descripcion: toStr(raw.rol_descripcion) || toStr(raw.descripcion),
     estado: toBool(raw.estado, toBool(raw.sw_activo, true)),
+    id_tipo_empresa: raw.id_tipo_empresa != null ? Number(raw.id_tipo_empresa) : undefined,
   }
 }
 

@@ -42,7 +42,7 @@ export async function PATCH(request: NextRequest) {
     const { consecutivo_rol, modulo_id, activo } = await request.json()
     const authHeader = request.headers.get("authorization") || undefined
 
-    const result = await actualizarPermisoController(consecutivo_rol, modulo_id, activo, authHeader)
+    const result = await actualizarPermisoController(consecutivo_rol, Number(modulo_id), activo, authHeader)
 
     if (!result.success) {
       return NextResponse.json(
@@ -66,7 +66,7 @@ export async function POST(request: NextRequest) {
     const { consecutivo_rol, modulo_id, activo } = await request.json()
     const authHeader = request.headers.get("authorization") || undefined
 
-    const result = await crearPermisoController(consecutivo_rol, modulo_id, activo ?? true, authHeader)
+    const result = await crearPermisoController(consecutivo_rol, Number(modulo_id), activo ?? true, authHeader)
 
     if (!result.success) {
       return NextResponse.json(

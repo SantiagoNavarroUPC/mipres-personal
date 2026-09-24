@@ -4,6 +4,12 @@ import { Pool } from "undici"
 const BASE_URL_TOKEN = getRequiredEnv("BASE_URL_TOKEN")
 
 export const PROGRAMACION_ENDPOINTS = {
+  // PUT api/Programacion/{nit}/{token}
+  // NOTA: no verificado contra documentación oficial de MIPRES; se asume el
+  // mismo patrón que Direccionamiento (PUT api/Direccionamiento/{nit}/{token}).
+  putProgramacion: (nit: string, token: string) =>
+    `${BASE_URL_TOKEN}/Programacion/${nit}/${token}`,
+
   // GET api/ProgramacionXFecha/{nit}/{token}/{fecha}
   programacionPorFecha: (nit: string, token: string, fecha: string) =>
     `${BASE_URL_TOKEN}/ProgramacionXFecha/${nit}/${token}/${fecha}`,
@@ -116,6 +122,13 @@ async function requestToMipres<T>(
   }
 
   return { success: false, error: "Unknown error" }
+}
+
+// PUT Registrar Programacion
+export async function putProgramacion(nit: string, token: string, payload: unknown) {
+  const url = PROGRAMACION_ENDPOINTS.putProgramacion(nit, token)
+  // Sin reintentos automáticos en creación, para no duplicar registros ante timeouts.
+  return requestToMipres(url, { method: "PUT", body: payload })
 }
 
 // GET Programacion por fecha

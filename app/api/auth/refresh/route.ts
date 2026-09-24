@@ -35,6 +35,14 @@ export async function POST(request: Request) {
       usuario: result.session.usuario,
       rol_mipres: result.session.rolMipres,
       rol_nombre: result.session.rolNombre ?? null,
+      nit: result.session.nit ?? null,
+      nombre_empresa: result.session.nombreEmpresa ?? null,
+      direccion_empresa: result.session.direccionEmpresa ?? null,
+      municipio_empresa: result.session.municipioEmpresa ?? null,
+      municipio_codigo_empresa: result.session.municipioCodigoEmpresa ?? null,
+      departamento_empresa: result.session.departamentoEmpresa ?? null,
+      departamento_codigo_empresa: result.session.departamentoCodigoEmpresa ?? null,
+      id_tipo_empresa: result.session.idTipoEmpresa ?? null,
     })
   } catch {
     return NextResponse.json(

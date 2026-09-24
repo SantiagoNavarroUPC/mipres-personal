@@ -1,4 +1,4 @@
-import type { Permiso, PermisosResponse } from "@/models/permisos.model"
+import type { Permiso, PermisosResponse, ModuloApp } from "@/models/permisos.model"
 import { MODULOS } from "@/models/permisos.model"
 import { getBackendApiUrl } from "@/lib/env"
 
@@ -15,11 +15,6 @@ function buildHeaders(authToken?: string) {
   }
 }
 
-function getModuloNumericId(moduloId: string): number {
-  const index = MODULOS.findIndex((m) => m.id === moduloId)
-  return index >= 0 ? index + 1 : 0
-}
-
 function getPermisosList(json: any): any[] {
   if (Array.isArray(json)) return json
   if (Array.isArray(json?.data)) return json.data
@@ -28,19 +23,23 @@ function getPermisosList(json: any): any[] {
   return []
 }
 
+export function foldAccents(value: string): string {
+  return value.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().trim()
+}
+
+// El slug de UI se resuelve por NOMBRE contra mipres.modulos_app (fuente de
+// verdad), nunca por posición en el array MODULOS de este frontend. La
+// comparación ignora tildes porque modulos_app tiene nombres sin acentuar
+// (ej. "Facturacion") mientras el frontend usa la forma acentuada.
 function normalizeModuloId(rawModuloId: unknown, moduloName: unknown): string {
-  if (typeof rawModuloId === "number") {
-    const idx = rawModuloId - 1
-    return MODULOS[idx]?.id ?? String(rawModuloId)
+  if (typeof moduloName === "string" && moduloName.trim()) {
+    const target = foldAccents(moduloName)
+    const found = MODULOS.find((m) => foldAccents(m.label) === target)
+    if (found) return found.id
   }
 
   if (typeof rawModuloId === "string" && rawModuloId.trim()) {
     return rawModuloId
-  }
-
-  if (typeof moduloName === "string") {
-    const found = MODULOS.find((m) => m.label.toLowerCase() === moduloName.toLowerCase())
-    return found ? found.id : moduloName.toLowerCase().replace(/\s+/g, "_")
   }
 
   return String(rawModuloId ?? "")
@@ -48,15 +47,10 @@ function normalizeModuloId(rawModuloId: unknown, moduloName: unknown): string {
 
 function buildPermisoWriteRequest(params: {
   consecutivoRol: number
-  moduloId: string
+  moduloId: number
   activo: boolean
 }) {
   const { consecutivoRol, moduloId, activo } = params
-  const numericModuloId = getModuloNumericId(moduloId)
-
-  if (numericModuloId === 0) {
-    throw new Error(`Módulo no encontrado: ${moduloId}`)
-  }
 
   if (isBrowser) {
     return {
@@ -66,8 +60,35 @@ function buildPermisoWriteRequest(params: {
   }
 
   return {
-    url: `${getBackendApiUrl()}/api/permisos/${consecutivoRol}/${numericModuloId}`,
+    url: `${getBackendApiUrl()}/api/permisos/${consecutivoRol}/${moduloId}`,
     body: { activo },
+  }
+}
+
+export async function obtenerModulos(authToken?: string): Promise<ModuloApp[]> {
+  try {
+    const url = isBrowser ? "/api/permisos/modulos" : `${getBackendApiUrl()}/api/permisos/modulos`
+    const response = await fetch(url, {
+      method: "GET",
+      headers: buildHeaders(authToken),
+    })
+
+    if (!response.ok) {
+      throw new Error(`Error al obtener módulos: ${response.status}`)
+    }
+
+    const json = await response.json()
+    const list = Array.isArray(json) ? json : Array.isArray(json?.data) ? json.data : []
+
+    return list.map((it: any) => ({
+      id: Number(it.id),
+      nombre: String(it.nombre ?? ""),
+      descripcion: it.descripcion ? String(it.descripcion) : undefined,
+      id_tipo_empresa: it.id_tipo_empresa != null ? Number(it.id_tipo_empresa) : undefined,
+    }))
+  } catch (error) {
+    console.error("Error en obtenerModulos:", error)
+    throw error
   }
 }
 
@@ -100,7 +121,7 @@ export async function obtenerPermisosPorRol(
 
 export async function actualizarPermiso(
   consecutivoRol: number,
-  moduloId: string,
+  moduloId: number,
   activo: boolean,
   authToken?: string
 ): Promise<Permiso> {
@@ -132,7 +153,7 @@ export async function actualizarPermiso(
 
 export async function agregarPermiso(
   consecutivoRol: number,
-  moduloId: string,
+  moduloId: number,
   activo: boolean = true,
   authToken?: string
 ): Promise<Permiso> {

@@ -3,7 +3,7 @@ import {
   obtenerProductoNutricional,
   obtenerServicioComplementario,
 } from '@/controllers/mipres-controller/prescripcion-controller/prescripcion-tecnologias.controller'
-import { IPS_DUSAKAWI } from '../config/organizacion'
+import { leerEmpresaDeSesion } from '../use-empresa-actual'
 
 interface DireccionamientoInfo {
   // Direccionamiento
@@ -346,7 +346,7 @@ export async function generateDireccionamientoPDF(data: DireccionamientoInfo) {
     borderWidth: 0.8,
   })
   
-  drawField('IPS Prescriptora', data.IPSPrescriptora || IPS_DUSAKAWI.nombreIPS, 48, yPosition - 20)
+  drawField('IPS Prescriptora', data.IPSPrescriptora || leerEmpresaDeSesion().nombreEmpresa || '', 48, yPosition - 20)
   drawField('Número Prescripción', data.NoPrescripcion, 280, yPosition - 20)
   drawField('Régimen', data.RegimenPrescripcion, 48, yPosition - 45)
   drawField('Ámbito', data.Ambito, 280, yPosition - 45)

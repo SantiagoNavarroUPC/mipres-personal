@@ -3,12 +3,14 @@
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Badge } from "@/components/ui/badge"
 import { AlertCircle, FileBarChart } from "lucide-react"
+import { useEmpresaActual } from "@/lib/use-empresa-actual"
 
 interface InformesHeaderProps {
   isConfigured: boolean
 }
 
 export function InformesHeader({ isConfigured }: InformesHeaderProps) {
+  const { esIPS } = useEmpresaActual()
   return (
     <>
       <div className="flex items-center justify-between">
@@ -20,7 +22,7 @@ export function InformesHeader({ isConfigured }: InformesHeaderProps) {
             Informes
           </h2>
           <p className="text-muted-foreground">
-            Consulta y descarga de reportes MIPRES para EPS/IPS
+            Consulta y descarga de reportes MIPRES para {esIPS ? "IPS" : "EPS"}
           </p>
         </div>
         <div className="flex items-center gap-2">

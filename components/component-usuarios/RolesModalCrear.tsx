@@ -12,9 +12,17 @@ import {
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { FileText, Loader2, ShieldCheck, ScrollText } from "lucide-react"
+import { Label } from "@/components/ui/label"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { FileText, Loader2, ShieldCheck, ScrollText, Building2 } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import { fetchWithAuth } from "@/lib/auth"
+
+const TIPO_EMPRESA_OPTIONS = [
+  { value: "1", label: "IPS" },
+  { value: "2", label: "EPS" },
+  { value: "3", label: "Ambas" },
+]
 
 export type RoleItem = {
   consecutivo_rol: number
@@ -32,12 +40,14 @@ interface DialogoCrearRolProps {
 export default function DialogoCrearRol({ open, onOpenChange, onCreated }: DialogoCrearRolProps) {
   const [newRole, setNewRole] = useState("")
   const [newRoleDescription, setNewRoleDescription] = useState("")
+  const [newRoleTipoEmpresa, setNewRoleTipoEmpresa] = useState("")
   const [creating, setCreating] = useState(false)
   const { toast } = useToast()
 
   function resetForm() {
     setNewRole("")
     setNewRoleDescription("")
+    setNewRoleTipoEmpresa("")
   }
 
   async function createRole() {
@@ -48,6 +58,15 @@ export default function DialogoCrearRol({ open, onOpenChange, onCreated }: Dialo
       toast({
         title: "Nombre requerido",
         description: "Ingrese un nombre para el rol",
+        variant: "destructive",
+      })
+      return
+    }
+
+    if (!newRoleTipoEmpresa) {
+      toast({
+        title: "Tipo de empresa requerido",
+        description: "Seleccione a qué tipo de empresa aplica este rol",
         variant: "destructive",
       })
       return
@@ -64,6 +83,7 @@ export default function DialogoCrearRol({ open, onOpenChange, onCreated }: Dialo
           nombre: roleName,
           descripcion: roleDescription || null,
           estado: true,
+          id_tipo_empresa: Number(newRoleTipoEmpresa),
         }),
       })
 
@@ -141,6 +161,24 @@ export default function DialogoCrearRol({ open, onOpenChange, onCreated }: Dialo
               className="border-[#E6F7F5] bg-background pl-11 text-foreground placeholder:text-muted-foreground focus-visible:ring-[#0f766e] dark:border-primary/35"
             />
           </div>
+          <div className="space-y-1.5">
+            <Label className="text-foreground">Tipo de empresa</Label>
+            <Select value={newRoleTipoEmpresa} onValueChange={setNewRoleTipoEmpresa} disabled={creating}>
+              <SelectTrigger className="border-[#E6F7F5] bg-background text-foreground focus:ring-[#0f766e] dark:border-primary/35">
+                <span className="mr-2 inline-flex h-6 w-6 items-center justify-center rounded-md bg-[#E6F7F5] dark:bg-primary/20">
+                  <Building2 className="h-4 w-4 text-[#0f766e]" />
+                </span>
+                <SelectValue placeholder="Seleccione a qué empresa aplica" />
+              </SelectTrigger>
+              <SelectContent>
+                {TIPO_EMPRESA_OPTIONS.map((opt) => (
+                  <SelectItem key={opt.value} value={opt.value}>
+                    {opt.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
         </div>
 
         <DialogFooter className="justify-end gap-2">
@@ -149,7 +187,7 @@ export default function DialogoCrearRol({ open, onOpenChange, onCreated }: Dialo
               Cancelar
             </Button>
           </DialogClose>
-          <Button type="button" onClick={() => void createRole()} disabled={creating || !newRole.trim()} className="bg-[#0f766e] text-white hover:bg-[#115e59]">
+          <Button type="button" onClick={() => void createRole()} disabled={creating || !newRole.trim() || !newRoleTipoEmpresa} className="bg-[#0f766e] text-white hover:bg-[#115e59]">
             {creating ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
             <ScrollText className="mr-2 h-4 w-4" />
             Crear rol

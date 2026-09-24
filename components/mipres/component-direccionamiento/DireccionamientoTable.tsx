@@ -7,10 +7,12 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { DireccionamientoModalAnular } from "./DireccionamientoViewAnular"
-import { ChevronLeft, ChevronRight, Eye, X, Calendar, ArrowUpDown, ArrowUp, ArrowDown, Pill, Stethoscope, Package as PackageIcon, Sparkles, Activity, Hash, Layers3, ShieldCheck } from "lucide-react"
+import { DireccionamientoModalProgramar } from "./DireccionamientoModalProgramar"
+import { ChevronLeft, ChevronRight, Eye, X, Calendar, ArrowUpDown, ArrowUp, ArrowDown, Pill, Stethoscope, Package as PackageIcon, Sparkles, Activity, Hash, Layers3, ShieldCheck, CalendarClock } from "lucide-react"
 import { toast } from "sonner"
 import type { Direccionamiento } from "@/models/mipres-sispro/direccionamiento"
 import type { MipresCredentials } from "@/models/credentials.model"
+import { useEmpresaActual } from "@/lib/use-empresa-actual"
 
 interface DireccionamientoTableProps {
   results: Direccionamiento[]
@@ -117,7 +119,10 @@ export function DireccionamientoTable({ results, credentials, onView, onAnularSu
   const [pageSize, setPageSize] = useState(10)
   const [anularModalOpen, setAnularModalOpen] = useState(false)
   const [selectedItemsForAnular, setSelectedItemsForAnular] = useState<Direccionamiento[]>([])
+  const [programarModalOpen, setProgramarModalOpen] = useState(false)
+  const [selectedItemForProgramar, setSelectedItemForProgramar] = useState<Direccionamiento | null>(null)
   const [showDuplicatesOnly, setShowDuplicatesOnly] = useState(false)
+  const { esIPS: mostrarProgramacion } = useEmpresaActual()
 
   const [searchPrescripcion, setSearchPrescripcion] = useState("")
   const [filterTipoTec, setFilterTipoTec] = useState("todos")
@@ -307,7 +312,7 @@ export function DireccionamientoTable({ results, credentials, onView, onAnularSu
               </th>
               <th className="text-right text-xs font-medium text-muted-foreground px-4 py-4">
                 <div className="flex justify-end">
-                  <span className="inline-block w-28 text-center">Acciones</span>
+                  <span className={`inline-block text-center ${mostrarProgramacion ? "w-36" : "w-28"}`}>Acciones</span>
                 </div>
               </th>
             </tr>
@@ -380,7 +385,7 @@ export function DireccionamientoTable({ results, credentials, onView, onAnularSu
                   </td>
                   <td className="px-4 py-2.5 text-right">
                     <div className="flex items-center justify-end">
-                      <div className="w-28 flex justify-center items-center gap-1">
+                      <div className={`flex justify-center items-center gap-1 ${mostrarProgramacion ? "w-36" : "w-28"}`}>
                         <div className="relative group">
                           <Button
                             variant="ghost"
@@ -407,6 +412,22 @@ export function DireccionamientoTable({ results, credentials, onView, onAnularSu
                             </Button>
                             <span className="pointer-events-none absolute right-full mr-2 top-1/2 -translate-y-1/2 rounded border bg-popover px-2 py-1 text-[10px] text-foreground shadow-sm opacity-0 group-hover:opacity-100 whitespace-nowrap transition-opacity">
                               Anular
+                            </span>
+                          </div>
+                        )}
+
+                        {mostrarProgramacion && !row.last.FecAnulacion && (
+                          <div className="relative group">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-7 w-7 text-primary hover:text-primary"
+                              onClick={() => { setSelectedItemForProgramar(row.last); setProgramarModalOpen(true); setActiveRow(rowKey); }}
+                            >
+                              <CalendarClock className="h-3.5 w-3.5" />
+                            </Button>
+                            <span className="pointer-events-none absolute right-full mr-2 top-1/2 -translate-y-1/2 rounded border bg-popover px-2 py-1 text-[10px] text-foreground shadow-sm opacity-0 group-hover:opacity-100 whitespace-nowrap transition-opacity">
+                              Programar
                             </span>
                           </div>
                         )}
@@ -473,6 +494,15 @@ export function DireccionamientoTable({ results, credentials, onView, onAnularSu
         credentials={credentials}
         onSuccess={onAnularSuccess}
       />
+
+      {mostrarProgramacion && (
+        <DireccionamientoModalProgramar
+          open={programarModalOpen}
+          onClose={() => setProgramarModalOpen(false)}
+          item={selectedItemForProgramar}
+          credentials={credentials}
+        />
+      )}
     </div>
   )
 }

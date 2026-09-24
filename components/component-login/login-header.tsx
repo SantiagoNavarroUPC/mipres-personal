@@ -5,13 +5,8 @@ import Image from "next/image"
 import { useTheme } from "next-themes"
 import { Moon, Sun } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { IPS_DUSAKAWI } from "@/lib/config/organizacion"
 
-interface LoginHeaderProps {
-  mode?: "login" | "register"
-}
-
-export function LoginHeader({ mode = "login" }: LoginHeaderProps) {
+export function LoginHeader() {
   const { resolvedTheme, setTheme } = useTheme()
   const [mounted, setMounted] = useState(false)
 
@@ -41,7 +36,7 @@ export function LoginHeader({ mode = "login" }: LoginHeaderProps) {
       <div className="relative h-28 w-28 overflow-hidden rounded-full bg-card shadow-md border border-border">
         <Image
           src="/logo.png"
-          alt={`Logo ${IPS_DUSAKAWI.nombreIPS}`}
+          alt="Logo MIPRES"
           fill
           className="object-contain p-2"
           priority
@@ -49,15 +44,13 @@ export function LoginHeader({ mode = "login" }: LoginHeaderProps) {
       </div>
       <div className="text-center">
         <h1 className="text-2xl font-bold tracking-tight text-foreground">
-          {mode === "register" ? "Crear cuenta" : "MIPRES"}
+          MIPRES
         </h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          {IPS_DUSAKAWI.nombreIPS}
+          MIPRES
         </p>
         <p className="text-xs text-muted-foreground">
-          {mode === "register"
-            ? "Completa los datos para registrarte"
-            : "Sistema de prescripciones de servicios y tecnologías"}
+          Sistema de prescripciones de servicios y tecnologías
         </p>
       </div>
     </div>

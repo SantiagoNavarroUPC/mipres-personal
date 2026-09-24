@@ -4,12 +4,14 @@ import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/ca
 import { Badge } from "@/components/ui/badge"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Package, AlertCircle } from "lucide-react"
+import { useEmpresaActual } from "@/lib/use-empresa-actual"
 
 interface SuministroHeaderProps {
   isConfigured: boolean
 }
 
 export function SuministroHeader({ isConfigured }: SuministroHeaderProps) {
+  const { esIPS } = useEmpresaActual()
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
@@ -21,7 +23,7 @@ export function SuministroHeader({ isConfigured }: SuministroHeaderProps) {
             Suministros
           </h2>
           <p className="text-muted-foreground">
-            Gestión de suministros para EPS
+            Gestión de suministros para {esIPS ? "IPS" : "EPS"}
           </p>
         </div>
         <div className="flex items-center gap-2">

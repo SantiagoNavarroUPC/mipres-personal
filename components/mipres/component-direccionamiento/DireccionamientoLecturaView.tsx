@@ -15,7 +15,6 @@ import {
 import { toast } from "sonner"
 import type { MipresCredentials } from "@/models/credentials.model"
 import { generateDireccionamientoPDF, downloadPDF } from "@/lib/plantillas_pdf/direccionamiento_pdf"
-import { IPS_DUSAKAWI } from "@/lib/config/organizacion"
 
 interface DireccionamientoLecturaModalProps {
   prescripcion: any
@@ -263,7 +262,7 @@ export function DireccionamientoLecturaModal({ prescripcion, open, onClose, cred
 
       const prestadorNombre = ipsData.nombre !== "N/A" ? ipsData.nombre : row.NomProv || row.NomPrestador || row.NombrePrestador || "N/A"
       const esTutela = Boolean(prescripcion?.NoTutela)
-      let prescriptoraNombre = esTutela ? IPS_DUSAKAWI.nombreIPS : "N/A"
+      let prescriptoraNombre = esTutela ? (credentials.nombreEmpresa || "N/A") : "N/A"
       if (prescripcion?.NroIDIPS) {
         try {
           const res = await fetch(`/api/mipres/direccionamiento/ips?search=${encodeURIComponent(prescripcion.NroIDIPS)}`)

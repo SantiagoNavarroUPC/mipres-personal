@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { RefreshCw } from "lucide-react"
+import { useEmpresaActual } from "@/lib/use-empresa-actual"
 
 interface PrescripcionSearchNovedadesProps {
   fechaNov: string
@@ -21,6 +22,7 @@ export function PrescripcionSearchNovedades({
   onFechaNovChange,
   onSearch,
 }: PrescripcionSearchNovedadesProps) {
+  const { esIPS } = useEmpresaActual()
   return (
     <Card>
       <CardHeader>
@@ -29,7 +31,7 @@ export function PrescripcionSearchNovedades({
           Novedades de Prescripciones
         </CardTitle>
         <CardDescription>
-          Retorna todas las novedades de prescripciones para una EPS/IPS en la fecha indicada
+          Retorna todas las novedades de prescripciones para una {esIPS ? "IPS" : "EPS"} en la fecha indicada
         </CardDescription>
       </CardHeader>
       <CardContent>

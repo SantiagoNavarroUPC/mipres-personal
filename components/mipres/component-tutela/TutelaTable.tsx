@@ -14,7 +14,6 @@ import { NoDireccionamientoLecturaModal } from "../component-nodirecionamiento"
 import type { MipresCredentials } from "@/models/credentials.model"
 import { preparePrescripcionExportData, exportToExcel } from "@/lib/config/export-utils"
 import { generarPrescripcionHTML } from "@/lib/plantillas_pdf/prescripcion_pdf"
-import { IPS_DUSAKAWI } from "@/lib/config/organizacion"
 import { useMipresQueryClient } from "@/hooks/useMipresQueries"
 import {
   Popover,
@@ -447,7 +446,12 @@ export function TutelaTable({ tutelas, credentials, onRefresh, onDireccionamient
         NoPrescripcion: tutela.NoTutela,
         FPrescripcion: tutela.FTutela,
         HPrescripcion: tutela.HTutela,
-        ...IPS_DUSAKAWI,
+        NroIDIPS: credentials.nit,
+        nombreIPS: credentials.nombreEmpresa,
+        DirSedeIPS: credentials.direccionEmpresa,
+        CodDANEMunIPS: credentials.municipioCodigoEmpresa,
+        municipioIPS: credentials.municipioEmpresa,
+        departamentoIPS: credentials.departamentoEmpresa,
       }
       await generarPrescripcionHTML(tutelaAsPrescripcion as any)
     } catch (error) {

@@ -3,12 +3,14 @@
 import { Badge } from "@/components/ui/badge"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Truck, AlertCircle } from "lucide-react"
+import { useEmpresaActual } from "@/lib/use-empresa-actual"
 
 interface EntregaHeaderProps {
   isConfigured: boolean
 }
 
 export function EntregaHeader({ isConfigured }: EntregaHeaderProps) {
+  const { esIPS } = useEmpresaActual()
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
@@ -20,7 +22,7 @@ export function EntregaHeader({ isConfigured }: EntregaHeaderProps) {
             Entregas
           </h2>
           <p className="text-muted-foreground">
-            Gestión de entregas para EPS
+            Gestión de entregas para {esIPS ? "IPS" : "EPS"}
           </p>
         </div>
         <div className="flex items-center gap-2">

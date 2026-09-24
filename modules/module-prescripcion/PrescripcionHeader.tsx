@@ -3,12 +3,14 @@
 import { Badge } from "@/components/ui/badge"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { AlertCircle, FileText } from "lucide-react"
+import { useEmpresaActual } from "@/lib/use-empresa-actual"
 
 interface PrescripcionHeaderProps {
   isConfigured: boolean
 }
 
 export function PrescripcionHeader({ isConfigured }: PrescripcionHeaderProps) {
+  const { esIPS } = useEmpresaActual()
   return (
     <>
       <div className="flex items-center justify-between">
@@ -20,7 +22,7 @@ export function PrescripcionHeader({ isConfigured }: PrescripcionHeaderProps) {
             Prescripciones
           </h2>
           <p className="text-muted-foreground">
-            Consulta de prescripciones MIPRES para EPS/IPS
+            Consulta de prescripciones MIPRES para {esIPS ? "IPS" : "EPS"}
           </p>
         </div>
         <div className="flex items-center gap-2">
