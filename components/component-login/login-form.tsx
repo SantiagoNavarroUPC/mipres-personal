@@ -11,14 +11,12 @@ import { secureStorageRemoveItem, secureStorageSetItem } from "@/lib/secure-stor
 // El NIT y el tipo de empresa (IPS/EPS) ya no vienen de NEXT_PUBLIC_NIT_EPSI/
 // NEXT_PUBLIC_NIT_IPS/NEXT_PUBLIC_TIPO_USUARIO: cada usuario tiene su propia
 // empresa (mipres.usuario_mipres.id_empresa), y /api/auth/login ya devuelve
-// nit/nombre_empresa/id_tipo_empresa de esa empresa. Para IPS el token sigue
-// siendo un secreto por variable de entorno (ya viene validado, no hay
-// intercambio). Para EPS, las credenciales (fuente + token de acceso ya
-// validado) se guardan por empresa en la BD (ver ConfiguracionModule) y se
-// cargan aquí mismo tras el login, para que el header no pida revalidar cada
-// sesión si ya estaban guardadas.
-const TOKEN_VALIDADO = process.env.NEXT_PUBLIC_TOKEN_VALIDADO
-
+// nit/nombre_empresa/id_tipo_empresa de esa empresa. Tanto IPS como EPS
+// cargan el token de acceso ya validado desde la BD (empresa_credenciales,
+// ver ConfiguracionModule): para IPS no hay intercambio contra MIPRES, así
+// que se digita el mismo token validado en subsidiado y en contributivo (ver
+// ValidacionCard, modo manual); para EPS puede venir de la validación por
+// webservice o también digitado a mano.
 interface CredencialesMipresDb {
   token_subsidiado: string | null
   token_contributivo: string | null
@@ -66,32 +64,19 @@ export function LoginForm() {
         return
       }
 
-      // IPS: el NIT y el token ya vienen validados (TOKEN_VALIDADO), no hay
-      // intercambio contra MIPRES. EPS: las credenciales (fuente + token de
-      // acceso ya validado) ya deben estar guardadas en la BD para esta
-      // empresa (Configuración > Credenciales/Validación); si no lo están,
-      // el header quedará "Sin Validar Token" hasta que se guarden ahí.
+      // Las credenciales (fuente + token de acceso ya validado) ya deben
+      // estar guardadas en la BD para esta empresa (Configuración >
+      // Credenciales/Validación); si no lo están, el header quedará "Sin
+      // Validar Token" hasta que se guarden ahí. Para IPS, subsidiado y
+      // contributivo llevan el mismo valor (no hay dos regímenes distintos).
       const nit = String(data.nit || "").trim()
-      const esIPS = data.id_tipo_empresa === 1
 
-      let tokenSubsidiado = ""
-      let tokenContributivo = ""
-      let tokenAccesoSubsidiado = ""
-      let tokenAccesoContributivo = ""
-      let tokenAcceso = ""
-
-      if (esIPS) {
-        tokenAcceso = String(TOKEN_VALIDADO || "").trim()
-        tokenAccesoSubsidiado = tokenAcceso
-        tokenAccesoContributivo = tokenAcceso
-      } else {
-        const credencialesMipres = await obtenerCredencialesMipres(data.token)
-        tokenSubsidiado = credencialesMipres?.token_subsidiado || ""
-        tokenContributivo = credencialesMipres?.token_contributivo || ""
-        tokenAccesoSubsidiado = credencialesMipres?.token_subsidiado_validado || ""
-        tokenAccesoContributivo = credencialesMipres?.token_contributivo_validado || ""
-        tokenAcceso = tokenAccesoSubsidiado || tokenAccesoContributivo || ""
-      }
+      const credencialesMipres = await obtenerCredencialesMipres(data.token)
+      const tokenSubsidiado = credencialesMipres?.token_subsidiado || ""
+      const tokenContributivo = credencialesMipres?.token_contributivo || ""
+      const tokenAccesoSubsidiado = credencialesMipres?.token_subsidiado_validado || ""
+      const tokenAccesoContributivo = credencialesMipres?.token_contributivo_validado || ""
+      const tokenAcceso = tokenAccesoSubsidiado || tokenAccesoContributivo || ""
 
       // El backend firma el JWT con una duración corta (ver JWT_EXPIRES_IN en
       // api-dusakawi); usar ese valor real evita que el cliente crea tener
@@ -130,8 +115,8 @@ export function LoginForm() {
           refreshToken: data.refreshToken || null,
           expiresAt,
           refreshExpiresAt,
-          tokenSubsidiado: esIPS ? tokenAcceso : tokenSubsidiado,
-          tokenContributivo: esIPS ? tokenAcceso : tokenContributivo,
+          tokenSubsidiado,
+          tokenContributivo,
           tokenAccesoSubsidiado,
           tokenAccesoContributivo,
         })

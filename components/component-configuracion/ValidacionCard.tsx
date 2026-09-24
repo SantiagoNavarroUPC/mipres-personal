@@ -18,6 +18,7 @@ interface ConnectionResult {
 }
 
 interface ValidacionCardProps {
+  esIPS: boolean
   generando: boolean
   generarResult: ConnectionResult | null
   tokenAccesoSubsidiado: string | null | undefined
@@ -30,6 +31,7 @@ interface ValidacionCardProps {
 }
 
 export function ValidacionCard({
+  esIPS,
   generando,
   generarResult,
   tokenAccesoSubsidiado,
@@ -40,17 +42,88 @@ export function ValidacionCard({
   guardandoManual,
   onGuardarManual,
 }: ValidacionCardProps) {
-  const [modoManual, setModoManual] = useState(false)
+  const [modoManual, setModoManual] = useState(esIPS)
   const [manualSubsidiado, setManualSubsidiado] = useState(tokenAccesoSubsidiado || "")
   const [manualContributivo, setManualContributivo] = useState(tokenAccesoContributivo || "")
+  // IPS no tiene dos regímenes (Subsidiado/Contributivo): un único token
+  // válido se guarda igual en ambas columnas de empresa_credenciales.
+  const [manualIPS, setManualIPS] = useState(tokenAccesoSubsidiado || tokenAccesoContributivo || "")
 
   useEffect(() => {
     setManualSubsidiado(tokenAccesoSubsidiado || "")
-  }, [tokenAccesoSubsidiado])
+    if (esIPS) setManualIPS(tokenAccesoSubsidiado || tokenAccesoContributivo || "")
+  }, [tokenAccesoSubsidiado, esIPS, tokenAccesoContributivo])
 
   useEffect(() => {
     setManualContributivo(tokenAccesoContributivo || "")
   }, [tokenAccesoContributivo])
+
+  if (esIPS) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <ShieldCheck className="h-5 w-5 text-primary" />
+            Validación de Credenciales
+          </CardTitle>
+          <CardDescription>
+            Como IPS no hay intercambio contra MIPRES: digite el token ya validado
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <Alert>
+            <Info className="h-4 w-4" />
+            <AlertDescription>
+              Digite el token de acceso que ya validó directamente en la página de MIPRES. Se guardará como token de acceso de esta empresa.
+            </AlertDescription>
+          </Alert>
+
+          <div>
+            <Label htmlFor="manual-ips">Token de Acceso</Label>
+            <Input
+              id="manual-ips"
+              type={showTokenAcceso ? "text" : "password"}
+              value={manualIPS}
+              onChange={(e) => setManualIPS(e.target.value)}
+              placeholder="Token de acceso ya validado"
+              disabled={guardandoManual}
+              className="mt-1"
+            />
+          </div>
+
+          <Button
+            className="w-full"
+            disabled={guardandoManual || !manualIPS.trim()}
+            onClick={() => void onGuardarManual(manualIPS.trim(), manualIPS.trim())}
+          >
+            {guardandoManual ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Save className="h-4 w-4 mr-2" />}
+            {guardandoManual ? "Guardando..." : "Guardar token de acceso"}
+          </Button>
+
+          {(tokenAccesoSubsidiado || tokenAccesoContributivo) && (
+            <div>
+              <div className="flex items-center justify-between">
+                <Label className="flex items-center gap-2">
+                  <ShieldCheck className="h-4 w-4" />
+                  Token de Acceso guardado
+                </Label>
+                <Button type="button" variant="ghost" size="sm" onClick={onShowTokenAccesoToggle}>
+                  {showTokenAcceso ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </Button>
+              </div>
+              <Input
+                type={showTokenAcceso ? "text" : "password"}
+                value={tokenAccesoSubsidiado || tokenAccesoContributivo || ""}
+                readOnly
+                className="mt-1 bg-green-50 dark:bg-green-950/20 border-green-200 dark:border-green-900"
+              />
+              <Badge className="mt-2 bg-green-600">✓ Guardado</Badge>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    )
+  }
 
   return (
     <Card>

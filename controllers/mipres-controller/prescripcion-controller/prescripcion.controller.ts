@@ -1,5 +1,5 @@
 import type { Prescripcion, NovedadPrescripcion } from "@/models/mipres-sispro/prescripcion"
-import type { MipresCredentials, TokenResponse } from "@/models/credentials.model"
+import type { MipresCredentials } from "@/models/credentials.model"
 import {
   fetchPrescripcionesPorFecha,
   fetchPrescripcionesPorPaciente,
@@ -7,7 +7,6 @@ import {
   fetchNovedadesPrescripciones,
   type TipoConsultaPrescripcion,
 } from "@/requests/mipres-sispro/prescripcion.request"
-import { fetchGenerarToken } from "@/requests/mipres-sispro/token.request"
 import { fetchIpsByNit } from "@/requests/Backend/ips.request"
 import {
   extractPrescripciones,
@@ -21,33 +20,6 @@ import { fetchDireccionamientoPorPrescripcion } from "@/requests/mipres-sispro/d
 
 function getTokenRaw(credentials: MipresCredentials): string {
   return credentials.tokenSubsidiado || credentials.tokenContributivo || ""
-}
-
-/**
- * Generar Token de Acceso
- */
-export async function generarTokenAcceso(nit: string, token: string): Promise<TokenResponse> {
-  try {
-    const result = await fetchGenerarToken(nit, token)
-    
-    if (result.success && result.tokenAcceso) {
-      return {
-        success: true,
-        tokenAcceso: result.tokenAcceso,
-      }
-    } else {
-      return {
-        success: false,
-        error: result.error || "Error al generar token",
-      }
-    }
-  } catch (error) {
-    return {
-      success: false,
-      error: "Error de conexión al generar token",
-      details: error instanceof Error ? error.message : "Error desconocido",
-    }
-  }
 }
 
 /**

@@ -224,6 +224,7 @@ export function ConfiguracionModule({ credentials, onSave }: ConfiguracionModule
         />
 
         <ValidacionCard
+          esIPS={esIPS}
           generando={generando}
           generarResult={generarResult}
           tokenAccesoSubsidiado={credencialesMipres.tokenSubsidiadoValidado}
