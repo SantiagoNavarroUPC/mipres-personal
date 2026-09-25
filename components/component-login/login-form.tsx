@@ -2,7 +2,16 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { User, Lock, Eye, EyeOff, Loader2 } from "lucide-react"
+import {
+  User,
+  Lock,
+  Eye,
+  EyeOff,
+  Loader2,
+  AlertCircle,
+  AlertTriangle,
+  ShieldCheck,
+} from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
@@ -44,6 +53,13 @@ export function LoginForm() {
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState("")
+  const [capsLockActive, setCapsLockActive] = useState(false)
+
+  const handlePasswordKeyEvent = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (typeof e.getModifierState === "function") {
+      setCapsLockActive(e.getModifierState("CapsLock"))
+    }
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -123,59 +139,77 @@ export function LoginForm() {
       )
       router.push("/mipres")
     } catch {
-      setError("Error de conexión. Intente nuevamente.")
+      setError("Error de conexión con el servidor. Intente nuevamente.")
     } finally {
       setIsLoading(false)
     }
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+    <form onSubmit={handleSubmit} className="flex flex-col gap-4">
       {error && (
-        <div className="rounded-lg border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive">
-          {error}
+        <div
+          role="alert"
+          className="flex items-start gap-2.5 rounded-xl border border-destructive/40 bg-destructive/10 p-3.5 text-xs text-destructive dark:text-red-400 transition-all animate-in fade-in slide-in-from-top-1"
+        >
+          <AlertCircle className="size-4 shrink-0 mt-0.5" />
+          <span className="leading-relaxed font-medium">{error}</span>
         </div>
       )}
 
-      <div className="flex flex-col gap-2">
-        <Label htmlFor="usuario" className="text-foreground">
-          Usuario
+      {/* Campo Usuario */}
+      <div className="flex flex-col gap-1.5 group">
+        <Label htmlFor="usuario" className="text-xs font-semibold text-foreground/90">
+          Usuario o Documento
         </Label>
         <div className="relative">
-          <User className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
+          <User className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground transition-colors group-focus-within:text-primary pointer-events-none" />
           <Input
             id="usuario"
             type="text"
-            placeholder="Ingrese su usuario"
+            placeholder="Ingrese su usuario o documento"
             value={usuario}
             onChange={(e) => setUsuario(e.target.value)}
-            className="pl-10 h-11 bg-card"
+            className="pl-10 h-11 bg-card/60 backdrop-blur-xs border-border/80 hover:border-border focus-visible:bg-card focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 transition-all text-sm rounded-xl"
             required
+            autoComplete="username"
             disabled={isLoading}
           />
         </div>
       </div>
 
-      <div className="flex flex-col gap-2">
-        <Label htmlFor="contrasena" className="text-foreground">
-          Contraseña
-        </Label>
+      {/* Campo Contraseña */}
+      <div className="flex flex-col gap-1.5 group">
+        <div className="flex items-center justify-between">
+          <Label htmlFor="contrasena" className="text-xs font-semibold text-foreground/90">
+            Contraseña
+          </Label>
+          {capsLockActive && (
+            <span className="inline-flex items-center gap-1 text-[11px] font-medium text-amber-600 dark:text-amber-400">
+              <AlertTriangle className="size-3" />
+              Mayúsculas activas
+            </span>
+          )}
+        </div>
         <div className="relative">
-          <Lock className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
+          <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground transition-colors group-focus-within:text-primary pointer-events-none" />
           <Input
             id="contrasena"
             type={showPassword ? "text" : "password"}
-            placeholder="Ingrese su contraseña"
+            placeholder="••••••••••••"
             value={contrasena}
             onChange={(e) => setContrasena(e.target.value)}
-            className="pl-10 pr-10 h-11 bg-card"
+            onKeyDown={handlePasswordKeyEvent}
+            onKeyUp={handlePasswordKeyEvent}
+            className="pl-10 pr-10 h-11 bg-card/60 backdrop-blur-xs border-border/80 hover:border-border focus-visible:bg-card focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 transition-all text-sm rounded-xl"
             required
+            autoComplete="current-password"
             disabled={isLoading}
           />
           <button
             type="button"
             onClick={() => setShowPassword(!showPassword)}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+            className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-muted-foreground hover:text-foreground transition-colors rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
             aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
           >
             {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
@@ -183,21 +217,36 @@ export function LoginForm() {
         </div>
       </div>
 
+      {/* Botón de Envío */}
       <Button
         type="submit"
         size="lg"
-        className="mt-2 h-11 w-full font-semibold text-base"
+        className="relative overflow-hidden group mt-2 h-11 w-full font-semibold text-sm sm:text-base bg-primary hover:bg-primary/95 text-primary-foreground shadow-lg shadow-primary/20 hover:shadow-primary/35 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 rounded-xl"
         disabled={isLoading}
       >
+        {/* Shimmer light bar on hover */}
+        <span
+          className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-white/20 to-transparent pointer-events-none"
+          aria-hidden="true"
+        />
+
         {isLoading ? (
-          <>
+          <span className="flex items-center justify-center gap-2">
             <Loader2 className="size-4 animate-spin" />
-            Ingresando...
-          </>
+            <span>Validando acceso...</span>
+          </span>
         ) : (
-          "Ingresar"
+          <span className="flex items-center justify-center gap-2">
+            <span>Ingresar al Sistema</span>
+          </span>
         )}
       </Button>
+
+      {/* Nota de seguridad al pie del formulario */}
+      <div className="flex items-center justify-center gap-1.5 pt-1 text-[11px] text-muted-foreground">
+        <ShieldCheck className="size-3.5 text-primary" />
+        <span>Conexión cifrada de extremo a extremo</span>
+      </div>
     </form>
   )
 }

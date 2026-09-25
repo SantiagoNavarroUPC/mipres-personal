@@ -164,4 +164,86 @@
   .scrollbar-hidden::-webkit-scrollbar {
     display: none;
   }
+
+  @keyframes float-blob-1 {
+    0%, 100% {
+      transform: translate3d(0, 0, 0) scale(1);
+    }
+    33% {
+      transform: translate3d(30px, -40px, 0) scale(1.08);
+    }
+    66% {
+      transform: translate3d(-25px, 25px, 0) scale(0.94);
+    }
+  }
+
+  @keyframes float-blob-2 {
+    0%, 100% {
+      transform: translate3d(0, 0, 0) scale(1);
+    }
+    33% {
+      transform: translate3d(-35px, 30px, 0) scale(0.95);
+    }
+    66% {
+      transform: translate3d(25px, -30px, 0) scale(1.06);
+    }
+  }
+
+  @keyframes float-blob-3 {
+    0%, 100% {
+      transform: translate3d(0, 0, 0) scale(1);
+    }
+    50% {
+      transform: translate3d(25px, -35px, 0) scale(1.04);
+    }
+  }
+
+  @keyframes pulse-subtle {
+    0%, 100% {
+      opacity: 0.35;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 0.65;
+      transform: scale(1.03);
+    }
+  }
+
+  @keyframes float-slow {
+    0%, 100% {
+      transform: translateY(0px) rotate(0deg);
+    }
+    50% {
+      transform: translateY(-16px) rotate(4deg);
+    }
+  }
+
+  @keyframes float-reverse {
+    0%, 100% {
+      transform: translateY(0px) rotate(0deg);
+    }
+    50% {
+      transform: translateY(16px) rotate(-4deg);
+    }
+  }
+
+  .animate-blob-1 {
+    animation: float-blob-1 18s ease-in-out infinite;
+  }
+  .animate-blob-2 {
+    animation: float-blob-2 22s ease-in-out infinite;
+  }
+  .animate-blob-3 {
+    animation: float-blob-3 26s ease-in-out infinite;
+  }
+  .animate-pulse-subtle {
+    animation: pulse-subtle 7s ease-in-out infinite;
+  }
+  .animate-float-slow {
+    animation: float-slow 8s ease-in-out infinite;
+  }
+  .animate-float-reverse {
+    animation: float-reverse 10s ease-in-out infinite;
+  }
 }
+
