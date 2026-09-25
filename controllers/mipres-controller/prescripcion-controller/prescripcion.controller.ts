@@ -428,7 +428,11 @@ async function marcarIpsSolicitante(prescripciones: Prescripcion[]) {
     const result = await fetchIpsByNit(nit)
     if (!result.success || !result.data || result.data.length === 0) return
 
-    const exact = result.data.find((item: any) => String(item.nit || "").trim() === nit) || result.data[0]
+    const cleanNit = nit.includes("-") ? nit.split("-")[0].trim() : nit
+    const exact = result.data.find((item: any) => {
+      const itemNit = String(item.nit || "").trim()
+      return itemNit === nit || itemNit === cleanNit
+    }) || result.data[0]
     const nombre = extractIpsNombre(exact)
     if (nombre) {
       ipsByNit.set(nit, nombre)

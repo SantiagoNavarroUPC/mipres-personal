@@ -3,11 +3,22 @@ import { getRequiredEnv } from "@/lib/env"
 const DUSAKAWI_API_URL = getRequiredEnv("DUSAKAWI_API_URL").trim()
 
 export interface IpsItem {
+  id_empresa_prestador?: number
   nit?: string
+  razon_social?: string
   ips_nombre?: string
   ips?: string
-  razon_social?: string
   nombre?: string
+  codigo_prestador?: string
+  direccion?: string
+  direccion_sede?: string
+  telefono?: string
+  correo_electronico?: string
+  id_municipio?: number | null
+  municipio_codigo?: string | null
+  municipio_nombre?: string | null
+  departamento_codigo?: string | null
+  departamento_nombre?: string | null
 }
 
 export interface RequestResult<T = unknown> {
@@ -33,11 +44,12 @@ function normalizeSearchVariants(search: string): string[] {
   const trimmed = String(search || "").trim()
   if (!trimmed) return []
   const digitsOnly = trimmed.replace(/\D/g, "")
-  return Array.from(new Set([trimmed, digitsOnly].filter(Boolean)))
+  const beforeHyphen = trimmed.includes("-") ? trimmed.split("-")[0].replace(/\D/g, "") : ""
+  return Array.from(new Set([trimmed, digitsOnly, beforeHyphen].filter(Boolean)))
 }
 
 function extractIpsName(item: IpsItem): string {
-  return String(item.ips || item.razon_social || item.nombre || item.ips_nombre || "").trim()
+  return String(item.ips_nombre || item.razon_social || item.ips || item.nombre || "").trim()
 }
 
 export async function fetchIpsByNit(nit: string): Promise<RequestResult<IpsItem[]>> {
