@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { RefreshCw, Calendar, Loader2 } from "lucide-react"
+import { SearchLoadingProgress } from "@/components/SearchLoadingProgress"
 
 interface TutelaSearchNovedadesProps {
   fecha: string
@@ -22,7 +23,7 @@ export function TutelaSearchNovedades({
   onSearch,
 }: TutelaSearchNovedadesProps) {
   return (
-    <Card className="relative overflow-hidden rounded-xl border border-border/80 dark:border-border/60 bg-card/85 dark:bg-card/75 backdrop-blur-xl shadow-xs">
+    <Card className="relative overflow-hidden rounded-xl border border-border/80 dark:border-border/60 bg-white dark:bg-card shadow-xs">
       <CardHeader>
         <CardTitle className="leading-none font-semibold flex items-center gap-2">
           <span className="inline-flex size-6 items-center justify-center rounded-md bg-primary/10 text-primary border border-primary/20">
@@ -34,7 +35,7 @@ export function TutelaSearchNovedades({
           Retorna las novedades de tutelas para una fecha especifica.
         </CardDescription>
       </CardHeader>
-      <CardContent>
+      <CardContent className="space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
           <div className="md:col-span-2 group flex flex-col gap-1.5">
             <Label htmlFor="fechaNovTut" className="flex items-center gap-1.5 text-xs font-semibold text-foreground/90">
@@ -60,13 +61,15 @@ export function TutelaSearchNovedades({
               aria-hidden="true"
             />
             {loading ? (
-              <Loader2 className="size-4 mr-2 animate-spin" />
+               <Loader2 className="size-4 mr-2 animate-spin" />
             ) : (
               <RefreshCw className="size-4 mr-2 transition-transform duration-200 group-hover:scale-110" />
             )}
             <span>{loading ? "Buscando..." : "Consultar"}</span>
           </Button>
         </div>
+
+        <SearchLoadingProgress loading={loading} />
       </CardContent>
     </Card>
   )

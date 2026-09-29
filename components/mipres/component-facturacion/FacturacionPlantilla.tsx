@@ -20,7 +20,7 @@ import {
   DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog"
-import { Download, Upload, Plus, Trash2, FileSpreadsheet, RotateCcw, Copy, ChevronLeft, ChevronRight } from "lucide-react"
+import { Download, Upload, Plus, Trash2, FileSpreadsheet, RotateCcw, Copy, ChevronLeft, ChevronRight, SlidersHorizontal } from "lucide-react"
 import { toast } from "sonner"
 import { fetchWithAuth } from "@/lib/auth"
 import type { FacturacionPlantillaRow, FacturacionPlantillaReservaRow } from "@/lib/facturacion-plantilla-storage"
@@ -383,8 +383,11 @@ export function FacturacionPlantilla() {
           <FileSpreadsheet className="h-5 w-5 text-primary shrink-0" />
           <span className="font-semibold text-sm">Plantilla de Facturación</span>
           <Select value={tipo} onValueChange={(v) => setTipo(v as PlantillaTipo)}>
-            <SelectTrigger className="h-8 w-[190px] text-xs">
-              <SelectValue />
+            <SelectTrigger className="h-8 w-[190px] text-xs bg-white dark:bg-card text-foreground border-input rounded-lg hover:border-primary/50 transition-colors shadow-2xs">
+              <div className="flex items-center gap-1.5 min-w-0 truncate">
+                <SlidersHorizontal className="size-3.5 text-primary shrink-0" />
+                <span className="truncate"><SelectValue /></span>
+              </div>
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="giro">Estructura de Giro</SelectItem>

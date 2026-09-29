@@ -1,7 +1,6 @@
 "use client"
 
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Badge } from "@/components/ui/badge"
 import { AlertCircle, FileBarChart } from "lucide-react"
 import { useEmpresaActual } from "@/lib/use-empresa-actual"
 
@@ -24,17 +23,6 @@ export function InformesHeader({ isConfigured }: InformesHeaderProps) {
           <p className="text-muted-foreground">
             Consulta y descarga de reportes MIPRES para {esIPS ? "IPS" : "EPS"}
           </p>
-        </div>
-        <div className="flex items-center gap-2">
-          {isConfigured ? (
-            <Badge variant="outline" className="bg-primary/10 text-primary border-primary/20">
-              Configurado
-            </Badge>
-          ) : (
-            <Badge variant="outline" className="bg-destructive/10 text-destructive border-destructive/20">
-              Sin configurar
-            </Badge>
-          )}
         </div>
       </div>
 

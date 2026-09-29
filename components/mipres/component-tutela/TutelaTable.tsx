@@ -5,7 +5,13 @@ import { Badge } from "@/components/ui/badge"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { FileText, Calendar, User, Hash, Eye, ChevronLeft, ChevronRight, Activity, Gavel, Pill, Stethoscope, Package, Sparkles, ArrowUpDown, ArrowUp, ArrowDown, Printer, Download, Info, Search } from "lucide-react"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { FileText, Calendar, User, Hash, Eye, ChevronLeft, ChevronRight, Activity, Gavel, Pill, Stethoscope, Package, Sparkles, ArrowUpDown, ArrowUp, ArrowDown, Printer, Download, Info, Search, SlidersHorizontal, Shield, FileSpreadsheet, X } from "lucide-react"
 import { TutelaInfoModal } from "./TutelaInfoModal"
 import { TutelaModal } from "./TutelaModal"
 import { CategoryBadge } from "@/components/mipres/component-prescripcion/CategoryBadge"
@@ -565,19 +571,29 @@ export function TutelaTable({ tutelas, credentials, onRefresh, onDireccionamient
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
-          <div className="relative w-[180px]">
-            <Search className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
+          <div className="relative w-[185px] group">
+            <Search className="pointer-events-none absolute left-2.5 top-1/2 size-3.5 -translate-y-1/2 text-muted-foreground transition-colors group-focus-within:text-primary" />
             <input
               type="text"
-              placeholder="Buscar"
+              placeholder="Buscar..."
               value={searchNoTutela}
               onChange={(e) => setSearchNoTutela(e.target.value)}
-              className="h-8 w-full rounded-md border bg-white pl-8 pr-3 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+              className="h-8 w-full rounded-lg border border-input bg-white dark:bg-card pl-8 pr-7 text-xs text-foreground placeholder:text-muted-foreground/70 shadow-2xs transition-all focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 hover:border-muted-foreground/40"
             />
+            {searchNoTutela && (
+              <button
+                type="button"
+                onClick={() => setSearchNoTutela("")}
+                className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full p-0.5 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+                title="Limpiar búsqueda"
+              >
+                <X className="size-3" />
+              </button>
+            )}
           </div>
 
           <Select value={direccionamientoFilter} onValueChange={(value: any) => setDireccionamientoFilter(value)}>
-            <SelectTrigger className="w-[130px] h-8 text-xs bg-white text-foreground border border-input">
+            <SelectTrigger className="w-[145px] h-8 text-xs bg-white dark:bg-card text-foreground border-input rounded-lg hover:border-primary/50 transition-colors shadow-2xs">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -588,25 +604,14 @@ export function TutelaTable({ tutelas, credentials, onRefresh, onDireccionamient
             </SelectContent>
           </Select>
 
-          <Select value={regimenFilter} onValueChange={(value: any) => setRegimenFilter(value)}>
-            <SelectTrigger className="w-[140px] h-8 text-xs bg-white text-foreground border border-input">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="todos">Regimen: Todos</SelectItem>
-              <SelectItem value="Contributivo">Regimen: Contributivo</SelectItem>
-              <SelectItem value="Subsidiado">Regimen: Subsidiado</SelectItem>
-            </SelectContent>
-          </Select>
-
           <Button
             variant="outline"
             size="sm"
-            className="h-8 text-xs gap-1 bg-white text-foreground border border-input hover:bg-muted/40"
+            className="h-8 text-xs gap-1.5 rounded-lg bg-white dark:bg-card text-foreground border-input hover:bg-emerald-50 dark:hover:bg-emerald-950/40 hover:text-emerald-700 dark:hover:text-emerald-300 hover:border-emerald-300 dark:hover:border-emerald-700 transition-colors shadow-2xs"
             onClick={handleExportExcel}
           >
-            <Download className="h-3.5 w-3.5" />
-            Exportar Excel
+            <FileSpreadsheet className="size-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
+            <span>Exportar Excel</span>
           </Button>
         </div>
       </div>
@@ -652,7 +657,63 @@ export function TutelaTable({ tutelas, credentials, onRefresh, onDireccionamient
                   </div>
                 </th>
                 <th className="text-center text-xs font-medium text-muted-foreground px-4 py-4">
-                  Tipo de regimen
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <button
+                        type="button"
+                        className={`inline-flex items-center justify-center gap-1.5 px-2 py-1 rounded-md transition-colors cursor-pointer group ${
+                          regimenFilter !== "todos"
+                            ? "bg-primary/10 text-primary font-semibold hover:bg-primary/15"
+                            : "hover:text-foreground hover:bg-muted/60"
+                        }`}
+                        title="Filtrar por régimen"
+                      >
+                        <span>Régimen</span>
+                        {regimenFilter !== "todos" && (
+                          <span className={`inline-flex items-center gap-0.5 px-1.5 py-0.2 rounded text-[10px] ${
+                            regimenFilter === "Contributivo"
+                              ? "bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-300"
+                              : "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300"
+                          }`}>
+                            {regimenFilter}
+                            <span
+                              role="button"
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                setRegimenFilter("todos")
+                              }}
+                              className="ml-0.5 hover:opacity-75 cursor-pointer font-bold"
+                              title="Quitar filtro"
+                            >
+                              ×
+                            </span>
+                          </span>
+                        )}
+                      </button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="center" className="min-w-[160px]">
+                      <DropdownMenuItem
+                        onClick={() => setRegimenFilter("todos")}
+                        className={`cursor-pointer ${regimenFilter === "todos" ? "font-semibold bg-accent" : ""}`}
+                      >
+                        Todos los regímenes
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() => setRegimenFilter("Contributivo")}
+                        className={`cursor-pointer ${regimenFilter === "Contributivo" ? "font-semibold bg-blue-50 text-blue-700 dark:bg-blue-950/40" : ""}`}
+                      >
+                        <span className="size-2 rounded-full bg-blue-500 mr-2 shrink-0" />
+                        Contributivo
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() => setRegimenFilter("Subsidiado")}
+                        className={`cursor-pointer ${regimenFilter === "Subsidiado" ? "font-semibold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40" : ""}`}
+                      >
+                        <span className="size-2 rounded-full bg-emerald-500 mr-2 shrink-0" />
+                        Subsidiado
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </th>
                 <th className="text-center text-xs font-medium text-muted-foreground px-4 py-4">
                   Tecnologías asociadas
@@ -737,11 +798,17 @@ export function TutelaTable({ tutelas, credentials, onRefresh, onDireccionamient
                     <td className="px-4 py-2.5 text-center">
                       <Badge
                         variant="secondary"
-                        className={`text-[10px] h-5 ${
+                        onClick={() => {
+                          if (tutela.tipoRegimen) {
+                            setRegimenFilter(tutela.tipoRegimen === regimenFilter ? "todos" : tutela.tipoRegimen)
+                          }
+                        }}
+                        title={tutela.tipoRegimen ? `Filtrar por régimen ${tutela.tipoRegimen}` : undefined}
+                        className={`text-[10px] h-5 cursor-pointer hover:scale-105 active:scale-95 transition-all select-none ${
                           tutela.tipoRegimen === "Contributivo"
-                            ? "bg-blue-100 text-blue-700"
+                            ? "bg-blue-100 text-blue-700 hover:bg-blue-200/80 dark:bg-blue-900/50 dark:text-blue-300"
                             : tutela.tipoRegimen === "Subsidiado"
-                            ? "bg-emerald-100 text-emerald-700"
+                            ? "bg-emerald-100 text-emerald-700 hover:bg-emerald-200/80 dark:bg-emerald-900/50 dark:text-emerald-300"
                             : "bg-muted text-muted-foreground"
                         }`}
                       >
@@ -981,7 +1048,7 @@ export function TutelaTable({ tutelas, credentials, onRefresh, onDireccionamient
             setPage(1)
           }}
         >
-          <SelectTrigger className="w-16 h-8 text-xs bg-white text-foreground border border-input">
+          <SelectTrigger className="w-16 h-8 text-xs bg-white dark:bg-card text-foreground border-input rounded-lg hover:border-primary/50 transition-colors shadow-2xs">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>

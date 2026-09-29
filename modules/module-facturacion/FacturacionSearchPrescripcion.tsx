@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Loader2, Search, FileText } from "lucide-react"
+import { SearchLoadingProgress } from "@/components/SearchLoadingProgress"
 
 interface FacturacionSearchPrescripcionProps {
   noPrescripcion: string
@@ -26,7 +27,7 @@ export function FacturacionSearchPrescripcion({
   }
 
   return (
-    <Card className="relative overflow-hidden rounded-xl border border-border/80 dark:border-border/60 bg-card/85 dark:bg-card/75 backdrop-blur-xl shadow-xs">
+    <Card className="relative overflow-hidden rounded-xl border border-border/80 dark:border-border/60 bg-white dark:bg-card shadow-xs">
       <CardHeader>
         <CardTitle className="leading-none font-semibold flex items-center gap-2">
           <span className="inline-flex size-6 items-center justify-center rounded-md bg-primary/10 text-primary border border-primary/20">
@@ -73,6 +74,8 @@ export function FacturacionSearchPrescripcion({
             <span>{loading ? "Buscando..." : "Consultar"}</span>
           </Button>
         </div>
+
+        <SearchLoadingProgress loading={loading} />
       </CardContent>
     </Card>
   )

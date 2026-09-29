@@ -16,9 +16,18 @@ import {
   Stethoscope,
   Sparkles,
   Activity,
-  ClipboardCheck
+  ClipboardCheck,
+  Search,
+  CheckCircle2,
 } from "lucide-react"
 import { ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import type { Suministro } from "@/models/mipres-sispro/suministro/suministro"
 import type { MipresCredentials } from "@/models/credentials.model"
 import { SuministroAnularModal } from "./SuministroAnularModal"
@@ -436,27 +445,42 @@ export function SuministroTable({ suministros, loading, credentials, onRefresh, 
             </div>
 
             <div className="flex flex-wrap items-center gap-2">
-              <input
-                value={filterPrescripcion}
-                onChange={(e) => setFilterPrescripcion(e.target.value)}
-                placeholder="Filtrar por prescripción"
-                className="h-8 px-3 text-xs border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
-                style={{ width: 220 }}
-              />
-              {filterPrescripcion && (
-                <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setFilterPrescripcion("")}>
-                  <Hash className="h-4 w-4" />
-                </Button>
-              )}
-              <select
+              <div className="relative w-[210px] group">
+                <Search className="pointer-events-none absolute left-2.5 top-1/2 size-3.5 -translate-y-1/2 text-muted-foreground transition-colors group-focus-within:text-primary" />
+                <input
+                  type="text"
+                  placeholder="Buscar N° prescripción..."
+                  value={filterPrescripcion}
+                  onChange={(e) => setFilterPrescripcion(e.target.value)}
+                  className="h-8 w-full rounded-lg border border-input bg-white dark:bg-card pl-8 pr-7 text-xs text-foreground placeholder:text-muted-foreground/70 shadow-2xs transition-all focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 hover:border-muted-foreground/40"
+                />
+                {filterPrescripcion && (
+                  <button
+                    type="button"
+                    onClick={() => setFilterPrescripcion("")}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full p-0.5 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+                    title="Limpiar búsqueda"
+                  >
+                    <X className="size-3" />
+                  </button>
+                )}
+              </div>
+
+              <Select
                 value={filterUltEntrega}
-                onChange={(e) => setFilterUltEntrega(e.target.value as "all" | "with_last_delivery")}
-                className="h-8 px-2 text-xs border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
-                style={{ width: 180 }}
+                onValueChange={(val: any) => setFilterUltEntrega(val)}
               >
-                <option value="all">Todos</option>
-                <option value="with_last_delivery">Con última entrega</option>
-              </select>
+                <SelectTrigger className="w-[185px] h-8 text-xs bg-white dark:bg-card text-foreground border-input rounded-lg hover:border-primary/50 transition-colors shadow-2xs">
+                  <div className="flex items-center gap-1.5 min-w-0 truncate">
+                    <CheckCircle2 className="size-3.5 text-primary shrink-0" />
+                    <span className="truncate"><SelectValue /></span>
+                  </div>
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Entrega: Todas</SelectItem>
+                  <SelectItem value="with_last_delivery">Con última entrega</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </div>
 
@@ -598,17 +622,23 @@ export function SuministroTable({ suministros, loading, credentials, onRefresh, 
 
           <div className="flex flex-wrap items-center justify-end gap-2">
             <span className="text-xs text-muted-foreground">Pag:</span>
-            <select
-              value={pageSize}
-              onChange={(e) => { setPageSize(Number(e.target.value)); setPage(1) }}
-              className="h-8 px-2 text-xs border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
-              style={{ width: 60 }}
+            <Select
+              value={String(pageSize)}
+              onValueChange={(value) => {
+                setPageSize(Number(value))
+                setPage(1)
+              }}
             >
-              <option value={5}>5</option>
-              <option value={10}>10</option>
-              <option value={20}>20</option>
-              <option value={50}>50</option>
-            </select>
+              <SelectTrigger className="w-16 h-8 text-xs bg-white dark:bg-card text-foreground border-input rounded-lg hover:border-primary/50 transition-colors shadow-2xs">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="5">5</SelectItem>
+                <SelectItem value="10">10</SelectItem>
+                <SelectItem value="20">20</SelectItem>
+                <SelectItem value="50">50</SelectItem>
+              </SelectContent>
+            </Select>
             <Button
               variant="ghost"
               size="icon"

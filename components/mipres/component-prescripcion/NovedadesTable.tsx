@@ -101,7 +101,7 @@ export function NovedadesTable({ novedades }: NovedadesTableProps) {
               setPage(1)
             }}
           >
-            <SelectTrigger className="w-16 h-8 text-xs bg-white text-foreground border border-input">
+            <SelectTrigger className="w-16 h-8 text-xs bg-white dark:bg-card text-foreground border-input rounded-lg hover:border-primary/50 transition-colors shadow-2xs">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>

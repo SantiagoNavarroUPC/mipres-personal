@@ -1,10 +1,9 @@
 "use client"
 
-import { Badge } from "@/components/ui/badge"
 import { ArrowRight } from "lucide-react"
 
 interface DireccionamientoHeaderProps {
-  isConfigured: boolean
+  isConfigured?: boolean
 }
 
 export function DireccionamientoHeader({ isConfigured }: DireccionamientoHeaderProps) {
@@ -18,21 +17,6 @@ export function DireccionamientoHeader({ isConfigured }: DireccionamientoHeaderP
           Direccionamiento
         </h2>
         <p className="text-muted-foreground">Gestion de direccionamientos MIPRES</p>
-      </div>
-      <div className="flex items-center gap-2">
-        <Badge variant="outline" className="text-sm bg-emerald-50 text-emerald-700 border-emerald-200">
-          <ArrowRight className="h-4 w-4 mr-1" />
-          Direccionamiento
-        </Badge>
-          {isConfigured ? (
-            <Badge variant="outline" className="bg-emerald-100 text-emerald-700 border-emerald-200">
-              Configurado
-            </Badge>
-          ) : (
-            <Badge variant="outline" className="bg-destructive/10 text-destructive border-destructive/20">
-              Sin configurar
-            </Badge>
-          )}
       </div>
     </div>
   )

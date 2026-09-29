@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Search, Calendar, Loader2 } from "lucide-react"
+import { SearchLoadingProgress } from "@/components/SearchLoadingProgress"
 
 interface EntregaSearchDateProps {
   fechaInicio: string
@@ -36,7 +37,7 @@ export function EntregaSearchDate({
   const isSearching = loading || loadingRango
 
   return (
-    <Card className="relative overflow-hidden rounded-xl border border-border/80 dark:border-border/60 bg-card/85 dark:bg-card/75 backdrop-blur-xl shadow-xs">
+    <Card className="relative overflow-hidden rounded-xl border border-border/80 dark:border-border/60 bg-white dark:bg-card shadow-xs">
       <CardHeader>
         <CardTitle className="leading-none font-semibold flex items-center gap-2">
           <span className="inline-flex size-6 items-center justify-center rounded-md bg-primary/10 text-primary border border-primary/20">
@@ -98,26 +99,12 @@ export function EntregaSearchDate({
           </Button>
         </div>
 
-        {loadingRango && (
-          <div className="space-y-2.5 rounded-xl border border-border/80 bg-card/60 backdrop-blur-xs p-3.5 transition-all">
-            <div className="flex items-center justify-between text-xs">
-              <div className="flex items-center gap-2">
-                <Loader2 className="size-3.5 animate-spin text-primary" />
-                <span className="font-medium text-foreground">Progreso de consulta</span>
-              </div>
-              <span className="font-semibold text-primary font-mono">{Math.round(rangoProgress)}%</span>
-            </div>
-            <div className="h-2 w-full overflow-hidden rounded-full bg-primary/15">
-              <div
-                className="h-full rounded-full bg-primary transition-all duration-300 relative overflow-hidden"
-                style={{ width: `${Math.min(100, Math.max(0, rangoProgress))}%` }}
-              />
-            </div>
-            {rangoInfo && (
-              <p className="text-xs text-muted-foreground">{rangoInfo}</p>
-            )}
-          </div>
-        )}
+        <SearchLoadingProgress
+          loading={loading}
+          loadingRango={loadingRango}
+          rangoProgress={rangoProgress}
+          rangoInfo={rangoInfo}
+        />
 
         {!loadingRango && rangoProgress === 100 && rangoInfo && (
           <div className="rounded-lg border border-primary/20 bg-primary/5 p-3">

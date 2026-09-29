@@ -1,4 +1,4 @@
-﻿import { Badge } from "@/components/ui/badge"
+import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { useState } from "react"
 import { CategoryBadge } from "./CategoryBadge"
@@ -27,6 +27,12 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 
 type JuntaProfesionalItem = {
   NoPrescripcion?: string
@@ -60,6 +66,10 @@ interface PrescripcionTableBodyProps {
   openAccionesModal: (presc: any) => void
   handlePrintPrescripcion: (presc: Prescripcion) => void
   credentials: MipresCredentials
+  regimenFilter?: "todos" | "Contributivo" | "Subsidiado"
+  setRegimenFilter?: (value: "todos" | "Contributivo" | "Subsidiado") => void
+  estJmFilter?: "todos" | "aprobada" | "pendiente" | "rechazada"
+  setEstJmFilter?: (value: "todos" | "aprobada" | "pendiente" | "rechazada") => void
 }
 
 function canDireccionarPrescripcion(presc: any) {
@@ -150,6 +160,10 @@ export function PrescripcionTableBody({
   openAccionesModal,
   handlePrintPrescripcion,
   credentials,
+  regimenFilter = "todos",
+  setRegimenFilter,
+  estJmFilter = "todos",
+  setEstJmFilter,
 }: PrescripcionTableBodyProps) {
   const [activeRow, setActiveRow] = useState<string | null>(null)
   const [juntaDataByNoPrescripcion, setJuntaDataByNoPrescripcion] = useState<Record<string, JuntaProfesionalItem[]>>({})
@@ -311,22 +325,137 @@ export function PrescripcionTableBody({
                 </button>
               </th>
               <th className="text-center text-xs font-medium text-muted-foreground px-4 py-4">
-                <div className="flex items-center justify-center gap-1.5">
-                  <Activity className="h-3 w-3" />
-                  Estado de Prescripcion
-                </div>
+                Estado de Prescripción
               </th>
               <th className="text-center text-xs font-medium text-muted-foreground px-4 py-4">
-                Tipo de regimen
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <button
+                      type="button"
+                      className={`inline-flex items-center justify-center gap-1.5 px-2 py-1 rounded-md transition-colors cursor-pointer group ${
+                        regimenFilter !== "todos"
+                          ? "bg-primary/10 text-primary font-semibold hover:bg-primary/15"
+                          : "hover:text-foreground hover:bg-muted/60"
+                      }`}
+                      title="Filtrar por régimen"
+                    >
+                      <span>Régimen</span>
+                      {regimenFilter !== "todos" && (
+                        <span className={`inline-flex items-center gap-0.5 px-1.5 py-0.2 rounded text-[10px] ${
+                          regimenFilter === "Contributivo"
+                            ? "bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-300"
+                            : "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300"
+                        }`}>
+                          {regimenFilter}
+                          <span
+                            role="button"
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              setRegimenFilter?.("todos")
+                            }}
+                            className="ml-0.5 hover:opacity-75 cursor-pointer font-bold"
+                            title="Quitar filtro"
+                          >
+                            ×
+                          </span>
+                        </span>
+                      )}
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="center" className="min-w-[160px]">
+                    <DropdownMenuItem
+                      onClick={() => setRegimenFilter?.("todos")}
+                      className={`cursor-pointer ${regimenFilter === "todos" ? "font-semibold bg-accent" : ""}`}
+                    >
+                      Todos los regímenes
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => setRegimenFilter?.("Contributivo")}
+                      className={`cursor-pointer ${regimenFilter === "Contributivo" ? "font-semibold bg-blue-50 text-blue-700 dark:bg-blue-950/40" : ""}`}
+                    >
+                      <span className="size-2 rounded-full bg-blue-500 mr-2 shrink-0" />
+                      Contributivo
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => setRegimenFilter?.("Subsidiado")}
+                      className={`cursor-pointer ${regimenFilter === "Subsidiado" ? "font-semibold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40" : ""}`}
+                    >
+                      <span className="size-2 rounded-full bg-emerald-500 mr-2 shrink-0" />
+                      Subsidiado
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </th>
               <th className="text-center text-xs font-medium text-muted-foreground px-4 py-4">
                 Tecnologías prescritas
               </th>
               <th className="text-center text-xs font-medium text-muted-foreground px-4 py-4">
-                <div className="flex items-center justify-center gap-1.5">
-                  Estado Junta
-                  <Info className="h-3 w-3" />
-                </div>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <button
+                      type="button"
+                      className={`inline-flex items-center justify-center gap-1.5 px-2 py-1 rounded-md transition-colors cursor-pointer group ${
+                        estJmFilter !== "todos"
+                          ? "bg-primary/10 text-primary font-semibold hover:bg-primary/15"
+                          : "hover:text-foreground hover:bg-muted/60"
+                      }`}
+                      title="Filtrar por estado de junta profesional"
+                    >
+                      <span>Estado Junta</span>
+                      {estJmFilter !== "todos" && (
+                        <span className={`inline-flex items-center gap-0.5 px-1.5 py-0.2 rounded text-[10px] ${
+                          estJmFilter === "aprobada"
+                            ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300"
+                            : estJmFilter === "pendiente"
+                            ? "bg-amber-100 text-amber-700 dark:bg-amber-900/50 dark:text-amber-300"
+                            : "bg-red-100 text-red-700 dark:bg-red-900/50 dark:text-red-300"
+                        }`}>
+                          {estJmFilter === "aprobada" ? "Aprobada" : estJmFilter === "pendiente" ? "Pendiente" : "Rechazada"}
+                          <span
+                            role="button"
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              setEstJmFilter?.("todos")
+                            }}
+                            className="ml-0.5 hover:opacity-75 cursor-pointer font-bold"
+                            title="Quitar filtro"
+                          >
+                            ×
+                          </span>
+                        </span>
+                      )}
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="center" className="min-w-[160px]">
+                    <DropdownMenuItem
+                      onClick={() => setEstJmFilter?.("todos")}
+                      className={`cursor-pointer ${estJmFilter === "todos" ? "font-semibold bg-accent" : ""}`}
+                    >
+                      Todos los estados JM
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => setEstJmFilter?.("aprobada")}
+                      className={`cursor-pointer ${estJmFilter === "aprobada" ? "font-semibold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40" : ""}`}
+                    >
+                      <span className="size-2 rounded-full bg-emerald-500 mr-2 shrink-0" />
+                      Aprobada
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => setEstJmFilter?.("pendiente")}
+                      className={`cursor-pointer ${estJmFilter === "pendiente" ? "font-semibold bg-amber-50 text-amber-700 dark:bg-amber-950/40" : ""}`}
+                    >
+                      <span className="size-2 rounded-full bg-amber-500 mr-2 shrink-0" />
+                      Pendiente
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => setEstJmFilter?.("rechazada")}
+                      className={`cursor-pointer ${estJmFilter === "rechazada" ? "font-semibold bg-red-50 text-red-700 dark:bg-red-950/40" : ""}`}
+                    >
+                      <span className="size-2 rounded-full bg-red-500 mr-2 shrink-0" />
+                      Rechazada
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </th>
               <th className="text-center text-xs font-medium text-muted-foreground px-4 py-4">
                 <Popover>
@@ -435,13 +564,19 @@ export function PrescripcionTableBody({
                   <td className="px-4 py-2.5 text-center">
                     <Badge
                       variant="secondary"
-                      className={`text-[9px] h-4 px-1.5 whitespace-nowrap ${
+                      onClick={() => {
+                        if (presc.tipoRegimen && setRegimenFilter) {
+                          setRegimenFilter(presc.tipoRegimen === regimenFilter ? "todos" : presc.tipoRegimen)
+                        }
+                      }}
+                      className={`text-[9px] h-4 px-1.5 whitespace-nowrap cursor-pointer hover:scale-105 active:scale-95 transition-all ${
                         presc.tipoRegimen === "Contributivo"
-                          ? "bg-blue-100 text-blue-700"
+                          ? "bg-blue-100 text-blue-700 hover:bg-blue-200/80"
                           : presc.tipoRegimen === "Subsidiado"
-                          ? "bg-emerald-100 text-emerald-700"
+                          ? "bg-emerald-100 text-emerald-700 hover:bg-emerald-200/80"
                           : "bg-muted text-muted-foreground"
                       }`}
+                      title={presc.tipoRegimen ? `Clic para filtrar por ${presc.tipoRegimen}` : undefined}
                     >
                       {presc.tipoRegimen || "Sin regimen"}
                     </Badge>

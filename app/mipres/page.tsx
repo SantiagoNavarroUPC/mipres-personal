@@ -218,7 +218,7 @@ function MipresContent() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="relative min-h-screen bg-background">
       <MipresHeader
         credentials={credentials}
         onToggleSidebar={() => setSidebarOpen(!sidebarOpen)}
@@ -233,7 +233,7 @@ function MipresContent() {
         />
       )}
 
-      <div className="flex">
+      <div className="flex relative z-10 pt-[60px]">
         <MipresSidebar
           activeModule={activeModule}
           onModuleChange={(module) => {
@@ -248,8 +248,16 @@ function MipresContent() {
           permisos={permisos}
           permisosLoaded={permisosLoaded}
         />
-        <main className={`flex-1 min-w-0 w-full p-3 sm:p-4 lg:p-6 transition-all duration-300 ${sidebarOpen ? "md:ml-64" : "md:ml-0"}`}>
-          <div key={`${credentials.nit}-${credentials.tokenAcceso}`}>
+        <main className={`relative flex-1 min-w-0 w-full p-3 sm:p-4 lg:p-6 transition-all duration-300 min-h-[calc(100vh-60px)] bg-white dark:bg-background ${sidebarOpen ? "md:ml-64" : "md:ml-0"}`}>
+          {/* Difuminado exclusivamente en las esquinas inferiores con el verde azulado oficial del tema */}
+          <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
+            {/* Esquina inferior derecha */}
+            <div className="absolute -bottom-10 -right-10 size-52 rounded-full bg-teal-700/15 dark:bg-teal-500/22 blur-2xl" />
+            {/* Esquina inferior izquierda */}
+            <div className="absolute -bottom-10 -left-10 size-48 rounded-full bg-primary/16 dark:bg-primary/25 blur-2xl" />
+          </div>
+
+          <div className="relative z-10" key={`${credentials.nit}-${credentials.tokenAcceso}`}>
             {renderModule()}
           </div>
         </main>

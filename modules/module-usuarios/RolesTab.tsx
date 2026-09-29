@@ -11,7 +11,7 @@ interface RolesTabProps {
 export function RolesTab({ credentials }: RolesTabProps) {
 	return (
 		<div className="space-y-4">
-			<div className="relative overflow-hidden rounded-xl border border-border/80 bg-card p-4 sm:p-5 shadow-xs">
+			<div className="relative overflow-hidden rounded-xl border border-border/80 bg-white dark:bg-card p-4 sm:p-5 shadow-xs">
 				<div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
 					<div className="flex items-center gap-3.5">
 						<div className="flex size-11 items-center justify-center rounded-xl bg-primary/10 text-primary border border-primary/20 shadow-2xs shrink-0">

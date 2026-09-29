@@ -12,6 +12,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { BarChart3, Calendar, Download, FileSpreadsheet, Building2, Loader2 } from "lucide-react"
+import { SearchLoadingProgress } from "@/components/SearchLoadingProgress"
 
 interface InformesSearchDateProps {
   fechaInicio: string
@@ -51,7 +52,7 @@ export function InformesSearchDate({
   const showNitPrestador = requiereNitPrestador(reporte)
 
   return (
-    <Card className="relative overflow-hidden rounded-xl border border-border/80 dark:border-border/60 bg-card/85 dark:bg-card/75 backdrop-blur-xl shadow-xs">
+    <Card className="relative overflow-hidden rounded-xl border border-border/80 dark:border-border/60 bg-white dark:bg-card shadow-xs">
       <CardHeader>
         <CardTitle className="leading-none font-semibold flex items-center gap-2">
           <span className="inline-flex size-6 items-center justify-center rounded-md bg-primary/10 text-primary border border-primary/20">
@@ -63,7 +64,7 @@ export function InformesSearchDate({
           Ingrese fecha inicio y fecha fin para consultar un rango y descargar el reporte en una sola accion.
         </CardDescription>
       </CardHeader>
-      <CardContent>
+      <CardContent className="space-y-4">
         <div
           className={`grid grid-cols-1 gap-4 items-end ${
             showNitPrestador
@@ -173,6 +174,12 @@ export function InformesSearchDate({
             <span>{loadingDashboard ? "Cargando..." : "Ver dashboard"}</span>
           </Button>
         </div>
+
+        <SearchLoadingProgress
+          loading={loading || loadingDashboard}
+          title={loadingDashboard ? "Generando visualización de dashboard" : "Generando y descargando reporte"}
+          subtitle={loadingDashboard ? "Procesando métricas y consolidando datos..." : "Consultando registros y estructurando archivo..."}
+        />
       </CardContent>
     </Card>
   )

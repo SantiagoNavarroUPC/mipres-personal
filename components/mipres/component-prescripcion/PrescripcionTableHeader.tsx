@@ -15,7 +15,20 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { AMBITOS_ATENCION } from "@/models/constants"
-import { Download, FileText, Loader2, Search } from "lucide-react"
+import {
+  Boxes,
+  Building2,
+  FileSpreadsheet,
+  FileText,
+  Loader2,
+  Map,
+  MapPin,
+  Scale,
+  Search,
+  Shield,
+  SlidersHorizontal,
+  X,
+} from "lucide-react"
 
 interface CategoryFilterState {
   med: boolean
@@ -26,8 +39,6 @@ interface CategoryFilterState {
 }
 
 type DireccionamientoFilter = "todos" | "direccionado" | "no-direccionado" | "no-direccionamiento"
-type EstJmFilter = "todos" | "aprobada" | "pendiente" | "rechazada"
-type RegimenFilter = "todos" | "Contributivo" | "Subsidiado"
 type DateSort = "none" | "asc" | "desc"
 
 interface PrescripcionTableHeaderProps {
@@ -47,10 +58,6 @@ interface PrescripcionTableHeaderProps {
   setSearchNoPrescripcion: Dispatch<SetStateAction<string>>
   direccionamientoFilter: DireccionamientoFilter
   setDireccionamientoFilter: Dispatch<SetStateAction<DireccionamientoFilter>>
-  estJmFilter: EstJmFilter
-  setEstJmFilter: Dispatch<SetStateAction<EstJmFilter>>
-  regimenFilter: RegimenFilter
-  setRegimenFilter: Dispatch<SetStateAction<RegimenFilter>>
   ambitoFilter: Record<string, boolean>
   setAmbitoFilter: Dispatch<SetStateAction<Record<string, boolean>>>
   categoryFilter: CategoryFilterState
@@ -75,10 +82,6 @@ export function PrescripcionTableHeader({
   setSearchNoPrescripcion,
   direccionamientoFilter,
   setDireccionamientoFilter,
-  estJmFilter,
-  setEstJmFilter,
-  regimenFilter,
-  setRegimenFilter,
   ambitoFilter,
   setAmbitoFilter,
   categoryFilter,
@@ -102,18 +105,29 @@ export function PrescripcionTableHeader({
       </div>
 
       <div className="flex flex-wrap items-center gap-2">
-        <div className="relative w-[180px]">
-          <Search className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
+        <div className="relative w-[185px] group">
+          <Search className="pointer-events-none absolute left-2.5 top-1/2 size-3.5 -translate-y-1/2 text-muted-foreground transition-colors group-focus-within:text-primary" />
           <input
             type="text"
-            placeholder="Buscar"
+            placeholder="Buscar..."
             value={searchNoPrescripcion}
             onChange={(e) => setSearchNoPrescripcion(e.target.value)}
-            className="h-8 w-full rounded-md border bg-white pl-8 pr-3 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+            className="h-8 w-full rounded-lg border border-input bg-white dark:bg-card pl-8 pr-7 text-xs text-foreground placeholder:text-muted-foreground/70 shadow-2xs transition-all focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 hover:border-muted-foreground/40"
           />
+          {searchNoPrescripcion && (
+            <button
+              type="button"
+              onClick={() => setSearchNoPrescripcion("")}
+              className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full p-0.5 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+              title="Limpiar búsqueda"
+            >
+              <X className="size-3" />
+            </button>
+          )}
         </div>
+
         <Select value={direccionamientoFilter} onValueChange={(value: any) => setDireccionamientoFilter(value)}>
-          <SelectTrigger className="w-[130px] h-8 text-xs bg-white text-foreground border border-input">
+          <SelectTrigger className="w-[145px] h-8 text-xs bg-white dark:bg-card text-foreground border-input rounded-lg hover:border-primary/50 transition-colors shadow-2xs">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -121,31 +135,6 @@ export function PrescripcionTableHeader({
             <SelectItem value="direccionado">Direccionado</SelectItem>
             <SelectItem value="no-direccionado">Sin Proceso</SelectItem>
             <SelectItem value="no-direccionamiento">No Direccionamiento</SelectItem>
-          </SelectContent>
-        </Select>
-
-        {isAdminUser ? (
-          <Select value={estJmFilter} onValueChange={(value: any) => setEstJmFilter(value)}>
-            <SelectTrigger className="w-[140px] h-8 text-xs bg-white text-foreground border border-input">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="todos">Estados JM</SelectItem>
-              <SelectItem value="aprobada">Aprobada</SelectItem>
-              <SelectItem value="pendiente">Pendiente</SelectItem>
-              <SelectItem value="rechazada">Rechazada</SelectItem>
-            </SelectContent>
-          </Select>
-        ) : null}
-
-        <Select value={regimenFilter} onValueChange={(value: any) => setRegimenFilter(value)}>
-          <SelectTrigger className="w-[140px] h-8 text-xs bg-white text-foreground border border-input">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="todos">Régimen: Todos</SelectItem>
-            <SelectItem value="Contributivo">Contributivo</SelectItem>
-            <SelectItem value="Subsidiado">Subsidiado</SelectItem>
           </SelectContent>
         </Select>
 
@@ -157,8 +146,11 @@ export function PrescripcionTableHeader({
           }}
           disabled={municipiosLoading && departamentoOptions.length === 0}
         >
-          <SelectTrigger className="w-[150px] h-8 text-xs bg-white text-foreground border border-input">
-            <SelectValue placeholder="Departamento IPS" />
+          <SelectTrigger className="w-[160px] h-8 text-xs bg-white dark:bg-card text-foreground border-input rounded-lg hover:border-primary/50 transition-colors shadow-2xs">
+            <div className="flex items-center gap-1.5 min-w-0 truncate">
+              <Map className="size-3.5 text-primary shrink-0" />
+              <span className="truncate"><SelectValue placeholder="Departamento IPS" /></span>
+            </div>
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="todos">Departamentos</SelectItem>
@@ -181,8 +173,11 @@ export function PrescripcionTableHeader({
           onValueChange={(value: any) => setMunicipioFilter(value)}
           disabled={departamentoFilter === "todos" || (municipiosLoading && municipioOptions.length === 0)}
         >
-          <SelectTrigger className="w-[160px] h-8 text-xs bg-white text-foreground border border-input">
-            <SelectValue placeholder={departamentoFilter === "todos" ? "Depto primero" : "Municipio"} />
+          <SelectTrigger className="w-[160px] h-8 text-xs bg-white dark:bg-card text-foreground border-input rounded-lg hover:border-primary/50 transition-colors shadow-2xs">
+            <div className="flex items-center gap-1.5 min-w-0 truncate">
+              <MapPin className="size-3.5 text-primary shrink-0" />
+              <span className="truncate"><SelectValue placeholder={departamentoFilter === "todos" ? "Depto primero" : "Municipio"} /></span>
+            </div>
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="todos">Municipio: Todos</SelectItem>
@@ -201,15 +196,23 @@ export function PrescripcionTableHeader({
         </Select>
 
         {municipiosError ? (
-          <span className="text-[10px] text-red-600 max-w-[170px] leading-tight">
+          <span className="text-[10px] text-destructive max-w-[170px] leading-tight font-medium">
             {municipiosError}
           </span>
         ) : null}
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline" size="sm" className="h-8 text-xs bg-white text-foreground border border-input hover:bg-muted/40">
-              Ámbito Hospitalario ({Object.values(ambitoFilter).filter(Boolean).length})
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-8 text-xs gap-1.5 rounded-lg bg-white dark:bg-card text-foreground border-input hover:bg-muted/40 hover:border-primary/50 transition-colors shadow-2xs"
+            >
+              <Building2 className="size-3.5 text-primary shrink-0" />
+              <span>Ámbito Hospitalario</span>
+              <span className="ml-0.5 rounded-full bg-primary/10 px-1.5 py-0.5 text-[10px] font-medium text-primary tabular-nums">
+                {Object.values(ambitoFilter).filter(Boolean).length}
+              </span>
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="min-w-[240px]">
@@ -287,11 +290,15 @@ export function PrescripcionTableHeader({
             <Button 
               variant="outline" 
               size="sm" 
-              className="h-8 text-xs bg-white text-foreground border border-input hover:bg-muted/40"
+              className="h-8 text-xs gap-1.5 rounded-lg bg-white dark:bg-card text-foreground border-input hover:bg-muted/40 hover:border-primary/50 transition-colors shadow-2xs"
               disabled={!isAdminUser}
               title={!isAdminUser ? "Solo Medicamentos disponible para este usuario" : "Seleccionar tecnologías"}
             >
-              Tecnologias ({Object.values(categoryFilter).filter(Boolean).length})
+              <Boxes className="size-3.5 text-primary shrink-0" />
+              <span>Tecnologías</span>
+              <span className="ml-0.5 rounded-full bg-primary/10 px-1.5 py-0.5 text-[10px] font-medium text-primary tabular-nums">
+                {Object.values(categoryFilter).filter(Boolean).length}
+              </span>
             </Button>
           </DropdownMenuTrigger>
           {isAdminUser && (
@@ -360,11 +367,11 @@ export function PrescripcionTableHeader({
         <Button
           variant="outline"
           size="sm"
-          className="h-8 text-xs gap-1 bg-white text-foreground border border-input hover:bg-muted/40"
+          className="h-8 text-xs gap-1.5 rounded-lg bg-white dark:bg-card text-foreground border-input hover:bg-emerald-50 dark:hover:bg-emerald-950/40 hover:text-emerald-700 dark:hover:text-emerald-300 hover:border-emerald-300 dark:hover:border-emerald-700 transition-colors shadow-2xs"
           onClick={handleExportExcel}
         >
-          <Download className="h-3.5 w-3.5" />
-          Exportar Excel
+          <FileSpreadsheet className="size-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
+          <span>Exportar Excel</span>
         </Button>
 
       </div>

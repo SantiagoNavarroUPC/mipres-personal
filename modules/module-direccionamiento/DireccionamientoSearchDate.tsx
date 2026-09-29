@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Calendar, Search, Loader2 } from "lucide-react"
+import { SearchLoadingProgress } from "@/components/SearchLoadingProgress"
 
 interface DireccionamientoSearchDateProps {
   fecha: string
@@ -26,7 +27,7 @@ export function DireccionamientoSearchDate({
   const hoy = new Date().toISOString().split("T")[0]
 
   return (
-    <Card className="relative overflow-hidden rounded-xl border border-border/80 dark:border-border/60 bg-card/85 dark:bg-card/75 backdrop-blur-xl shadow-xs">
+    <Card className="relative overflow-hidden rounded-xl border border-border/80 dark:border-border/60 bg-white dark:bg-card shadow-xs">
       <CardHeader>
         <CardTitle className="leading-none font-semibold flex items-center gap-2">
           <span className="inline-flex size-6 items-center justify-center rounded-md bg-primary/10 text-primary border border-primary/20">
@@ -36,7 +37,7 @@ export function DireccionamientoSearchDate({
         </CardTitle>
         <CardDescription>Retorna la informacion de lo direccionado por fecha</CardDescription>
       </CardHeader>
-      <CardContent>
+      <CardContent className="space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
           <div className="group flex flex-col gap-1.5">
             <Label htmlFor="fechaDir" className="flex items-center gap-1.5 text-xs font-semibold text-foreground/90">
@@ -84,6 +85,8 @@ export function DireccionamientoSearchDate({
             <span>{loading ? "Buscando..." : "Consultar"}</span>
           </Button>
         </div>
+
+        <SearchLoadingProgress loading={loading} />
       </CardContent>
     </Card>
   )

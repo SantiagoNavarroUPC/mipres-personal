@@ -4,9 +4,9 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  --background: oklch(0.98 0.008 190);
+  --background: #ffffff;
   --foreground: oklch(0.22 0.03 190);
-  --card: oklch(1 0 0);
+  --card: #ffffff;
   --card-foreground: oklch(0.22 0.03 190);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.22 0.03 190);
@@ -29,13 +29,13 @@
   --chart-4: oklch(0.72 0.13 190);
   --chart-5: oklch(0.34 0.11 190);
   --radius: 0.625rem;
-  --sidebar: #eafaf8;
+  --sidebar: #ffffff;
   --sidebar-foreground: oklch(0.2 0.02 190);
   --sidebar-primary: #0f766e;
   --sidebar-primary-foreground: oklch(1 0 0);
-  --sidebar-accent: oklch(0.88 0.05 190);
-  --sidebar-accent-foreground: oklch(0.2 0.05 190);
-  --sidebar-border: oklch(0.85 0.05 190);
+  --sidebar-accent: oklch(0.96 0.015 190);
+  --sidebar-accent-foreground: oklch(0.2 0.03 190);
+  --sidebar-border: oklch(0.92 0.01 190);
   --sidebar-ring: #0f766e;
   --appbar: #0f766e;
   --appbar-foreground: oklch(1 0 0);
@@ -257,6 +257,19 @@
 
   .animate-laser-sweep {
     animation: laser-sweep 2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  }
+
+  @keyframes indeterminate-bar {
+    0% {
+      transform: translateX(-100%);
+    }
+    100% {
+      transform: translateX(350%);
+    }
+  }
+
+  .animate-indeterminate {
+    animation: indeterminate-bar 1.5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
   }
 }
 

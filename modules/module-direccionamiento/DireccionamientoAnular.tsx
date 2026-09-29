@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Ban, Loader2 } from "lucide-react"
+import { SearchLoadingProgress } from "@/components/SearchLoadingProgress"
 
 interface DireccionamientoAnularProps {
   idDireccionamiento: string
@@ -20,7 +21,7 @@ export function DireccionamientoAnular({
   onAnular,
 }: DireccionamientoAnularProps) {
   return (
-    <Card className="relative overflow-hidden rounded-xl border border-border/80 dark:border-border/60 bg-card/85 dark:bg-card/75 backdrop-blur-xl shadow-xs">
+    <Card className="relative overflow-hidden rounded-xl border border-border/80 dark:border-border/60 bg-white dark:bg-card shadow-xs">
       <CardHeader>
         <CardTitle className="leading-none font-semibold flex items-center gap-2">
           <span className="inline-flex size-6 items-center justify-center rounded-md bg-destructive/10 text-destructive border border-destructive/20">
@@ -30,7 +31,7 @@ export function DireccionamientoAnular({
         </CardTitle>
         <CardDescription>Metodo para anular un direccionamiento</CardDescription>
       </CardHeader>
-      <CardContent>
+      <CardContent className="space-y-4">
         <div className="flex flex-col sm:flex-row gap-4 items-stretch sm:items-end">
           <div className="flex-1 group flex flex-col gap-1.5">
             <Label htmlFor="idDir" className="flex items-center gap-1.5 text-xs font-semibold text-foreground/90">
@@ -64,6 +65,12 @@ export function DireccionamientoAnular({
             <span>{loading ? "Anulando..." : "Anular"}</span>
           </Button>
         </div>
+
+        <SearchLoadingProgress
+          loading={loading}
+          title="Procesando anulación en MIPRES"
+          subtitle="Enviando solicitud de anulación de direccionamiento al servicio oficial..."
+        />
       </CardContent>
     </Card>
   )

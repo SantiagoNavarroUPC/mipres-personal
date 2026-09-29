@@ -1,6 +1,5 @@
 "use client"
 
-import { Badge } from "@/components/ui/badge"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Receipt, AlertCircle } from "lucide-react"
 
@@ -22,21 +21,6 @@ export function FacturacionHeader({ isConfigured }: FacturacionHeaderProps) {
           <p className="text-muted-foreground">
             Consulta de datos facturados MIPRES
           </p>
-        </div>
-        <div className="flex items-center gap-2">
-          <Badge variant="outline" className="text-sm bg-emerald-50 text-emerald-700 border-emerald-200">
-            <Receipt className="h-4 w-4 mr-1" />
-            Facturación
-          </Badge>
-          {isConfigured ? (
-            <Badge variant="outline" className="bg-emerald-100 text-emerald-700 border-emerald-200">
-              Configurado
-            </Badge>
-          ) : (
-            <Badge variant="outline" className="bg-destructive/10 text-destructive border-destructive/20">
-              Sin configurar
-            </Badge>
-          )}
         </div>
       </div>
 

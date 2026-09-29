@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Search, User, Calendar, IdCard, Loader2 } from "lucide-react"
 import { TIPOS_DOCUMENTO } from "@/models/constants"
+import { SearchLoadingProgress } from "@/components/SearchLoadingProgress"
 
 interface DireccionamientoSearchPatientProps {
   fechaPac: string
@@ -30,7 +31,7 @@ export function DireccionamientoSearchPatient({
   onSearch,
 }: DireccionamientoSearchPatientProps) {
   return (
-    <Card className="relative overflow-hidden rounded-xl border border-border/80 dark:border-border/60 bg-card/85 dark:bg-card/75 backdrop-blur-xl shadow-xs">
+    <Card className="relative overflow-hidden rounded-xl border border-border/80 dark:border-border/60 bg-white dark:bg-card shadow-xs">
       <CardHeader>
         <CardTitle className="leading-none font-semibold flex items-center gap-2">
           <span className="inline-flex size-6 items-center justify-center rounded-md bg-primary/10 text-primary border border-primary/20">
@@ -107,6 +108,8 @@ export function DireccionamientoSearchPatient({
             </Button>
           </div>
         </div>
+
+        <SearchLoadingProgress loading={loading} />
       </CardContent>
     </Card>
   )

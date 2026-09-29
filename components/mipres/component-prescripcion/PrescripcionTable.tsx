@@ -1050,10 +1050,6 @@ export function PrescripcionTable({
         setSearchNoPrescripcion={setSearchNoPrescripcion}
         direccionamientoFilter={direccionamientoFilter}
         setDireccionamientoFilter={setDireccionamientoFilter}
-        estJmFilter={estJmFilter}
-        setEstJmFilter={setEstJmFilter}
-        regimenFilter={regimenFilter}
-        setRegimenFilter={setRegimenFilter}
         ambitoFilter={ambitoFilter}
         setAmbitoFilter={setAmbitoFilter}
         categoryFilter={categoryFilter}
@@ -1066,6 +1062,10 @@ export function PrescripcionTable({
         allFiltered={filteredPrescripciones}
         dateSort={dateSort}
         setDateSort={setDateSort}
+        regimenFilter={regimenFilter}
+        setRegimenFilter={setRegimenFilter}
+        estJmFilter={estJmFilter}
+        setEstJmFilter={setEstJmFilter}
         direccionamientoStatus={direccionamientoStatus}
         noDireccionamientoStatus={noDireccionamientoStatus}
         noDireccionamientoNoAnuladoStatus={noDireccionamientoNoAnuladoStatus}
@@ -1086,7 +1086,7 @@ export function PrescripcionTable({
             setPage(1)
           }}
         >
-          <SelectTrigger className="w-16 h-8 text-xs bg-white text-foreground border border-input">
+          <SelectTrigger className="w-16 h-8 text-xs bg-white dark:bg-card text-foreground border-input rounded-lg hover:border-primary/50 transition-colors shadow-2xs">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>

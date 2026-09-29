@@ -1,6 +1,5 @@
 "use client"
 
-import { Badge } from "@/components/ui/badge"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { ClipboardList, AlertCircle } from "lucide-react"
 import { useEmpresaActual } from "@/lib/use-empresa-actual"
@@ -24,21 +23,6 @@ export function TutelaHeader({ isConfigured }: TutelaHeaderProps) {
           <p className="text-muted-foreground">
             Consulta de tutelas MIPRES para {esIPS ? "IPS" : "EPS"}
           </p>
-        </div>
-        <div className="flex items-center gap-2">
-          <Badge variant="outline" className="text-sm bg-emerald-50 text-emerald-700 border-emerald-200">
-            <ClipboardList className="h-4 w-4 mr-1" />
-            Tutelas
-          </Badge>
-          {isConfigured ? (
-            <Badge variant="outline" className="bg-emerald-100 text-emerald-700 border-emerald-200">
-              Configurado
-            </Badge>
-          ) : (
-            <Badge variant="outline" className="bg-destructive/10 text-destructive border-destructive/20">
-              Sin configurar
-            </Badge>
-          )}
         </div>
       </div>
 

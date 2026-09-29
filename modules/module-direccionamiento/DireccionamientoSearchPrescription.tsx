@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { FileText, Search, Loader2 } from "lucide-react"
+import { SearchLoadingProgress } from "@/components/SearchLoadingProgress"
 
 interface DireccionamientoSearchPrescriptionProps {
   noPresc: string
@@ -20,7 +21,7 @@ export function DireccionamientoSearchPrescription({
   onSearch,
 }: DireccionamientoSearchPrescriptionProps) {
   return (
-    <Card className="relative overflow-hidden rounded-xl border border-border/80 dark:border-border/60 bg-card/85 dark:bg-card/75 backdrop-blur-xl shadow-xs">
+    <Card className="relative overflow-hidden rounded-xl border border-border/80 dark:border-border/60 bg-white dark:bg-card shadow-xs">
       <CardHeader>
         <CardTitle className="leading-none font-semibold flex items-center gap-2">
           <span className="inline-flex size-6 items-center justify-center rounded-md bg-primary/10 text-primary border border-primary/20">
@@ -30,7 +31,7 @@ export function DireccionamientoSearchPrescription({
         </CardTitle>
         <CardDescription>Retorna la informacion de direccionamiento por numero de prescripcion</CardDescription>
       </CardHeader>
-      <CardContent>
+      <CardContent className="space-y-4">
         <div className="flex flex-col sm:flex-row gap-4 items-stretch sm:items-end">
           <div className="flex-1 group flex flex-col gap-1.5">
             <Label htmlFor="noPrescDir" className="flex items-center gap-1.5 text-xs font-semibold text-foreground/90">
@@ -63,6 +64,8 @@ export function DireccionamientoSearchPrescription({
             <span>{loading ? "Buscando..." : "Consultar"}</span>
           </Button>
         </div>
+
+        <SearchLoadingProgress loading={loading} />
       </CardContent>
     </Card>
   )

@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { RefreshCw, Calendar, Loader2 } from "lucide-react"
 import { useEmpresaActual } from "@/lib/use-empresa-actual"
+import { SearchLoadingProgress } from "@/components/SearchLoadingProgress"
 
 interface PrescripcionSearchNovedadesProps {
   fechaNov: string
@@ -24,7 +25,7 @@ export function PrescripcionSearchNovedades({
 }: PrescripcionSearchNovedadesProps) {
   const { esIPS } = useEmpresaActual()
   return (
-    <Card className="relative overflow-hidden rounded-xl border border-border/80 dark:border-border/60 bg-card/85 dark:bg-card/75 backdrop-blur-xl shadow-xs">
+    <Card className="relative overflow-hidden rounded-xl border border-border/80 dark:border-border/60 bg-white dark:bg-card shadow-xs">
       <CardHeader>
         <CardTitle className="leading-none font-semibold flex items-center gap-2">
           <span className="inline-flex size-6 items-center justify-center rounded-md bg-primary/10 text-primary border border-primary/20">
@@ -36,7 +37,7 @@ export function PrescripcionSearchNovedades({
           Retorna todas las novedades de prescripciones para una {esIPS ? "IPS" : "EPS"} en la fecha indicada
         </CardDescription>
       </CardHeader>
-      <CardContent>
+      <CardContent className="space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
           <div className="md:col-span-2 group flex flex-col gap-1.5">
             <Label htmlFor="fechaNov" className="flex items-center gap-1.5 text-xs font-semibold text-foreground/90">
@@ -69,6 +70,8 @@ export function PrescripcionSearchNovedades({
             <span>{loading ? "Buscando..." : "Consultar Novedades"}</span>
           </Button>
         </div>
+
+        <SearchLoadingProgress loading={loading} />
       </CardContent>
     </Card>
   )

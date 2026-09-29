@@ -42,13 +42,12 @@ export function MipresHeader({ credentials, onToggleSidebar }: MipresHeaderProps
 
   const isDarkMode = mounted && resolvedTheme === "dark"
 
-  const isConfigured = Boolean(
-    credentials.nit &&
-    credentials.tokenSubsidiado &&
-    credentials.tokenContributivo &&
-    credentials.tokenAccesoSubsidiado &&
-    credentials.tokenAccesoContributivo
-  )
+  const isTokenValidado = esIPS
+    ? Boolean(credentials.tokenAccesoSubsidiado || credentials.tokenAccesoContributivo || credentials.tokenAcceso)
+    : Boolean(
+        (credentials.tokenAccesoSubsidiado && credentials.tokenAccesoContributivo) ||
+        credentials.tokenAcceso
+      )
 
   const formatRoleName = (raw?: string | number | null) => {
     if (!raw) return null
@@ -104,7 +103,7 @@ export function MipresHeader({ credentials, onToggleSidebar }: MipresHeaderProps
   }
 
   return (
-    <header className="sticky top-0 z-50 bg-appbar text-appbar-foreground shadow-sm border-b border-white/10 backdrop-blur-md">
+    <header className="fixed top-0 inset-x-0 z-50 h-[60px] bg-appbar text-appbar-foreground shadow-sm border-b border-white/10 backdrop-blur-md">
       {/* Subtle bottom gradient accent line */}
       <div
         className="absolute bottom-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-white/25 to-transparent pointer-events-none"
@@ -226,11 +225,19 @@ export function MipresHeader({ credentials, onToggleSidebar }: MipresHeaderProps
                 )}
                 <div className="flex items-center justify-between text-[11px]">
                   <span className="text-muted-foreground">NIT {esIPS ? "IPS" : "EPS"}:</span>
+                  <span className="font-mono font-medium text-foreground">{credentials.nit || "N/A"}</span>
+                </div>
+                <div className="flex items-center justify-between text-[11px]">
+                  <span className="text-muted-foreground">Token MIPRES:</span>
                   <Badge
-                    variant={isConfigured ? "secondary" : "destructive"}
-                    className="text-[10px] px-1.5 py-0 font-medium"
+                    variant="outline"
+                    className={`text-[10px] px-1.5 py-0 font-medium ${
+                      isTokenValidado
+                        ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20"
+                        : "bg-destructive/10 text-destructive border-destructive/20"
+                    }`}
                   >
-                    {isConfigured ? credentials.nit : "Sin Validar Token"}
+                    {isTokenValidado ? "Validado" : "No validado"}
                   </Badge>
                 </div>
               </div>

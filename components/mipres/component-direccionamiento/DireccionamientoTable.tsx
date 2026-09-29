@@ -6,9 +6,15 @@ import { CategoryBadge } from "@/components/mipres/component-prescripcion/Catego
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 import { DireccionamientoModalAnular } from "./DireccionamientoViewAnular"
 import { DireccionamientoModalProgramar } from "./DireccionamientoModalProgramar"
-import { ChevronLeft, ChevronRight, Eye, X, Calendar, ArrowUpDown, ArrowUp, ArrowDown, Pill, Stethoscope, Package as PackageIcon, Sparkles, Activity, Hash, Layers3, ShieldCheck, CalendarClock } from "lucide-react"
+import { ChevronLeft, ChevronRight, Eye, X, Calendar, ArrowUpDown, ArrowUp, ArrowDown, Pill, Stethoscope, Package as PackageIcon, Sparkles, Activity, Hash, Layers3, ShieldCheck, CalendarClock, Search, Boxes, Shield, Copy, Compass } from "lucide-react"
 import { toast } from "sonner"
 import type { Direccionamiento } from "@/models/mipres-sispro/direccionamiento"
 import type { MipresCredentials } from "@/models/credentials.model"
@@ -216,6 +222,7 @@ export function DireccionamientoTable({ results, credentials, onView, onAnularSu
     <div className="space-y-3">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-2">
+          <Compass className="h-5 w-5 text-primary" />
           <h3 className="font-semibold text-base">Direccionamientos</h3>
           <Badge variant="secondary" className="text-xs">
             {filteredTotal}
@@ -223,16 +230,33 @@ export function DireccionamientoTable({ results, credentials, onView, onAnularSu
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
-          <input
-            type="text"
-            placeholder="Buscar N° prescripción"
-            value={searchPrescripcion}
-            onChange={(e) => setSearchPrescripcion(e.target.value)}
-            className="h-8 px-3 text-xs border rounded-md w-[180px] bg-white text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-          />
+          <div className="relative w-[190px] group">
+            <Search className="pointer-events-none absolute left-2.5 top-1/2 size-3.5 -translate-y-1/2 text-muted-foreground transition-colors group-focus-within:text-primary" />
+            <input
+              type="text"
+              placeholder="Buscar N° prescripción..."
+              value={searchPrescripcion}
+              onChange={(e) => setSearchPrescripcion(e.target.value)}
+              className="h-8 w-full rounded-lg border border-input bg-white dark:bg-card pl-8 pr-7 text-xs text-foreground placeholder:text-muted-foreground/70 shadow-2xs transition-all focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 hover:border-muted-foreground/40"
+            />
+            {searchPrescripcion && (
+              <button
+                type="button"
+                onClick={() => setSearchPrescripcion("")}
+                className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full p-0.5 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+                title="Limpiar búsqueda"
+              >
+                <X className="size-3" />
+              </button>
+            )}
+          </div>
+
           <Select value={filterTipoTec} onValueChange={setFilterTipoTec}>
-            <SelectTrigger className="w-[160px] h-8 text-xs bg-white text-foreground border border-input">
-              <SelectValue />
+            <SelectTrigger className="w-[160px] h-8 text-xs bg-white dark:bg-card text-foreground border-input rounded-lg hover:border-primary/50 transition-colors shadow-2xs">
+              <div className="flex items-center gap-1.5 min-w-0 truncate">
+                <Boxes className="size-3.5 text-primary shrink-0" />
+                <span className="truncate"><SelectValue /></span>
+              </div>
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="todos">Tipo: Todos</SelectItem>
@@ -243,28 +267,17 @@ export function DireccionamientoTable({ results, credentials, onView, onAnularSu
               <SelectItem value="S">Tipo: Servicios</SelectItem>
             </SelectContent>
           </Select>
-          <Select value={regimenFilter} onValueChange={(value: any) => setRegimenFilter(value)}>
-            <SelectTrigger className="w-[160px] h-8 text-xs bg-white text-foreground border border-input">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="todos">Régimen: Todos</SelectItem>
-              <SelectItem value="Contributivo">Régimen: Contributivo</SelectItem>
-              <SelectItem value="Subsidiado">Régimen: Subsidiado</SelectItem>
-            </SelectContent>
-          </Select>
 
-          <div className="flex items-center gap-2">
-             <label className="text-xs flex items-center gap-1 cursor-pointer select-none bg-muted px-2 py-1.5 rounded-md border hover:bg-muted/80 transition-colors">
-               <input 
-                 type="checkbox" 
-                 checked={showDuplicatesOnly}
-                 onChange={(e) => setShowDuplicatesOnly(e.target.checked)}
-                 className="accent-primary h-3 w-3"
-               />
-               Solo Duplicados
-             </label>
-           </div>
+          <label className="text-xs flex items-center gap-1.5 cursor-pointer select-none bg-white dark:bg-card px-2.5 h-8 rounded-lg border border-input hover:border-primary/50 text-foreground transition-colors shadow-2xs">
+            <Copy className="size-3.5 text-primary shrink-0" />
+            <input 
+              type="checkbox" 
+              checked={showDuplicatesOnly}
+              onChange={(e) => setShowDuplicatesOnly(e.target.checked)}
+              className="accent-primary h-3.5 w-3.5 rounded"
+            />
+            <span>Solo Duplicados</span>
+          </label>
         </div>
       </div>
 
@@ -297,7 +310,65 @@ export function DireccionamientoTable({ results, credentials, onView, onAnularSu
                   {dateSort === "desc" && <ArrowDown className="h-3 w-3" />}
                 </button>
               </th>
-              <th className="text-center text-xs font-medium text-muted-foreground px-4 py-4">Tipo de regimen</th>
+              <th className="text-center text-xs font-medium text-muted-foreground px-4 py-4">
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <button
+                      type="button"
+                      className={`inline-flex items-center justify-center gap-1.5 px-2 py-1 rounded-md transition-colors cursor-pointer group ${
+                        regimenFilter !== "todos"
+                          ? "bg-primary/10 text-primary font-semibold hover:bg-primary/15"
+                          : "hover:text-foreground hover:bg-muted/60"
+                      }`}
+                      title="Filtrar por régimen"
+                    >
+                      <span>Régimen</span>
+                      {regimenFilter !== "todos" && (
+                        <span className={`inline-flex items-center gap-0.5 px-1.5 py-0.2 rounded text-[10px] ${
+                          regimenFilter === "Contributivo"
+                            ? "bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-300"
+                            : "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300"
+                        }`}>
+                          {regimenFilter}
+                          <span
+                            role="button"
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              setRegimenFilter("todos")
+                            }}
+                            className="ml-0.5 hover:opacity-75 cursor-pointer font-bold"
+                            title="Quitar filtro"
+                          >
+                            ×
+                          </span>
+                        </span>
+                      )}
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="center" className="min-w-[160px]">
+                    <DropdownMenuItem
+                      onClick={() => setRegimenFilter("todos")}
+                      className={`cursor-pointer ${regimenFilter === "todos" ? "font-semibold bg-accent" : ""}`}
+                    >
+                      Todos los regímenes
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => setRegimenFilter("Contributivo")}
+                      className={`cursor-pointer ${regimenFilter === "Contributivo" ? "font-semibold bg-blue-50 text-blue-700 dark:bg-blue-950/40" : ""}`}
+                    >
+                      <span className="size-2 rounded-full bg-blue-500 mr-2 shrink-0" />
+                      Contributivo
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => setRegimenFilter("Subsidiado")}
+                      className={`cursor-pointer ${regimenFilter === "Subsidiado" ? "font-semibold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40" : ""}`}
+                    >
+                      <span className="size-2 rounded-full bg-emerald-500 mr-2 shrink-0" />
+                      Subsidiado
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </th>
               <th className="text-center text-xs font-medium text-muted-foreground px-4 py-4">
                 <div className="flex items-center justify-center gap-1.5">
                   <Layers3 className="h-3 w-3" />
@@ -361,11 +432,17 @@ export function DireccionamientoTable({ results, credentials, onView, onAnularSu
                   <td className="px-4 py-2.5 text-center">
                     <Badge
                       variant="secondary"
-                      className={`text-[10px] h-5 ${
+                      onClick={() => {
+                        if (row.tipoRegimen) {
+                          setRegimenFilter(row.tipoRegimen === regimenFilter ? "todos" : row.tipoRegimen as any)
+                        }
+                      }}
+                      title={row.tipoRegimen ? `Filtrar por régimen ${row.tipoRegimen}` : undefined}
+                      className={`text-[10px] h-5 cursor-pointer hover:scale-105 active:scale-95 transition-all select-none ${
                         row.tipoRegimen === "Contributivo"
-                          ? "bg-blue-100 text-blue-700"
+                          ? "bg-blue-100 text-blue-700 hover:bg-blue-200/80 dark:bg-blue-900/50 dark:text-blue-300"
                           : row.tipoRegimen === "Subsidiado"
-                          ? "bg-emerald-100 text-emerald-700"
+                          ? "bg-emerald-100 text-emerald-700 hover:bg-emerald-200/80 dark:bg-emerald-900/50 dark:text-emerald-300"
                           : "bg-muted text-muted-foreground"
                       }`}
                     >
@@ -451,7 +528,7 @@ export function DireccionamientoTable({ results, credentials, onView, onAnularSu
             setPage(1)
           }}
         >
-          <SelectTrigger className="w-16 h-8 text-xs bg-white text-foreground border border-input">
+          <SelectTrigger className="w-16 h-8 text-xs bg-white dark:bg-card text-foreground border-input rounded-lg hover:border-primary/50 transition-colors shadow-2xs">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>

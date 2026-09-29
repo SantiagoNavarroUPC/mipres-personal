@@ -19,6 +19,10 @@ import {
   ArrowLeft,
   ArrowRight,
   Loader2,
+  FileCheck2,
+  Search,
+  SlidersHorizontal,
+  X,
 } from "lucide-react"
 import type { ReporteEntrega } from "@/models/mipres-sispro/reporte-entrega/reporte-entrega"
 import type { Suministro } from "@/models/mipres-sispro/suministro/suministro"
@@ -585,6 +589,7 @@ export function ReporteEntregaTable({ reportes, loading, onRefreshReportes, onFo
       {!anyViewOpen && <>
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-2">
+          <FileCheck2 className="h-5 w-5 text-primary" />
           <h3 className="font-semibold text-base">Reportes Entrega</h3>
           <Badge variant="secondary" className="text-xs">
             {filteredGroups.length}
@@ -592,16 +597,29 @@ export function ReporteEntregaTable({ reportes, loading, onRefreshReportes, onFo
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
-          <input
-            type="text"
-            placeholder="Buscar N° prescripción o paciente"
-            value={filterText}
-            onChange={(e) => setFilterText(e.target.value)}
-            className="h-8 px-3 text-xs border rounded-md w-[220px] bg-white text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-          />
+          <div className="relative w-[230px] group">
+            <Search className="pointer-events-none absolute left-2.5 top-1/2 size-3.5 -translate-y-1/2 text-muted-foreground transition-colors group-focus-within:text-primary" />
+            <input
+              type="text"
+              placeholder="Buscar N° prescripción o paciente..."
+              value={filterText}
+              onChange={(e) => setFilterText(e.target.value)}
+              className="h-8 w-full rounded-lg border border-input bg-white dark:bg-card pl-8 pr-7 text-xs text-foreground placeholder:text-muted-foreground/70 shadow-2xs transition-all focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 hover:border-muted-foreground/40"
+            />
+            {filterText && (
+              <button
+                type="button"
+                onClick={() => setFilterText("")}
+                className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full p-0.5 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+                title="Limpiar búsqueda"
+              >
+                <X className="size-3" />
+              </button>
+            )}
+          </div>
 
           <Select value={filterState} onValueChange={(v: any) => setFilterState(v)}>
-            <SelectTrigger className="w-[220px] h-8 text-xs bg-white text-foreground border border-input">
+            <SelectTrigger className="w-[195px] h-8 text-xs bg-white dark:bg-card text-foreground border-input rounded-lg hover:border-primary/50 transition-colors shadow-2xs">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -616,13 +634,16 @@ export function ReporteEntregaTable({ reportes, loading, onRefreshReportes, onFo
           <Button
             variant="outline"
             size="sm"
-            className="h-8 px-3 text-xs bg-white text-foreground border border-input hover:bg-muted/40"
+            className="h-8 gap-1.5 px-3 text-xs rounded-lg bg-white dark:bg-card text-foreground border-input hover:bg-primary/5 hover:border-primary/50 transition-colors shadow-2xs"
             onClick={handleHacerSuministroMasivo}
             disabled={reportesElegiblesTodos.length === 0}
             title="Hacer suministro masivo (incluye todas las páginas del resultado filtrado)"
           >
-            <Plus className="h-4 w-4 mr-1" />
-            Hacer suministro masivo ({reportesElegiblesTodos.length})
+            <Plus className="size-3.5 text-primary" />
+            <span>Hacer suministro masivo</span>
+            <span className="ml-0.5 rounded-full bg-primary/10 px-1.5 py-0.5 text-[10px] font-medium text-primary tabular-nums">
+              {reportesElegiblesTodos.length}
+            </span>
           </Button>
         </div>
       </div>
@@ -839,22 +860,25 @@ export function ReporteEntregaTable({ reportes, loading, onRefreshReportes, onFo
 
       <div className="flex flex-wrap items-center justify-end gap-2">
         <span className="text-xs text-muted-foreground">Pag:</span>
-        <select
-          value={pageSize}
-          onChange={e => {
-            setPageSize(Number(e.target.value))
+        <Select
+          value={String(pageSize)}
+          onValueChange={(val) => {
+            setPageSize(Number(val))
             setPage(1)
             // @ts-ignore
             window && window.scrollTo && window.scrollTo({ top: 0, behavior: "smooth" })
           }}
-          className="h-8 px-2 text-xs border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
-          style={{ width: 60 }}
         >
-          <option value={5}>5</option>
-          <option value={10}>10</option>
-          <option value={20}>20</option>
-          <option value={50}>50</option>
-        </select>
+          <SelectTrigger className="w-16 h-8 text-xs bg-white dark:bg-card text-foreground border-input rounded-lg hover:border-primary/50 transition-colors shadow-2xs">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="5">5</SelectItem>
+            <SelectItem value="10">10</SelectItem>
+            <SelectItem value="20">20</SelectItem>
+            <SelectItem value="50">50</SelectItem>
+          </SelectContent>
+        </Select>
 
         <Button
           variant="ghost"
