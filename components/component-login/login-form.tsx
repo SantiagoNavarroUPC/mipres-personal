@@ -163,7 +163,6 @@ export function LoginForm() {
           Usuario o Documento
         </Label>
         <div className="relative">
-          <User className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground transition-colors group-focus-within:text-primary pointer-events-none" />
           <Input
             id="usuario"
             type="text"
@@ -175,6 +174,7 @@ export function LoginForm() {
             autoComplete="username"
             disabled={isLoading}
           />
+          <User className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground transition-colors group-focus-within:text-primary pointer-events-none z-10" />
         </div>
       </div>
 
@@ -192,11 +192,10 @@ export function LoginForm() {
           )}
         </div>
         <div className="relative">
-          <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground transition-colors group-focus-within:text-primary pointer-events-none" />
           <Input
             id="contrasena"
             type={showPassword ? "text" : "password"}
-            placeholder="••••••••••••"
+            placeholder="Ingrese su contraseña"
             value={contrasena}
             onChange={(e) => setContrasena(e.target.value)}
             onKeyDown={handlePasswordKeyEvent}
@@ -206,10 +205,11 @@ export function LoginForm() {
             autoComplete="current-password"
             disabled={isLoading}
           />
+          <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground transition-colors group-focus-within:text-primary pointer-events-none z-10" />
           <button
             type="button"
             onClick={() => setShowPassword(!showPassword)}
-            className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-muted-foreground hover:text-foreground transition-colors rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
+            className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-muted-foreground hover:text-foreground transition-colors rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 z-10"
             aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
           >
             {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}

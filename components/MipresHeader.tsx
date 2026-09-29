@@ -153,20 +153,8 @@ export function MipresHeader({ credentials, onToggleSidebar }: MipresHeaderProps
           </div>
         </div>
 
-        {/* Right: Status Pills, Theme Toggle, Notifications, User Menu */}
-        <div className="flex items-center gap-1.5 sm:gap-3">
-          {roleLabel && (
-            <Badge variant="secondary" className="hidden sm:flex">
-              {roleLabel}
-            </Badge>
-          )}
-          <Badge
-            variant={isConfigured ? "secondary" : "destructive"}
-            className="hidden sm:flex"
-          >
-            {isConfigured ? `NIT ${esIPS ? "IPS" : "EPS"}: ${credentials.nit}` : "Sin Validar Token"}
-          </Badge>
-
+        {/* Right: Theme Toggle, Notifications, User Menu */}
+        <div className="flex items-center gap-1.5 sm:gap-2.5">
           {/* Theme switcher button */}
           <Button
             variant="ghost"
@@ -222,19 +210,30 @@ export function MipresHeader({ credentials, onToggleSidebar }: MipresHeaderProps
                     </p>
                   )}
                   {roleLabel && (
-                    <span className="inline-block mt-0.5 text-[10px] font-medium text-primary px-1.5 py-0.5 rounded bg-primary/10">
+                    <span className="inline-block mt-0.5 text-[10px] font-medium text-primary px-1.5 py-0.5 rounded-md bg-primary/10 border border-primary/20">
                       {roleLabel}
                     </span>
                   )}
                 </div>
               </div>
 
-              {credentials.nombreEmpresa && (
-                <div className="px-2 py-1.5 text-[11px] text-muted-foreground flex items-center gap-1.5 border-b border-border/60 pb-2 mb-1">
-                  <Building2 className="size-3.5 shrink-0 text-muted-foreground/70" />
-                  <span className="truncate">{credentials.nombreEmpresa}</span>
+              <div className="px-2 py-1.5 text-[11px] text-muted-foreground flex flex-col gap-1.5 border-b border-border/60 pb-2 mb-1">
+                {credentials.nombreEmpresa && (
+                  <div className="flex items-center gap-1.5">
+                    <Building2 className="size-3.5 shrink-0 text-muted-foreground/70" />
+                    <span className="truncate font-medium text-foreground">{credentials.nombreEmpresa}</span>
+                  </div>
+                )}
+                <div className="flex items-center justify-between text-[11px]">
+                  <span className="text-muted-foreground">NIT {esIPS ? "IPS" : "EPS"}:</span>
+                  <Badge
+                    variant={isConfigured ? "secondary" : "destructive"}
+                    className="text-[10px] px-1.5 py-0 font-medium"
+                  >
+                    {isConfigured ? credentials.nit : "Sin Validar Token"}
+                  </Badge>
                 </div>
-              )}
+              </div>
 
               <DropdownMenuItem
                 onClick={handleLogout}

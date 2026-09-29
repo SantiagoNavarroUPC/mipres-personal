@@ -245,5 +245,18 @@
   .animate-float-reverse {
     animation: float-reverse 10s ease-in-out infinite;
   }
+
+  @keyframes laser-sweep {
+    0% {
+      transform: translateX(-100%);
+    }
+    100% {
+      transform: translateX(250%);
+    }
+  }
+
+  .animate-laser-sweep {
+    animation: laser-sweep 2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  }
 }
 

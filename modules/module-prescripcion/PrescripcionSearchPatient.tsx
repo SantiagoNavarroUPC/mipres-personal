@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Search, User } from "lucide-react"
+import { Search, User, Calendar, IdCard, Loader2 } from "lucide-react"
 import { TIPOS_DOCUMENTO } from "@/models/mipres-sispro/prescripcion"
 
 interface PrescripcionSearchPatientProps {
@@ -45,10 +45,12 @@ export function PrescripcionSearchPatient({
   const requiereTipoDoc = tieneFechas
 
   return (
-    <Card>
+    <Card className="relative overflow-hidden rounded-xl border border-border/80 dark:border-border/60 bg-card/85 dark:bg-card/75 backdrop-blur-xl shadow-xs">
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <User className="h-5 w-5" />
+        <CardTitle className="leading-none font-semibold flex items-center gap-2">
+          <span className="inline-flex size-6 items-center justify-center rounded-md bg-primary/10 text-primary border border-primary/20">
+            <User className="size-3.5" />
+          </span>
           Consulta por Paciente
         </CardTitle>
         <CardDescription>
@@ -58,34 +60,43 @@ export function PrescripcionSearchPatient({
       <CardContent>
         <div className="space-y-4">
           <div className="flex flex-wrap items-end gap-4">
-            <div className="flex-1 min-w-[140px]">
-              <Label htmlFor="fechaPac">Fecha Inicial (Opcional)</Label>
+            <div className="group flex-1 min-w-[140px] flex flex-col gap-1.5">
+              <Label htmlFor="fechaPac" className="flex items-center gap-1.5 text-xs font-semibold text-foreground/90">
+                <Calendar className="size-3 text-muted-foreground group-focus-within:text-primary transition-colors" />
+                Fecha Inicial (Opcional)
+              </Label>
               <Input
                 id="fechaPac"
                 type="date"
                 value={fechaPac}
                 onChange={(e) => onFechaPacChange(e.target.value)}
-                className="mt-1"
+                className="h-9 bg-card/60 backdrop-blur-xs border-border/80 hover:border-border focus-visible:bg-card focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 transition-all text-sm rounded-xl"
               />
             </div>
-            <div className="flex-1 min-w-[140px]">
-              <Label htmlFor="fechaFinPac">Fecha Final (Opcional)</Label>
+            <div className="group flex-1 min-w-[140px] flex flex-col gap-1.5">
+              <Label htmlFor="fechaFinPac" className="flex items-center gap-1.5 text-xs font-semibold text-foreground/90">
+                <Calendar className="size-3 text-muted-foreground group-focus-within:text-primary transition-colors" />
+                Fecha Final (Opcional)
+              </Label>
               <Input
                 id="fechaFinPac"
                 type="date"
                 value={fechaFinPac}
                 onChange={(e) => onFechaFinPacChange(e.target.value)}
-                className="mt-1"
+                className="h-9 bg-card/60 backdrop-blur-xs border-border/80 hover:border-border focus-visible:bg-card focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 transition-all text-sm rounded-xl"
                 placeholder="Opcional"
               />
             </div>
-            <div className="flex-1 min-w-[180px]">
-              <Label htmlFor="tipoDoc">Tipo Documento</Label>
+            <div className="group flex-1 min-w-[180px] flex flex-col gap-1.5">
+              <Label htmlFor="tipoDoc" className="flex items-center gap-1.5 text-xs font-semibold text-foreground/90">
+                <IdCard className="size-3 text-muted-foreground group-focus-within:text-primary transition-colors" />
+                Tipo Documento
+              </Label>
               <Select
                 value={tipoDoc || "__seleccione__"}
                 onValueChange={(value) => onTipoDocChange(value === "__seleccione__" ? "" : value)}
               >
-                <SelectTrigger className="mt-1">
+                <SelectTrigger className="h-9 bg-card/60 backdrop-blur-xs border-border/80 hover:border-border focus:bg-card focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all text-sm rounded-xl">
                   <SelectValue placeholder="Seleccione..." />
                 </SelectTrigger>
                 <SelectContent>
@@ -98,14 +109,17 @@ export function PrescripcionSearchPatient({
                 </SelectContent>
               </Select>
             </div>
-            <div className="flex-1 min-w-[140px]">
-              <Label htmlFor="numDoc">Número Documento</Label>
+            <div className="group flex-1 min-w-[140px] flex flex-col gap-1.5">
+              <Label htmlFor="numDoc" className="flex items-center gap-1.5 text-xs font-semibold text-foreground/90">
+                <User className="size-3 text-muted-foreground group-focus-within:text-primary transition-colors" />
+                Número Documento
+              </Label>
               <Input
                 id="numDoc"
                 type="text"
                 value={numDoc}
                 onChange={(e) => onNumDocChange(e.target.value)}
-                className="mt-1"
+                className="h-9 bg-card/60 backdrop-blur-xs border-border/80 hover:border-border focus-visible:bg-card focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 transition-all text-sm rounded-xl"
                 placeholder="Ej. 12345678"
               />
             </div>
@@ -113,16 +127,20 @@ export function PrescripcionSearchPatient({
               <Button 
                 onClick={onSearch} 
                 disabled={loading || !numDoc || !isConfigured || (requiereTipoDoc && !tipoDoc)}
-                className="w-full"
+                className="relative overflow-hidden group h-9 w-full font-semibold text-sm bg-primary hover:bg-primary/95 text-primary-foreground shadow-sm shadow-primary/20 hover:shadow-primary/35 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 rounded-xl"
               >
+                <span
+                  className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-white/20 to-transparent pointer-events-none"
+                  aria-hidden="true"
+                />
                 {loading ? (
                   <>
-                    <Search className="mr-2 h-4 w-4 animate-spin" />
+                    <Loader2 className="mr-2 size-4 animate-spin" />
                     Consultando...
                   </>
                 ) : (
                   <>
-                    <Search className="mr-2 h-4 w-4" />
+                    <Search className="mr-2 size-4 transition-transform duration-200 group-hover:scale-110" />
                     Consultar
                   </>
                 )}
@@ -131,15 +149,20 @@ export function PrescripcionSearchPatient({
           </div>
 
           {loadingRango && (
-            <div className="space-y-2">
-              <div className="flex justify-between text-xs text-muted-foreground">
-                <span>{rangoInfo || "Procesando..."}</span>
-                <span>{Math.round(rangoProgress)}%</span>
+            <div className="space-y-2.5 rounded-xl border border-border/80 bg-card/60 backdrop-blur-xs p-3.5 transition-all">
+              <div className="flex items-center justify-between text-xs">
+                <div className="flex items-center gap-2">
+                  <Loader2 className="size-3.5 animate-spin text-primary" />
+                  <span className="font-medium text-foreground">
+                    {rangoInfo || "Procesando..."}
+                  </span>
+                </div>
+                <span className="font-semibold text-primary font-mono">{Math.round(rangoProgress)}%</span>
               </div>
-              <div className="h-2 w-full bg-secondary rounded-full overflow-hidden">
+              <div className="h-2 w-full overflow-hidden rounded-full bg-primary/15">
                 <div 
-                  className="h-full bg-primary transition-all duration-300 ease-in-out"
-                  style={{ width: `${rangoProgress}%` }}
+                  className="h-full bg-primary rounded-full transition-all duration-300 relative overflow-hidden"
+                  style={{ width: `${Math.min(100, Math.max(0, rangoProgress))}%` }}
                 />
               </div>
             </div>
