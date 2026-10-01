@@ -38,7 +38,6 @@ interface CategoryFilterState {
   serv: boolean
 }
 
-type DireccionamientoFilter = "todos" | "direccionado" | "no-direccionado" | "no-direccionamiento"
 type DateSort = "none" | "asc" | "desc"
 
 interface PrescripcionTableHeaderProps {
@@ -56,8 +55,6 @@ interface PrescripcionTableHeaderProps {
   municipioOptions: Array<{ value: string; label: string }>
   searchNoPrescripcion: string
   setSearchNoPrescripcion: Dispatch<SetStateAction<string>>
-  direccionamientoFilter: DireccionamientoFilter
-  setDireccionamientoFilter: Dispatch<SetStateAction<DireccionamientoFilter>>
   ambitoFilter: Record<string, boolean>
   setAmbitoFilter: Dispatch<SetStateAction<Record<string, boolean>>>
   categoryFilter: CategoryFilterState
@@ -80,8 +77,6 @@ export function PrescripcionTableHeader({
   municipioOptions,
   searchNoPrescripcion,
   setSearchNoPrescripcion,
-  direccionamientoFilter,
-  setDireccionamientoFilter,
   ambitoFilter,
   setAmbitoFilter,
   categoryFilter,
@@ -105,11 +100,11 @@ export function PrescripcionTableHeader({
       </div>
 
       <div className="flex flex-wrap items-center gap-2">
-        <div className="relative w-[185px] group">
+        <div className="relative w-[260px] sm:w-[280px] group">
           <Search className="pointer-events-none absolute left-2.5 top-1/2 size-3.5 -translate-y-1/2 text-muted-foreground transition-colors group-focus-within:text-primary" />
           <input
             type="text"
-            placeholder="Buscar..."
+            placeholder="Buscar por prescripción..."
             value={searchNoPrescripcion}
             onChange={(e) => setSearchNoPrescripcion(e.target.value)}
             className="h-8 w-full rounded-lg border border-input bg-white dark:bg-card pl-8 pr-7 text-xs text-foreground placeholder:text-muted-foreground/70 shadow-2xs transition-all focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 hover:border-muted-foreground/40"
@@ -125,18 +120,6 @@ export function PrescripcionTableHeader({
             </button>
           )}
         </div>
-
-        <Select value={direccionamientoFilter} onValueChange={(value: any) => setDireccionamientoFilter(value)}>
-          <SelectTrigger className="w-[145px] h-8 text-xs bg-white dark:bg-card text-foreground border-input rounded-lg hover:border-primary/50 transition-colors shadow-2xs">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="todos">Estado: Todos</SelectItem>
-            <SelectItem value="direccionado">Direccionado</SelectItem>
-            <SelectItem value="no-direccionado">Sin Proceso</SelectItem>
-            <SelectItem value="no-direccionamiento">No Direccionamiento</SelectItem>
-          </SelectContent>
-        </Select>
 
         <Select
           value={departamentoFilter}

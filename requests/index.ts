@@ -10,4 +10,4 @@ export { DEFAULT_HEADERS as PRESCRIPCIONTECNOLOGIAS_DEFAULT_HEADERS } from "./mi
 export { DEFAULT_HEADERS as SUMINISTRO_DEFAULT_HEADERS } from "./mipres-sispro/suministro.request"
 export { DEFAULT_HEADERS as PROGRAMACION_DEFAULT_HEADERS } from "./mipres-sispro/programacion.request"
 export { DEFAULT_HEADERS as ENTREGA_DEFAULT_HEADERS } from "./mipres-sispro/entrega.request"
-export * from "./backend/reportes.requests"
+export * from "./Backend/reportes.requests"

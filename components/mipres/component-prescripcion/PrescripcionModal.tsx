@@ -70,7 +70,7 @@ export function PrescripcionModal({ prescripcion, open, onClose }: ModalProps) {
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-3xl max-h-[85vh] p-0 gap-0">
+      <DialogContent className="w-[95vw] sm:max-w-3xl max-h-[85vh] p-0 gap-0 rounded-2xl overflow-hidden">
         <DialogHeader className="px-6 pt-6 pb-4 border-b bg-muted/30">
           <DialogTitle className="flex items-center gap-2 text-lg">
             <FileText className="h-5 w-5 text-primary" />

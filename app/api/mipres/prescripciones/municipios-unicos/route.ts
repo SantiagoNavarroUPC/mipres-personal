@@ -84,7 +84,7 @@ export async function GET(request: NextRequest) {
         )
       }
 
-      const pacienteParams = (tipoDoc && numDoc) ? { tipoDoc, numDoc } : undefined
+      const pacienteParams = (tipoDoc && numDoc) ? { tipoDoc, numDoc } : undefined;
 
       [result1, result2] = await Promise.all([
         consultarPrescripcionesPorRangoFechas(
@@ -114,7 +114,7 @@ export async function GET(request: NextRequest) {
         tipoDoc: tipoDoc || undefined,
         numDoc: numDoc || undefined,
         noPrescripcion: noPrescripcion || undefined,
-      }
+      };
 
       [result1, result2] = await Promise.all([
         consultarPrescripciones(credentialsSubsidiado, tipo, params),

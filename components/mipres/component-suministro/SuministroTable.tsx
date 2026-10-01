@@ -19,6 +19,10 @@ import {
   ClipboardCheck,
   Search,
   CheckCircle2,
+  ChevronLeft,
+  ChevronRight,
+  ChevronsLeft,
+  ChevronsRight,
 } from "lucide-react"
 import { ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react"
 import {
@@ -484,57 +488,59 @@ export function SuministroTable({ suministros, loading, credentials, onRefresh, 
             </div>
           </div>
 
-          <Card className="overflow-hidden gap-0 py-0">
+          <Card className="overflow-hidden gap-0 py-0 rounded-xl border border-border/80 dark:border-border/60 bg-card shadow-xs">
             <div className="w-full max-w-full overflow-x-auto">
-              <table className="w-full min-w-[1000px]">
+              <table className="w-full">
                 <thead>
-                  <tr className="border-b bg-muted/40">
-                    <th className="text-center text-xs font-medium text-muted-foreground px-4 py-4 pl-8">
-                      <div className="flex items-center gap-1.5 justify-start">
-                        <FileText className="h-3 w-3" />
-                        Prescripción
+                  <tr className="border-b border-primary/20 bg-primary text-white whitespace-nowrap">
+                    <th className="text-center text-[11px] sm:text-xs font-semibold text-white px-2 sm:px-4 py-2 sm:py-3 whitespace-nowrap">
+                      <div className="flex items-center justify-center gap-1.5 whitespace-nowrap">
+                        <Hash className="h-3.5 w-3.5 text-white shrink-0" />
+                        <span>No. Prescripción</span>
                       </div>
                     </th>
-                    <th className="text-center text-xs font-medium text-muted-foreground px-4 py-4">
-                      <div className="flex items-center justify-center gap-1.5">
-                        <Package className="h-3 w-3" />
-                        Suministros
+                    <th className="text-center text-[11px] sm:text-xs font-semibold text-white px-2 sm:px-4 py-2 sm:py-3 whitespace-nowrap hidden sm:table-cell">
+                      <div className="flex items-center justify-center gap-1.5 whitespace-nowrap">
+                        <Package className="h-3.5 w-3.5 text-white shrink-0" />
+                        <span>Suministros</span>
                       </div>
                     </th>
-                    <th className="text-center text-xs font-medium text-muted-foreground px-4 py-4">Tecnologías</th>
-                    <th className="text-center text-xs font-medium text-muted-foreground px-4 py-4">Estado Último</th>
-                    <th className="text-center text-xs font-medium text-muted-foreground px-4 py-4">
+                    <th className="text-center text-[11px] sm:text-xs font-semibold text-white px-2 sm:px-4 py-2 sm:py-3 whitespace-nowrap hidden xl:table-cell">Tecnologías</th>
+                    <th className="text-center text-[11px] sm:text-xs font-semibold text-white px-2 sm:px-4 py-2 sm:py-3 whitespace-nowrap hidden sm:table-cell">Estado Último</th>
+                    <th className="text-center text-[11px] sm:text-xs font-semibold text-white px-2 sm:px-4 py-2 sm:py-3 whitespace-nowrap hidden sm:table-cell">
                       <button
                         type="button"
                         onClick={() => setDateSort(dateSort === "none" ? "desc" : dateSort === "desc" ? "asc" : "none")}
-                        className="flex items-center justify-center gap-1.5 w-full hover:text-foreground transition-colors cursor-pointer"
+                        className="flex items-center justify-center gap-1.5 w-full hover:text-white/80 transition-colors cursor-pointer text-white whitespace-nowrap"
                       >
-                        Fecha Suministro
-                        {dateSort === "none" && <ArrowUpDown className="h-3 w-3" />}
-                        {dateSort === "asc" && <ArrowUp className="h-3 w-3" />}
-                        {dateSort === "desc" && <ArrowDown className="h-3 w-3" />}
+                        <span>Fecha Suministro</span>
+                        {dateSort === "none" && <ArrowUpDown className="h-3.5 w-3.5 text-white/70 shrink-0" />}
+                        {dateSort === "asc" && <ArrowUp className="h-3.5 w-3.5 text-white shrink-0" />}
+                        {dateSort === "desc" && <ArrowDown className="h-3.5 w-3.5 text-white shrink-0" />}
                       </button>
                     </th>
-                    <th className="text-center text-xs font-medium text-muted-foreground px-4 py-4">Acciones</th>
+                    <th className="text-center text-[11px] sm:text-xs font-semibold text-white px-2 sm:px-4 py-2 sm:py-3 whitespace-nowrap w-24 sm:w-28">
+                      <span>Acciones</span>
+                    </th>
                   </tr>
                 </thead>
-                <tbody className="divide-y text-justify">
+                <tbody className="divide-y divide-border/60 dark:divide-border/40">
                   {displayedGroups.map((group) => {
                     const techCount = techCountsByPrescripcion[group.noPrescripcion] || { M: 0, P: 0, D: 0, N: 0, S: 0 }
                     const isActive = activeRow === group.noPrescripcion
                     return (
                       <tr key={group.noPrescripcion} className={`transition-colors hover:bg-muted/30${isActive ? " bg-emerald-50 dark:bg-zinc-800/80" : ""}`}>
-                        <td className="px-4 py-2.5 text-left align-middle">
-                          <span className="font-mono text-xs font-medium text-primary pl-4">
+                        <td className="px-2 sm:px-4 py-2 sm:py-2.5 text-center">
+                          <span className="font-mono text-xs font-medium text-primary">
                             {group.noPrescripcion}
                           </span>
                         </td>
-                        <td className="px-4 py-2.5 text-center">
+                        <td className="px-4 py-2.5 text-center hidden sm:table-cell">
                           <Badge variant="secondary" className="text-[10px] h-5 px-2">
                             {group.count} {group.count === 1 ? "Registro" : "Registros"}
                           </Badge>
                         </td>
-                        <td className="px-4 py-2.5 text-center">
+                        <td className="px-4 py-2.5 text-center hidden xl:table-cell">
                           <div className="flex gap-0.5 justify-center whitespace-nowrap">
                             <CategoryBadge icon={Pill} label="Med" count={techCount.M} colorClass="bg-emerald-100 text-emerald-700" />
                             <CategoryBadge icon={Stethoscope} label="Proc" count={techCount.P} colorClass="bg-sky-100 text-sky-700" />
@@ -543,7 +549,7 @@ export function SuministroTable({ suministros, loading, credentials, onRefresh, 
                             <CategoryBadge icon={Activity} label="Serv" count={techCount.S} colorClass="bg-violet-100 text-violet-700" />
                           </div>
                         </td>
-                        <td className="px-4 py-2.5 text-center">
+                        <td className="px-4 py-2.5 text-center hidden sm:table-cell">
                           <Badge
                             variant="outline"
                             className={`h-5 px-2 text-[10px] ${
@@ -555,12 +561,12 @@ export function SuministroTable({ suministros, loading, credentials, onRefresh, 
                             {group.latestSuministro?.EntregaCompleta === 1 ? "Completa" : "Parcial"}
                           </Badge>
                         </td>
-                        <td className="px-4 py-2.5 text-center">
+                        <td className="px-4 py-2.5 text-center hidden sm:table-cell">
                           <span className="text-xs text-muted-foreground font-mono">
                             {group.latestSuministro?.FecSuministro || "N/A"}
                           </span>
                         </td>
-                        <td className="px-4 py-2.5 text-center align-middle">
+                        <td className="px-2 sm:px-4 py-2 sm:py-2.5 text-center align-middle">
                           <div className="flex items-center justify-center gap-1">
                             <Button
                               variant="ghost"
@@ -620,46 +626,93 @@ export function SuministroTable({ suministros, loading, credentials, onRefresh, 
             </div>
           </Card>
 
-          <div className="flex flex-wrap items-center justify-end gap-2">
-            <span className="text-xs text-muted-foreground">Pag:</span>
-            <Select
-              value={String(pageSize)}
-              onValueChange={(value) => {
-                setPageSize(Number(value))
-                setPage(1)
-              }}
-            >
-              <SelectTrigger className="w-16 h-8 text-xs bg-white dark:bg-card text-foreground border-input rounded-lg hover:border-primary/50 transition-colors shadow-2xs">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="5">5</SelectItem>
-                <SelectItem value="10">10</SelectItem>
-                <SelectItem value="20">20</SelectItem>
-                <SelectItem value="50">50</SelectItem>
-              </SelectContent>
-            </Select>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-8 w-8"
-              disabled={page <= 1}
-              onClick={() => setPage(Math.max(1, page - 1))}
-            >
-              <ArrowLeft className="h-4 w-4" />
-            </Button>
-            <span className="px-2 text-xs font-medium min-w-[50px] text-center">
-              {page} / {pageCount}
-            </span>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-8 w-8"
-              disabled={page >= pageCount}
-              onClick={() => setPage(Math.min(pageCount, page + 1))}
-            >
-              <ArrowRight className="h-4 w-4" />
-            </Button>
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 px-4 py-2.5 rounded-xl border border-border/80 dark:border-border/60 bg-white/70 dark:bg-card/75 backdrop-blur-xl shadow-2xs">
+            {/* Info summary */}
+            <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+              <span>Mostrando</span>
+              <span className="font-semibold text-foreground">
+                {filteredTotal === 0 ? 0 : (page - 1) * pageSize + 1} - {Math.min(page * pageSize, filteredTotal)}
+              </span>
+              <span>de</span>
+              <span className="inline-flex items-center px-1.5 py-0.5 rounded-md bg-primary/10 text-primary font-semibold text-[11px] tabular-nums">
+                {filteredTotal}
+              </span>
+              <span>registros</span>
+            </div>
+
+            {/* Controls */}
+            <div className="flex flex-wrap items-center gap-3">
+              <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                <span>Filas:</span>
+                <Select
+                  value={String(pageSize)}
+                  onValueChange={(value) => {
+                    setPageSize(Number(value))
+                    setPage(1)
+                  }}
+                >
+                  <SelectTrigger className="w-[68px] h-8 text-xs bg-white dark:bg-card text-foreground border-input rounded-lg hover:border-primary/50 transition-colors shadow-2xs">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="5">5</SelectItem>
+                    <SelectItem value="10">10</SelectItem>
+                    <SelectItem value="20">20</SelectItem>
+                    <SelectItem value="50">50</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="flex items-center gap-1">
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="h-8 w-8 rounded-lg bg-white dark:bg-card border-input hover:border-primary/50 hover:text-primary transition-all cursor-pointer shadow-2xs"
+                  disabled={page <= 1}
+                  onClick={() => setPage(1)}
+                  title="Primera página"
+                >
+                  <ChevronsLeft className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="h-8 w-8 rounded-lg bg-white dark:bg-card border-input hover:border-primary/50 hover:text-primary transition-all cursor-pointer shadow-2xs"
+                  disabled={page <= 1}
+                  onClick={() => setPage(Math.max(1, page - 1))}
+                  title="Página anterior"
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                </Button>
+
+                <div className="px-2.5 h-8 flex items-center justify-center rounded-lg border border-border/80 bg-white dark:bg-card text-xs font-semibold tabular-nums text-foreground shadow-2xs">
+                  <span className="text-primary">{page}</span>
+                  <span className="mx-1 text-muted-foreground/60">/</span>
+                  <span className="text-muted-foreground">{pageCount}</span>
+                </div>
+
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="h-8 w-8 rounded-lg bg-white dark:bg-card border-input hover:border-primary/50 hover:text-primary transition-all cursor-pointer shadow-2xs"
+                  disabled={page >= pageCount}
+                  onClick={() => setPage(Math.min(pageCount, page + 1))}
+                  title="Página siguiente"
+                >
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="h-8 w-8 rounded-lg bg-white dark:bg-card border-input hover:border-primary/50 hover:text-primary transition-all cursor-pointer shadow-2xs"
+                  disabled={page >= pageCount}
+                  onClick={() => setPage(pageCount)}
+                  title="Última página"
+                >
+                  <ChevronsRight className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
           </div>
         </>
       )}

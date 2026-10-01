@@ -8,7 +8,7 @@ import type { Prescripcion } from "@/models/mipres-sispro/prescripcion"
 import type { MipresCredentials } from "@/models/credentials.model"
 import { useMipresQueryClient } from "@/hooks/useMipresQueries"
 import { AMBITOS_ATENCION, ESTADOS_PRESCRIPCION } from "@/models/constants"
-import { ChevronLeft, ChevronRight, FileText } from "lucide-react"
+import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, FileText } from "lucide-react"
 
 import { PrescripcionTableHeader } from "./PrescripcionTableHeader"
 import { PrescripcionTableBody } from "./PrescripcionTableBody"
@@ -1018,13 +1018,15 @@ export function PrescripcionTable({
 
   if (!prescripciones || prescripciones.length === 0) {
     return (
-      <Card className="border-dashed">
-        <CardContent className="flex flex-col items-center justify-center py-12">
-          <div className="rounded-full bg-muted p-3 mb-3">
-            <FileText className="h-6 w-6 text-muted-foreground" />
+      <Card className="rounded-2xl border border-dashed border-border/80 dark:border-border/60 bg-card/85 dark:bg-card/75 backdrop-blur-xl shadow-xs">
+        <CardContent className="flex flex-col items-center justify-center py-16 text-center">
+          <div className="size-14 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center mb-4 text-primary shadow-xs">
+            <FileText className="size-7" />
           </div>
-          <p className="text-base font-medium text-muted-foreground">No se encontraron prescripciones</p>
-          <p className="text-sm text-muted-foreground/70 mt-1">Intenta con otros criterios de búsqueda</p>
+          <p className="text-base font-semibold text-foreground">No se encontraron prescripciones</p>
+          <p className="text-xs text-muted-foreground mt-1 max-w-sm">
+            No hay prescripciones registradas para esta consulta. Intenta ajustando el rango de fechas o los criterios de búsqueda.
+          </p>
         </CardContent>
       </Card>
     )
@@ -1048,8 +1050,6 @@ export function PrescripcionTable({
         municipioOptions={municipioOptions}
         searchNoPrescripcion={searchNoPrescripcion}
         setSearchNoPrescripcion={setSearchNoPrescripcion}
-        direccionamientoFilter={direccionamientoFilter}
-        setDireccionamientoFilter={setDireccionamientoFilter}
         ambitoFilter={ambitoFilter}
         setAmbitoFilter={setAmbitoFilter}
         categoryFilter={categoryFilter}
@@ -1066,6 +1066,8 @@ export function PrescripcionTable({
         setRegimenFilter={setRegimenFilter}
         estJmFilter={estJmFilter}
         setEstJmFilter={setEstJmFilter}
+        direccionamientoFilter={direccionamientoFilter}
+        setDireccionamientoFilter={setDireccionamientoFilter}
         direccionamientoStatus={direccionamientoStatus}
         noDireccionamientoStatus={noDireccionamientoStatus}
         noDireccionamientoNoAnuladoStatus={noDireccionamientoNoAnuladoStatus}
@@ -1077,48 +1079,92 @@ export function PrescripcionTable({
         handlePrintPrescripcion={handlePrintPrescripcion}
       />
 
-      <div className="flex flex-wrap items-center justify-end gap-2">
-        <span className="text-xs text-muted-foreground">Pag:</span>
-        <Select
-          value={String(pageSize)}
-          onValueChange={(value) => {
-            setPageSize(Number(value))
-            setPage(1)
-          }}
-        >
-          <SelectTrigger className="w-16 h-8 text-xs bg-white dark:bg-card text-foreground border-input rounded-lg hover:border-primary/50 transition-colors shadow-2xs">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="5">5</SelectItem>
-            <SelectItem value="10">10</SelectItem>
-            <SelectItem value="20">20</SelectItem>
-            <SelectItem value="50">50</SelectItem>
-          </SelectContent>
-        </Select>
-
-        <div className="flex items-center gap-0.5">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8"
-            disabled={page <= 1}
-            onClick={() => setPage(Math.max(1, page - 1))}
-          >
-            <ChevronLeft className="h-4 w-4" />
-          </Button>
-          <span className="px-2 text-xs font-medium min-w-[50px] text-center">
-            {page} / {pageCount}
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-3 px-4 py-2.5 rounded-xl border border-border/80 dark:border-border/60 bg-white/70 dark:bg-card/75 backdrop-blur-xl shadow-2xs">
+        {/* Info summary */}
+        <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+          <span>Mostrando</span>
+          <span className="font-semibold text-foreground">
+            {total === 0 ? 0 : (page - 1) * pageSize + 1} - {Math.min(page * pageSize, total)}
           </span>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8"
-            disabled={page >= pageCount}
-            onClick={() => setPage(Math.min(pageCount, page + 1))}
-          >
-            <ChevronRight className="h-4 w-4" />
-          </Button>
+          <span>de</span>
+          <span className="inline-flex items-center px-1.5 py-0.5 rounded-md bg-primary/10 text-primary font-semibold text-[11px] tabular-nums">
+            {total}
+          </span>
+          <span>prescripciones</span>
+        </div>
+
+        {/* Controls */}
+        <div className="flex flex-wrap items-center gap-3">
+          <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+            <span>Filas:</span>
+            <Select
+              value={String(pageSize)}
+              onValueChange={(value) => {
+                setPageSize(Number(value))
+                setPage(1)
+              }}
+            >
+              <SelectTrigger className="w-[68px] h-8 text-xs bg-white dark:bg-card text-foreground border-input rounded-lg hover:border-primary/50 transition-colors shadow-2xs">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="5">5</SelectItem>
+                <SelectItem value="10">10</SelectItem>
+                <SelectItem value="20">20</SelectItem>
+                <SelectItem value="50">50</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="flex items-center gap-1">
+            <Button
+              variant="outline"
+              size="icon"
+              className="h-8 w-8 rounded-lg bg-white dark:bg-card border-input hover:border-primary/50 hover:text-primary transition-all cursor-pointer shadow-2xs"
+              disabled={page <= 1}
+              onClick={() => setPage(1)}
+              title="Primera página"
+            >
+              <ChevronsLeft className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="outline"
+              size="icon"
+              className="h-8 w-8 rounded-lg bg-white dark:bg-card border-input hover:border-primary/50 hover:text-primary transition-all cursor-pointer shadow-2xs"
+              disabled={page <= 1}
+              onClick={() => setPage(Math.max(1, page - 1))}
+              title="Página anterior"
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+
+            <div className="px-2.5 h-8 flex items-center justify-center rounded-lg border border-border/80 bg-white dark:bg-card text-xs font-semibold tabular-nums text-foreground shadow-2xs">
+              <span className="text-primary">{page}</span>
+              <span className="mx-1 text-muted-foreground/60">/</span>
+              <span className="text-muted-foreground">{pageCount}</span>
+            </div>
+
+            <Button
+              variant="outline"
+              size="icon"
+              className="h-8 w-8 rounded-lg bg-white dark:bg-card border-input hover:border-primary/50 hover:text-primary transition-all cursor-pointer shadow-2xs"
+              disabled={page >= pageCount}
+              onClick={() => setPage(Math.min(pageCount, page + 1))}
+              title="Página siguiente"
+            >
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="outline"
+              size="icon"
+              className="h-8 w-8 rounded-lg bg-white dark:bg-card border-input hover:border-primary/50 hover:text-primary transition-all cursor-pointer shadow-2xs"
+              disabled={page >= pageCount}
+              onClick={() => setPage(pageCount)}
+              title="Última página"
+            >
+              <ChevronsRight className="h-4 w-4" />
+            </Button>
+          </div>
         </div>
       </div>
       </>}

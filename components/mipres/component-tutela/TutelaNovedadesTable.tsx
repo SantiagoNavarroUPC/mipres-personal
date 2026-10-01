@@ -30,29 +30,29 @@ export function TutelaNovedadesTable({ novedades }: TutelaNovedadesTableProps) {
   }
 
   return (
-    <Card className="overflow-hidden gap-0 py-0">
+    <Card className="overflow-hidden gap-0 py-0 rounded-xl border border-border/80 dark:border-border/60 bg-card shadow-xs">
       <div className="w-full max-w-full overflow-x-auto">
-        <table className="w-full min-w-[680px] text-xs sm:text-sm">
+        <table className="w-full text-xs sm:text-sm">
           <thead>
-            <tr className="border-b bg-muted/40">
-              <th className="text-left text-xs font-medium text-muted-foreground px-4 py-4">
-                <div className="flex items-center gap-1.5">
-                  <FileText className="h-3 w-3" />
-                  Tutela
+            <tr className="border-b border-primary/20 bg-primary text-white whitespace-nowrap">
+              <th className="text-left text-[11px] sm:text-xs font-semibold text-white px-2 sm:px-4 py-2 sm:py-3 whitespace-nowrap">
+                <div className="flex items-center gap-1.5 whitespace-nowrap">
+                  <FileText className="h-3.5 w-3.5 text-white shrink-0" />
+                  <span>Tutela</span>
                 </div>
               </th>
-              <th className="text-left text-xs font-medium text-muted-foreground px-4 py-4">
-                <div className="flex items-center gap-1.5">
-                  <Calendar className="h-3 w-3" />
-                  Fecha
+              <th className="text-left text-[11px] sm:text-xs font-semibold text-white px-2 sm:px-4 py-2 sm:py-3 whitespace-nowrap">
+                <div className="flex items-center gap-1.5 whitespace-nowrap">
+                  <Calendar className="h-3.5 w-3.5 text-white shrink-0" />
+                  <span>Fecha</span>
                 </div>
               </th>
-              <th className="text-left text-xs font-medium text-muted-foreground px-4 py-4">
-                Detalle
+              <th className="text-left text-[11px] sm:text-xs font-semibold text-white px-2 sm:px-4 py-2 sm:py-3 whitespace-nowrap">
+                <span>Detalle</span>
               </th>
             </tr>
           </thead>
-          <tbody className="divide-y">
+          <tbody className="divide-y divide-border/60 dark:divide-border/40">
             {novedades.map((item, idx) => {
               const noTutela = pickField(item, ["NoTutela", "NroTutela", "noTutela", "NoPrescripcion"]) ?? "-"
               const fecha = pickField(item, ["FTutela", "Fecha", "FNov", "FecNov"]) ?? "-"

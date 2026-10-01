@@ -18,6 +18,7 @@ import {
   ChevronRight,
   Activity,
   Layers,
+  FileText,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import type { MipresModule } from "@/app/mipres/page"
@@ -319,12 +320,12 @@ export function MipresSidebar({
   return (
     <aside
       className={cn(
-        "fixed left-0 top-[60px] h-[calc(100vh-60px)] w-64 bg-sidebar border-r border-sidebar-border transition-transform duration-300 z-40 flex flex-col shadow-lg md:shadow-none select-none",
+        "fixed left-0 top-[60px] h-[calc(100vh-60px)] h-[calc(100dvh-60px)] w-64 bg-sidebar border-r border-sidebar-border transition-transform duration-300 z-40 flex flex-col shadow-lg md:shadow-none select-none overflow-y-auto md:overflow-hidden touch-pan-y overscroll-contain",
         isOpen ? "translate-x-0" : "-translate-x-full"
       )}
     >
       {/* Module Navigation */}
-      <nav className="flex-1 px-3 py-3 space-y-3 overflow-y-auto scrollbar-hidden">
+      <nav className="flex-1 md:min-h-0 px-3 py-3 space-y-3 md:overflow-y-auto md:scrollbar-hidden">
         {!permisosLoaded ? (
           <div className="space-y-2 py-2">
             {[1, 2, 3, 4, 5, 6].map((i) => (
@@ -369,7 +370,7 @@ export function MipresSidebar({
       </nav>
 
       {/* Footer Status and Author Credit with Login Background Animation */}
-      <div className="p-3 border-t border-sidebar-border/80 bg-sidebar/60">
+      <div className="p-3 border-t border-sidebar-border/80 bg-sidebar/60 shrink-0">
         <div className="relative group overflow-hidden rounded-xl border border-border/80 dark:border-sidebar-border/80 bg-white dark:bg-card p-2.5 shadow-xs transition-all duration-300 hover:border-sidebar-primary/60 hover:shadow-md">
           {/* Animated constellation, floating blobs and dot grid from login background */}
           <SidebarFooterBackground />

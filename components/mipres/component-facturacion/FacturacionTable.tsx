@@ -6,8 +6,6 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import {
   Receipt,
-  ArrowLeft,
-  ArrowRight,
   Download,
   ArrowUpDown,
   ArrowUp,
@@ -17,7 +15,19 @@ import {
   Plus,
   X,
   Loader2,
+  Hash,
+  ChevronLeft,
+  ChevronRight,
+  ChevronsLeft,
+  ChevronsRight,
 } from "lucide-react"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import type { Facturacion } from "@/models/mipres-sispro/facturacion/facturacion"
 import { ESTADOS_FACTURACION, TIPOS_TEC_FACTURACION } from "@/models/constants"
 
@@ -349,53 +359,58 @@ export function FacturacionTable({ facturaciones, keysConDatos, idsConDatos, loa
       )}
 
       {/* Tabla */}
-      <Card className="overflow-hidden gap-0 py-0">
+      <Card className="overflow-hidden gap-0 py-0 rounded-xl border border-border/80 dark:border-border/60 bg-card shadow-xs">
         <div className="w-full max-w-full overflow-x-auto">
-          <table className="w-full min-w-[820px]">
+          <table className="w-full">
             <thead>
-              <tr className="border-b bg-muted/40">
-                <th className="px-2 py-3 w-8 text-center">
+              <tr className="border-b border-primary/20 bg-primary text-white whitespace-nowrap">
+                <th className="px-2 py-2 sm:py-3 w-8 text-center hidden sm:table-cell">
                   <input
                     ref={selectAllRef}
                     type="checkbox"
                     checked={allPageSelected}
                     onChange={toggleSelectAll}
                     disabled={pendingKeysPage.size === 0}
-                    className="h-3.5 w-3.5 accent-emerald-600 cursor-pointer disabled:cursor-not-allowed disabled:opacity-30"
+                    className="h-3.5 w-3.5 accent-white cursor-pointer disabled:cursor-not-allowed disabled:opacity-30"
                     title="Seleccionar todos los pendientes de esta página"
                   />
                 </th>
-                <th className="text-center text-xs font-medium text-muted-foreground px-2 py-3">#</th>
-                <th className="text-left text-xs font-medium text-muted-foreground px-2 py-3">Prescripción</th>
-                <th className="text-left text-xs font-medium text-muted-foreground px-2 py-3">Tecnología</th>
-                <th className="text-left text-xs font-medium text-muted-foreground px-2 py-3">Factura · CUFE</th>
-                <th className="text-right text-xs font-medium text-muted-foreground px-2 py-3">Cant.</th>
-                <th className="text-right text-xs font-medium text-muted-foreground px-2 py-3">Vlr. Unit.</th>
-                <th className="text-right text-xs font-medium text-muted-foreground px-2 py-3">Vlr. Total</th>
-                <th className="text-center text-xs font-medium text-muted-foreground px-2 py-3">
+                <th className="text-center text-[11px] sm:text-xs font-semibold text-white px-2 py-2 sm:py-3 whitespace-nowrap hidden sm:table-cell">#</th>
+                <th className="text-center text-[11px] sm:text-xs font-semibold text-white px-2 sm:px-4 py-2 sm:py-3 whitespace-nowrap">
+                  <div className="flex items-center justify-center gap-1.5 whitespace-nowrap">
+                    <Hash className="h-3.5 w-3.5 text-white shrink-0" />
+                    <span>No. Prescripción</span>
+                  </div>
+                </th>
+                <th className="text-center text-[11px] sm:text-xs font-semibold text-white px-2 sm:px-4 py-2 sm:py-3 whitespace-nowrap hidden xl:table-cell">Tecnología</th>
+                <th className="text-center text-[11px] sm:text-xs font-semibold text-white px-2 sm:px-4 py-2 sm:py-3 whitespace-nowrap hidden sm:table-cell">Factura · CUFE</th>
+                <th className="text-right text-[11px] sm:text-xs font-semibold text-white px-2 sm:px-4 py-2 sm:py-3 whitespace-nowrap hidden sm:table-cell">Cant.</th>
+                <th className="text-right text-[11px] sm:text-xs font-semibold text-white px-2 sm:px-4 py-2 sm:py-3 whitespace-nowrap hidden sm:table-cell">Vlr. Unit.</th>
+                <th className="text-right text-[11px] sm:text-xs font-semibold text-white px-2 sm:px-4 py-2 sm:py-3 whitespace-nowrap hidden sm:table-cell">Vlr. Total</th>
+                <th className="text-center text-[11px] sm:text-xs font-semibold text-white px-2 sm:px-4 py-2 sm:py-3 whitespace-nowrap hidden sm:table-cell">
                   <button
                     type="button"
                     onClick={() =>
                       setDateSort(dateSort === "none" ? "desc" : dateSort === "desc" ? "asc" : "none")
                     }
-                    className="flex items-center justify-center gap-1 w-full hover:text-foreground transition-colors cursor-pointer"
+                    className="flex items-center justify-center gap-1 w-full hover:text-white/80 transition-colors cursor-pointer text-white whitespace-nowrap"
                   >
-                    Fecha Fact.
-                    {dateSort === "none" && <ArrowUpDown className="h-3 w-3" />}
-                    {dateSort === "asc" && <ArrowUp className="h-3 w-3" />}
-                    {dateSort === "desc" && <ArrowDown className="h-3 w-3" />}
+                    <span>Fecha Fact.</span>
+                    {dateSort === "none" && <ArrowUpDown className="h-3.5 w-3.5 text-white/70 shrink-0" />}
+                    {dateSort === "asc" && <ArrowUp className="h-3.5 w-3.5 text-white shrink-0" />}
+                    {dateSort === "desc" && <ArrowDown className="h-3.5 w-3.5 text-white shrink-0" />}
                   </button>
                 </th>
-                <th className="text-center text-xs font-medium text-muted-foreground px-2 py-3">Estado</th>
-                <th className="text-center text-xs font-medium text-muted-foreground px-2 py-3">
+                <th className="text-center text-[11px] sm:text-xs font-semibold text-white px-2 sm:px-4 py-2 sm:py-3 whitespace-nowrap hidden sm:table-cell">Estado</th>
+                <th className="text-center text-[11px] sm:text-xs font-semibold text-white px-2 sm:px-4 py-2 sm:py-3 whitespace-nowrap w-24 sm:w-28">
                   <div className="flex items-center justify-center gap-1">
-                    Ver
-                    {loadingDatos && <Loader2 className="h-3 w-3 animate-spin" />}
+                    <span>Acciones</span>
+                    {loadingDatos && <Loader2 className="h-3.5 w-3.5 animate-spin text-white" />}
                   </div>
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y">
+            <tbody className="divide-y divide-border/60 dark:divide-border/40">
               {displayed.length === 0 ? (
                 <tr>
                   <td colSpan={11} className="text-center text-muted-foreground py-10 text-sm">
@@ -409,7 +424,7 @@ export function FacturacionTable({ facturaciones, keysConDatos, idsConDatos, loa
                     key={fac.IDFacturacion ?? idx}
                     className={`transition-colors hover:bg-muted/30 ${fac.FecAnulacion ? "opacity-60" : ""}`}
                   >
-                    <td className="px-2 py-2.5 text-center w-8">
+                    <td className="px-2 py-2.5 text-center w-8 hidden sm:table-cell">
                       {(() => {
                         const rowKey = `${fac.NoPrescripcion}-${fac.ConTec}-${fac.NoEntrega}`
                         const sinDatos = keysConDatos !== undefined && !keysConDatos.has(rowKey)
@@ -426,30 +441,30 @@ export function FacturacionTable({ facturaciones, keysConDatos, idsConDatos, loa
                         )
                       })()}
                     </td>
-                    <td className="px-2 py-2.5 text-center text-xs font-mono font-semibold text-muted-foreground whitespace-nowrap">
+                    <td className="px-2 py-2.5 text-center text-xs font-mono font-semibold text-muted-foreground whitespace-nowrap hidden sm:table-cell">
                       {fac.TipoTec}{fac.ConTec}-{fac.NoEntrega}
                     </td>
-                    <td className="px-2 py-2.5 font-mono text-xs font-medium text-primary">
+                    <td className="px-2 sm:px-4 py-2 sm:py-2.5 text-center font-mono text-xs font-medium text-primary">
                       {fac.NoPrescripcion}
                     </td>
-                    <td className="px-2 py-2.5">
+                    <td className="px-2 py-2.5 hidden xl:table-cell">
                       <TipoTecBadge tipo={fac.TipoTec} />
                     </td>
-                    <td className="px-2 py-2.5 font-mono text-xs">{fac.NoFactura || "—"}</td>
-                    <td className="px-2 py-2.5 text-right text-xs">{fac.CantUnMinDis}</td>
-                    <td className="px-2 py-2.5 text-right text-xs text-muted-foreground">
+                    <td className="px-2 py-2.5 font-mono text-xs hidden sm:table-cell">{fac.NoFactura || "—"}</td>
+                    <td className="px-2 py-2.5 text-right text-xs hidden sm:table-cell">{fac.CantUnMinDis}</td>
+                    <td className="px-2 py-2.5 text-right text-xs text-muted-foreground hidden sm:table-cell">
                       {formatCurrency(fac.ValorUnitFacturado)}
                     </td>
-                    <td className="px-2 py-2.5 text-right text-xs font-semibold text-emerald-700">
+                    <td className="px-2 py-2.5 text-right text-xs font-semibold text-emerald-700 hidden sm:table-cell">
                       {formatCurrency(fac.ValorTotFacturado)}
                     </td>
-                    <td className="px-2 py-2.5 text-center text-xs font-mono text-muted-foreground">
+                    <td className="px-2 py-2.5 text-center text-xs font-mono text-muted-foreground hidden sm:table-cell">
                       {formatDate(fac.FecFacturacion)}
                     </td>
-                    <td className="px-2 py-2.5 text-center">
+                    <td className="px-2 py-2.5 text-center hidden sm:table-cell">
                       <EstadoBadge estado={fac.EstFacturacion} />
                     </td>
-                    <td className="px-2 py-2.5 text-center">
+                    <td className="px-2 sm:px-4 py-2 sm:py-2.5 text-center">
                       {(() => {
                         const rowKey = `${fac.NoPrescripcion}-${fac.ConTec}-${fac.NoEntrega}`
                         const sinDatos = keysConDatos !== undefined && !keysConDatos.has(rowKey)
@@ -512,40 +527,93 @@ export function FacturacionTable({ facturaciones, keysConDatos, idsConDatos, loa
       </Card>
 
       {/* Paginación */}
-      <div className="flex flex-wrap items-center justify-end gap-2">
-        <span className="text-xs text-muted-foreground">Pag:</span>
-        <select
-          value={pageSize}
-          onChange={(e) => { setPageSize(Number(e.target.value)); setPage(1) }}
-          className="h-8 px-2 text-xs border rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-primary"
-          style={{ width: 60 }}
-        >
-          <option value={5}>5</option>
-          <option value={10}>10</option>
-          <option value={20}>20</option>
-          <option value={50}>50</option>
-        </select>
-        <Button
-          variant="ghost"
-          size="icon"
-          className="h-8 w-8"
-          disabled={page <= 1}
-          onClick={() => setPage(Math.max(1, page - 1))}
-        >
-          <ArrowLeft className="h-4 w-4" />
-        </Button>
-        <span className="px-2 text-xs font-medium min-w-[50px] text-center">
-          {page} / {pageCount}
-        </span>
-        <Button
-          variant="ghost"
-          size="icon"
-          className="h-8 w-8"
-          disabled={page >= pageCount}
-          onClick={() => setPage(Math.min(pageCount, page + 1))}
-        >
-          <ArrowRight className="h-4 w-4" />
-        </Button>
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-3 px-4 py-2.5 rounded-xl border border-border/80 dark:border-border/60 bg-white/70 dark:bg-card/75 backdrop-blur-xl shadow-2xs">
+        {/* Info summary */}
+        <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+          <span>Mostrando</span>
+          <span className="font-semibold text-foreground">
+            {filtered.length === 0 ? 0 : (page - 1) * pageSize + 1} - {Math.min(page * pageSize, filtered.length)}
+          </span>
+          <span>de</span>
+          <span className="inline-flex items-center px-1.5 py-0.5 rounded-md bg-primary/10 text-primary font-semibold text-[11px] tabular-nums">
+            {filtered.length}
+          </span>
+          <span>registros</span>
+        </div>
+
+        {/* Controls */}
+        <div className="flex flex-wrap items-center gap-3">
+          <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+            <span>Filas:</span>
+            <Select
+              value={String(pageSize)}
+              onValueChange={(value) => {
+                setPageSize(Number(value))
+                setPage(1)
+              }}
+            >
+              <SelectTrigger className="w-[68px] h-8 text-xs bg-white dark:bg-card text-foreground border-input rounded-lg hover:border-primary/50 transition-colors shadow-2xs">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="5">5</SelectItem>
+                <SelectItem value="10">10</SelectItem>
+                <SelectItem value="20">20</SelectItem>
+                <SelectItem value="50">50</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="flex items-center gap-1">
+            <Button
+              variant="outline"
+              size="icon"
+              className="h-8 w-8 rounded-lg bg-white dark:bg-card border-input hover:border-primary/50 hover:text-primary transition-all cursor-pointer shadow-2xs"
+              disabled={page <= 1}
+              onClick={() => setPage(1)}
+              title="Primera página"
+            >
+              <ChevronsLeft className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="outline"
+              size="icon"
+              className="h-8 w-8 rounded-lg bg-white dark:bg-card border-input hover:border-primary/50 hover:text-primary transition-all cursor-pointer shadow-2xs"
+              disabled={page <= 1}
+              onClick={() => setPage(Math.max(1, page - 1))}
+              title="Página anterior"
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+
+            <div className="px-2.5 h-8 flex items-center justify-center rounded-lg border border-border/80 bg-white dark:bg-card text-xs font-semibold tabular-nums text-foreground shadow-2xs">
+              <span className="text-primary">{page}</span>
+              <span className="mx-1 text-muted-foreground/60">/</span>
+              <span className="text-muted-foreground">{pageCount}</span>
+            </div>
+
+            <Button
+              variant="outline"
+              size="icon"
+              className="h-8 w-8 rounded-lg bg-white dark:bg-card border-input hover:border-primary/50 hover:text-primary transition-all cursor-pointer shadow-2xs"
+              disabled={page >= pageCount}
+              onClick={() => setPage(Math.min(pageCount, page + 1))}
+              title="Página siguiente"
+            >
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="outline"
+              size="icon"
+              className="h-8 w-8 rounded-lg bg-white dark:bg-card border-input hover:border-primary/50 hover:text-primary transition-all cursor-pointer shadow-2xs"
+              disabled={page >= pageCount}
+              onClick={() => setPage(pageCount)}
+              title="Última página"
+            >
+              <ChevronsRight className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
       </div>
 
     </div>

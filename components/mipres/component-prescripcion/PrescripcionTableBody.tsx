@@ -2,6 +2,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { useState } from "react"
 import { CategoryBadge } from "./CategoryBadge"
+import { InfoMobileModal } from "./InfoMobileModal"
 import { AMBITOS_ATENCION, MODALIDAD } from "@/models/constants"
 import { getArray } from "./utils"
 import {
@@ -18,6 +19,8 @@ import {
   Package,
   Sparkles,
   Info,
+  Search,
+  Building2,
 } from "lucide-react"
 import type { Prescripcion } from "@/models/mipres-sispro/prescripcion"
 import type { MipresCredentials } from "@/models/credentials.model"
@@ -70,6 +73,8 @@ interface PrescripcionTableBodyProps {
   setRegimenFilter?: (value: "todos" | "Contributivo" | "Subsidiado") => void
   estJmFilter?: "todos" | "aprobada" | "pendiente" | "rechazada"
   setEstJmFilter?: (value: "todos" | "aprobada" | "pendiente" | "rechazada") => void
+  direccionamientoFilter?: "todos" | "direccionado" | "no-direccionado" | "no-direccionamiento"
+  setDireccionamientoFilter?: (value: "todos" | "direccionado" | "no-direccionado" | "no-direccionamiento") => void
 }
 
 function canDireccionarPrescripcion(presc: any) {
@@ -164,8 +169,11 @@ export function PrescripcionTableBody({
   setRegimenFilter,
   estJmFilter = "todos",
   setEstJmFilter,
+  direccionamientoFilter = "todos",
+  setDireccionamientoFilter,
 }: PrescripcionTableBodyProps) {
   const [activeRow, setActiveRow] = useState<string | null>(null)
+  const [selectedPacienteForModal, setSelectedPacienteForModal] = useState<any>(null)
   const [juntaDataByNoPrescripcion, setJuntaDataByNoPrescripcion] = useState<Record<string, JuntaProfesionalItem[]>>({})
   const [juntaLoadingByNoPrescripcion, setJuntaLoadingByNoPrescripcion] = useState<Record<string, boolean>>({})
   const [juntaErrorByNoPrescripcion, setJuntaErrorByNoPrescripcion] = useState<Record<string, string | null>>({})
@@ -289,25 +297,26 @@ export function PrescripcionTableBody({
       </div>
     )
   }
+
   return (
-    <Card className="overflow-hidden gap-0 py-0">
+    <Card className="overflow-hidden gap-0 py-0 rounded-xl border border-border/80 dark:border-border/60 bg-card shadow-xs">
       <div className="w-full max-w-full overflow-x-auto">
-        <table className="w-full min-w-[1200px]">
+        <table className="w-full">
           <thead>
-            <tr className="border-b bg-muted/40">
-              <th className="text-center text-xs font-medium text-muted-foreground px-4 py-4">
-                <div className="flex items-center justify-center gap-1.5">
-                  <Hash className="h-3 w-3" />
-                  Prescripción
+            <tr className="border-b border-primary/20 bg-primary text-white whitespace-nowrap">
+              <th className="text-center text-[11px] sm:text-xs font-semibold text-white px-1.5 py-2 sm:px-3 sm:py-3 whitespace-nowrap">
+                <div className="flex items-center justify-center gap-1 sm:gap-1.5 whitespace-nowrap">
+                  <Hash className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-white shrink-0" />
+                  <span>Prescripción</span>
                 </div>
               </th>
-              <th className="text-center text-xs font-medium text-muted-foreground px-4 py-4">
-                <div className="flex items-center justify-center gap-1.5">
-                  <User className="h-3 w-3" />
-                  Paciente
+              <th className="text-center text-[11px] sm:text-xs font-semibold text-white px-1 py-2 sm:px-3 sm:py-3 whitespace-nowrap">
+                <div className="flex items-center justify-center whitespace-nowrap">
+                  <User className="h-3 w-3 text-white shrink-0 sm:hidden" />
+                  <span className="hidden sm:inline">Paciente</span>
                 </div>
               </th>
-              <th className="text-center text-xs font-medium text-muted-foreground px-4 py-4">
+              <th className="text-center text-xs font-semibold text-white px-3 py-3 whitespace-nowrap hidden xl:table-cell">
                 <button
                   type="button"
                   onClick={() => {
@@ -315,37 +324,33 @@ export function PrescripcionTableBody({
                       dateSort === "none" ? "desc" : dateSort === "desc" ? "asc" : "none"
                     )
                   }}
-                  className="flex items-center justify-center gap-1.5 w-full hover:text-foreground transition-colors cursor-pointer"
+                  className="flex items-center justify-center gap-1.5 w-full hover:text-white/80 transition-colors cursor-pointer text-white whitespace-nowrap"
                 >
-                  <Calendar className="h-3 w-3" />
-                  Fecha de Prescripción
-                  {dateSort === "none" && <ArrowUpDown className="h-3 w-3" />}
-                  {dateSort === "asc" && <ArrowUp className="h-3 w-3" />}
-                  {dateSort === "desc" && <ArrowDown className="h-3 w-3" />}
+                  <Calendar className="h-3.5 w-3.5 text-white shrink-0" />
+                  <span className="whitespace-nowrap">Fecha de Prescripción</span>
+                  {dateSort === "none" && <ArrowUpDown className="h-3.5 w-3.5 text-white/70 shrink-0" />}
+                  {dateSort === "asc" && <ArrowUp className="h-3.5 w-3.5 text-white shrink-0" />}
+                  {dateSort === "desc" && <ArrowDown className="h-3.5 w-3.5 text-white shrink-0" />}
                 </button>
               </th>
-              <th className="text-center text-xs font-medium text-muted-foreground px-4 py-4">
-                Estado de Prescripción
+              <th className="text-center text-xs font-semibold text-white px-3 py-3 whitespace-nowrap hidden xl:table-cell">
+                <span className="whitespace-nowrap">Estado de Prescripción</span>
               </th>
-              <th className="text-center text-xs font-medium text-muted-foreground px-4 py-4">
+              <th className="text-center text-xs font-semibold text-white px-3 py-3 whitespace-nowrap hidden xl:table-cell">
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <button
                       type="button"
-                      className={`inline-flex items-center justify-center gap-1.5 px-2 py-1 rounded-md transition-colors cursor-pointer group ${
+                      className={`inline-flex items-center justify-center gap-1.5 px-2.5 py-1 rounded-md transition-colors cursor-pointer group text-white whitespace-nowrap ${
                         regimenFilter !== "todos"
-                          ? "bg-primary/10 text-primary font-semibold hover:bg-primary/15"
-                          : "hover:text-foreground hover:bg-muted/60"
+                          ? "bg-white/20 font-semibold"
+                          : "hover:bg-white/15"
                       }`}
                       title="Filtrar por régimen"
                     >
-                      <span>Régimen</span>
+                      <span className="whitespace-nowrap">Régimen</span>
                       {regimenFilter !== "todos" && (
-                        <span className={`inline-flex items-center gap-0.5 px-1.5 py-0.2 rounded text-[10px] ${
-                          regimenFilter === "Contributivo"
-                            ? "bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-300"
-                            : "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300"
-                        }`}>
+                        <span className="inline-flex items-center gap-0.5 px-1.5 py-0.2 rounded text-[10px] bg-white text-primary font-semibold shadow-xs shrink-0 whitespace-nowrap">
                           {regimenFilter}
                           <span
                             role="button"
@@ -386,44 +391,23 @@ export function PrescripcionTableBody({
                   </DropdownMenuContent>
                 </DropdownMenu>
               </th>
-              <th className="text-center text-xs font-medium text-muted-foreground px-4 py-4">
-                Tecnologías prescritas
+              <th className="text-center text-xs font-semibold text-white px-2.5 py-3 whitespace-nowrap hidden xl:table-cell">
+                <span className="whitespace-nowrap">Tecnologías</span>
               </th>
-              <th className="text-center text-xs font-medium text-muted-foreground px-4 py-4">
+              <th className="text-center text-[11px] sm:text-xs font-semibold text-white px-1 py-2 sm:px-2 sm:py-3 whitespace-nowrap">
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <button
                       type="button"
-                      className={`inline-flex items-center justify-center gap-1.5 px-2 py-1 rounded-md transition-colors cursor-pointer group ${
+                      className={`inline-flex items-center justify-center gap-1 sm:gap-1.5 px-1.5 sm:px-2.5 py-1 rounded-md transition-colors cursor-pointer group text-white whitespace-nowrap ${
                         estJmFilter !== "todos"
-                          ? "bg-primary/10 text-primary font-semibold hover:bg-primary/15"
-                          : "hover:text-foreground hover:bg-muted/60"
+                          ? "bg-white/20 font-semibold"
+                          : "hover:bg-white/15"
                       }`}
                       title="Filtrar por estado de junta profesional"
                     >
-                      <span>Estado Junta</span>
-                      {estJmFilter !== "todos" && (
-                        <span className={`inline-flex items-center gap-0.5 px-1.5 py-0.2 rounded text-[10px] ${
-                          estJmFilter === "aprobada"
-                            ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300"
-                            : estJmFilter === "pendiente"
-                            ? "bg-amber-100 text-amber-700 dark:bg-amber-900/50 dark:text-amber-300"
-                            : "bg-red-100 text-red-700 dark:bg-red-900/50 dark:text-red-300"
-                        }`}>
-                          {estJmFilter === "aprobada" ? "Aprobada" : estJmFilter === "pendiente" ? "Pendiente" : "Rechazada"}
-                          <span
-                            role="button"
-                            onClick={(e) => {
-                              e.stopPropagation()
-                              setEstJmFilter?.("todos")
-                            }}
-                            className="ml-0.5 hover:opacity-75 cursor-pointer font-bold"
-                            title="Quitar filtro"
-                          >
-                            ×
-                          </span>
-                        </span>
-                      )}
+                      <span className="hidden sm:inline whitespace-nowrap">Estado Junta</span>
+                      <span className="sm:hidden whitespace-nowrap">Junta</span>
                     </button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="center" className="min-w-[160px]">
@@ -457,43 +441,76 @@ export function PrescripcionTableBody({
                   </DropdownMenuContent>
                 </DropdownMenu>
               </th>
-              <th className="text-center text-xs font-medium text-muted-foreground px-4 py-4">
-                <Popover>
-                  <PopoverTrigger className="flex items-center justify-center gap-1.5 cursor-pointer hover:text-foreground transition-colors w-full">
-                    Direccionamiento
-                    <Info className="h-3 w-3" />
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-3">
-                    <div className="space-y-2 text-xs font-medium">
-                      <div className="flex items-center gap-2">
-                        <span className="h-2.5 w-2.5 rounded-full bg-gray-400 shadow-sm" />
-                        <span>Sin proceso</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <span className="h-2.5 w-2.5 rounded-full bg-emerald-500 shadow-sm" />
-                        <span>Direccionamiento</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <span className="h-2.5 w-2.5 rounded-full bg-red-500 shadow-sm" />
-                        <span>No direccionamiento</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <span className="h-2.5 w-2.5 rounded-full bg-amber-500 shadow-sm" />
-                        <span>Anulada</span>
-                      </div>
-                    </div>
-                  </PopoverContent>
-                </Popover>
+              <th className="text-center text-[11px] sm:text-xs font-semibold text-white px-1 py-2 sm:px-2 sm:py-3 whitespace-nowrap">
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <button
+                      type="button"
+                      className={`inline-flex items-center justify-center gap-1 sm:gap-1.5 px-1.5 sm:px-2.5 py-1 rounded-md transition-colors cursor-pointer group text-white whitespace-nowrap ${
+                        direccionamientoFilter !== "todos"
+                          ? "bg-white/20 font-semibold"
+                          : "hover:bg-white/15"
+                      }`}
+                      title="Filtrar por direccionamiento"
+                    >
+                      <span className="hidden sm:inline whitespace-nowrap">Direccionamiento</span>
+                      <span className="sm:hidden whitespace-nowrap">Direcc.</span>
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="center" className="min-w-[180px]">
+                    <DropdownMenuItem
+                      onClick={() => setDireccionamientoFilter?.("todos")}
+                      className={`cursor-pointer ${direccionamientoFilter === "todos" ? "font-semibold bg-accent" : ""}`}
+                    >
+                      Todos los estados
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => setDireccionamientoFilter?.("direccionado")}
+                      className={`cursor-pointer ${direccionamientoFilter === "direccionado" ? "font-semibold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40" : ""}`}
+                    >
+                      <span className="size-2 rounded-full bg-emerald-500 mr-2 shrink-0" />
+                      Direccionado
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => setDireccionamientoFilter?.("no-direccionado")}
+                      className={`cursor-pointer ${direccionamientoFilter === "no-direccionado" ? "font-semibold bg-gray-100 text-gray-700 dark:bg-zinc-800 dark:text-zinc-300" : ""}`}
+                    >
+                      <span className="size-2 rounded-full bg-gray-400 mr-2 shrink-0" />
+                      Sin Proceso
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => setDireccionamientoFilter?.("no-direccionamiento")}
+                      className={`cursor-pointer ${direccionamientoFilter === "no-direccionamiento" ? "font-semibold bg-red-50 text-red-700 dark:bg-red-950/40" : ""}`}
+                    >
+                      <span className="size-2 rounded-full bg-red-500 mr-2 shrink-0" />
+                      No Direccionamiento
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </th>
-              <th className="text-center text-xs font-medium text-muted-foreground px-4 py-4">
-                <div className="flex justify-center">
-                  <span className="inline-block w-40 text-center">Acciones</span>
-                </div>
+              <th className="text-center text-[11px] sm:text-xs font-semibold text-white px-1 py-2 sm:px-2 sm:py-3 whitespace-nowrap w-10 sm:w-16">
+                <span className="hidden sm:inline">Acciones</span>
+                <span className="sm:hidden">Acc.</span>
               </th>
             </tr>
           </thead>
-          <tbody id="prescripcionesTableBody" className="divide-y">
-            {displayed.map((presc: any, idx) => {
+          <tbody id="prescripcionesTableBody" className="divide-y divide-border/60 dark:divide-border/40">
+            {displayed.length === 0 ? (
+              <tr>
+                <td colSpan={9} className="py-16 text-center">
+                  <div className="flex flex-col items-center justify-center max-w-sm mx-auto">
+                    <div className="size-12 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center mb-3 text-primary shadow-xs">
+                      <Search className="size-5" />
+                    </div>
+                    <p className="text-sm font-semibold text-foreground">No se encontraron prescripciones</p>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      No hay registros que coincidan con los filtros aplicados en este momento.
+                    </p>
+                  </div>
+                </td>
+              </tr>
+            ) : (
+              displayed.map((presc: any, idx) => {
               const medCount = getArray(presc, "medicamentos").length
               const procCount = getArray(presc, "procedimientos").length
               const dispCount = getArray(presc, "dispositivos").length
@@ -516,22 +533,38 @@ export function PrescripcionTableBody({
 
               return (
                 <tr
-                  key={presc.NoPrescripcion ?? idx}
+                  key={rowKey}
                   className={`transition-colors hover:bg-muted/30${isActive ? " bg-emerald-50 dark:bg-zinc-800/80" : ""}`}
                 >
-                  <td className="px-4 py-2.5 text-center">
-                    <div className="flex flex-col items-center justify-center leading-tight">
-                      <span className="font-mono text-xs font-medium text-primary">
+                  <td className="px-1.5 py-1.5 sm:px-3 sm:py-2.5 text-center">
+                    <div className="inline-flex flex-col items-center justify-center leading-tight gap-0.5 text-center">
+                      <span className="font-mono text-[10px] sm:text-xs font-semibold tracking-tight text-primary">
                         {presc.NoPrescripcion ?? "-"}
                       </span>
-                      <span className="text-[10px] text-muted-foreground max-w-[160px] truncate">
+                      <span className="hidden sm:inline-block text-[10px] text-muted-foreground max-w-[130px] truncate" title={ambitoNombre}>
                         {ambitoNombre}
                       </span>
                     </div>
                   </td>
-                  <td className="px-4 py-2.5 text-center">
-                    <div className="flex flex-col items-center justify-center leading-tight gap-1">
-                      <span className="text-xs font-medium truncate max-w-[140px]">
+                  <td className="px-1 py-1.5 sm:px-3 sm:py-2.5 text-center">
+                    {/* Vista Mobile: Solo icono de usuario con botón para abrir modal */}
+                    <div className="sm:hidden flex items-center justify-center">
+                      <button
+                        type="button"
+                        onClick={() => setSelectedPacienteForModal(presc)}
+                        className="p-1 rounded-md bg-primary/10 hover:bg-primary/20 text-primary transition-colors cursor-pointer"
+                        title={`Ver detalles de ${presc.PNPaciente || ""} ${presc.PAPaciente || ""}`}
+                      >
+                        <User className="size-3.5" />
+                      </button>
+                    </div>
+
+                    {/* Vista Desktop / Tablet (sm+): Información del paciente */}
+                    <div
+                      className="hidden sm:inline-flex flex-col items-center justify-center leading-tight gap-0.5 text-center mx-auto"
+                      title={`${presc.PNPaciente || ""} ${presc.PAPaciente || ""}`}
+                    >
+                      <span className="text-xs font-medium truncate max-w-[160px] text-foreground">
                         {presc.PNPaciente} {presc.PAPaciente}
                       </span>
                       <span className="text-[10px] text-muted-foreground">
@@ -539,13 +572,13 @@ export function PrescripcionTableBody({
                       </span>
                     </div>
                   </td>
-                  <td className="px-4 py-2.5 text-center">
+                  <td className="px-3 py-2.5 text-center hidden xl:table-cell">
                     <div className="text-xs text-muted-foreground">
                       <div className="font-medium">{presc.FPrescripcion?.split("T")[0]}</div>
                       <div className="text-[10px]">{presc.HPrescripcion || "-"}</div>
                     </div>
                   </td>
-                  <td className="px-4 py-2.5 text-center">
+                  <td className="px-3 py-2.5 text-center hidden xl:table-cell">
                     <Badge
                       variant={presc.EstPres === 4 ? "default" : "destructive"}
                       className={`text-[9px] h-4 px-1.5 whitespace-nowrap ${
@@ -561,7 +594,7 @@ export function PrescripcionTableBody({
                         : `Estado ${presc.EstPres}`}
                     </Badge>
                   </td>
-                  <td className="px-4 py-2.5 text-center">
+                  <td className="px-3 py-2.5 text-center hidden xl:table-cell">
                     <Badge
                       variant="secondary"
                       onClick={() => {
@@ -571,9 +604,9 @@ export function PrescripcionTableBody({
                       }}
                       className={`text-[9px] h-4 px-1.5 whitespace-nowrap cursor-pointer hover:scale-105 active:scale-95 transition-all ${
                         presc.tipoRegimen === "Contributivo"
-                          ? "bg-blue-100 text-blue-700 hover:bg-blue-200/80"
+                          ? "bg-blue-100 text-blue-700 hover:bg-blue-200/80 dark:bg-blue-950/60 dark:text-blue-300"
                           : presc.tipoRegimen === "Subsidiado"
-                          ? "bg-emerald-100 text-emerald-700 hover:bg-emerald-200/80"
+                          ? "bg-emerald-100 text-emerald-700 hover:bg-emerald-200/80 dark:bg-emerald-950/60 dark:text-emerald-300"
                           : "bg-muted text-muted-foreground"
                       }`}
                       title={presc.tipoRegimen ? `Clic para filtrar por ${presc.tipoRegimen}` : undefined}
@@ -581,38 +614,38 @@ export function PrescripcionTableBody({
                       {presc.tipoRegimen || "Sin regimen"}
                     </Badge>
                   </td>
-                  <td className="px-4 py-2.5">
+                  <td className="px-2.5 py-2.5 hidden xl:table-cell">
                     <div className="flex flex-col items-center gap-1">
                       <div className="flex flex-nowrap gap-0.5 justify-center whitespace-nowrap">
                       <CategoryBadge
                         icon={Pill}
                         label="Med"
                         count={medCount}
-                        colorClass="bg-emerald-100 text-emerald-700"
+                        colorClass="bg-emerald-100 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300"
                       />
                       <CategoryBadge
                         icon={Stethoscope}
                         label="Proc"
                         count={procCount}
-                        colorClass="bg-sky-100 text-sky-700"
+                        colorClass="bg-sky-100 text-sky-700 dark:bg-sky-950/60 dark:text-sky-300"
                       />
                       <CategoryBadge
                         icon={Package}
                         label="Disp"
                         count={dispCount}
-                        colorClass="bg-amber-100 text-amber-700"
+                        colorClass="bg-amber-100 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300"
                       />
                       <CategoryBadge
                         icon={Sparkles}
                         label="Nutr"
                         count={nutrCount}
-                        colorClass="bg-rose-100 text-rose-700"
+                        colorClass="bg-rose-100 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300"
                       />
                       <CategoryBadge
                         icon={Activity}
                         label="Serv"
                         count={servCount}
-                        colorClass="bg-violet-100 text-violet-700"
+                        colorClass="bg-violet-100 text-violet-700 dark:bg-violet-950/60 dark:text-violet-300"
                       />
                       </div>
                       {presc.ipsSolicitanteNombre ? (
@@ -620,9 +653,11 @@ export function PrescripcionTableBody({
                           <PopoverTrigger asChild>
                             <button
                               type="button"
-                              className="inline-block max-w-[260px] whitespace-nowrap text-[10px] text-green-700 font-medium text-center leading-tight hover:underline"
+                              className="inline-flex items-center justify-center gap-1 max-w-[200px] text-[10px] text-emerald-700 dark:text-emerald-400 font-medium text-center leading-tight hover:underline truncate"
+                              title={presc.ipsSolicitanteNombre}
                             >
-                              {presc.ipsSolicitanteNombre}
+                              <Building2 className="size-2.5 shrink-0 opacity-70" />
+                              <span className="truncate">{presc.ipsSolicitanteNombre}</span>
                             </button>
                           </PopoverTrigger>
                           <PopoverContent className="w-72 p-3">
@@ -653,7 +688,7 @@ export function PrescripcionTableBody({
                       ) : null}
                     </div>
                   </td>
-                  <td className="px-4 py-2.5 text-center">
+                  <td className="px-1 py-1.5 sm:px-2 sm:py-2.5 text-center">
                     <Popover onOpenChange={(open) => {
                       if (open) {
                         void loadJuntaProfesional(presc)
@@ -662,7 +697,7 @@ export function PrescripcionTableBody({
                       <PopoverTrigger asChild>
                         <button
                           type="button"
-                          className="inline-flex items-center justify-center gap-1"
+                          className="inline-flex items-center justify-center gap-0.5 sm:gap-1"
                           aria-label="Abrir información de Junta Profesional"
                         >
                           {(() => {
@@ -671,7 +706,7 @@ export function PrescripcionTableBody({
                             if (activeTypes.length === 0) {
                               return (
                                 <span
-                                  className={`h-3.5 w-3.5 rounded-full inline-block ${status === "error" ? "bg-red-500" : status === "warning" ? "bg-amber-500" : "bg-emerald-500"}`}
+                                  className={`h-2.5 w-2.5 sm:h-3.5 sm:w-3.5 rounded-full inline-block ${status === "error" ? "bg-red-500" : status === "warning" ? "bg-amber-500" : "bg-emerald-500"}`}
                                   title={status === "error" ? "Tecnología rechazada por junta" : status === "warning" ? "Pendiente evaluación junta" : "Tecnología aprobada"}
                                 />
                               )
@@ -682,7 +717,7 @@ export function PrescripcionTableBody({
                               return (
                                 <span
                                   key={td.type}
-                                  className={`h-3.5 w-3.5 rounded-full inline-block ${ts === "error" ? "bg-red-500" : ts === "warning" ? "bg-amber-500" : "bg-emerald-500"}`}
+                                  className={`h-2.5 w-2.5 sm:h-3.5 sm:w-3.5 rounded-full inline-block ${ts === "error" ? "bg-red-500" : ts === "warning" ? "bg-amber-500" : "bg-emerald-500"}`}
                                   title={`${label}: ${ts === "error" ? "Rechazada por junta" : ts === "warning" ? "Pendiente evaluación" : "Aprobada"}`}
                                 />
                               )
@@ -690,7 +725,7 @@ export function PrescripcionTableBody({
                           })()}
                         </button>
                       </PopoverTrigger>
-                      <PopoverContent className="w-96 p-4">
+                      <PopoverContent className="w-[88vw] sm:w-96 p-3 sm:p-4 max-w-[360px] sm:max-w-none">
                         <div className="space-y-3">
                           <div>
                             <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Junta Profesional</p>
@@ -701,17 +736,17 @@ export function PrescripcionTableBody({
                       </PopoverContent>
                     </Popover>
                   </td>
-                  <td className="px-4 py-2.5 text-center">
+                  <td className="px-1 py-1.5 sm:px-4 sm:py-2.5 text-center">
                     {anulacionStatus[presc.NoPrescripcion] && canDireccionar && !hasNoDireccionamiento ? (
                       <div className="flex items-center justify-center gap-1">
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="h-7 w-7"
+                          className="h-6 w-6 sm:h-7 sm:w-7"
                           onClick={() => { openAccionesModal(presc); setActiveRow(rowKey); }}
                           title="Direccionamiento Anulado - Clic para reactivar"
                         >
-                          <span className="h-3.5 w-3.5 rounded-full bg-gray-400" />
+                          <span className="h-2.5 w-2.5 sm:h-3.5 sm:w-3.5 rounded-full bg-gray-400" />
                         </Button>
                       </div>
                     ) : hasDireccionamiento &&
@@ -721,7 +756,7 @@ export function PrescripcionTableBody({
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="h-7 w-7"
+                          className="h-6 w-6 sm:h-7 sm:w-7"
                           onClick={() => { openVerModal(presc); setActiveRow(rowKey); }}
                           title={
                             anulacionStatus[presc.NoPrescripcion]
@@ -730,7 +765,7 @@ export function PrescripcionTableBody({
                           }
                         >
                           <span
-                            className={`h-3.5 w-3.5 rounded-full ${
+                            className={`h-2.5 w-2.5 sm:h-3.5 sm:w-3.5 rounded-full ${
                               anulacionStatus[presc.NoPrescripcion]
                                 ? "bg-gray-400"
                                 : "bg-emerald-500"
@@ -743,11 +778,11 @@ export function PrescripcionTableBody({
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="h-7 w-7"
+                          className="h-6 w-6 sm:h-7 sm:w-7"
                           onClick={() => { openNoDireccionamientoModal(presc); setActiveRow(rowKey); }}
                           title="No Direccionamiento - Clic para ver detalles"
                         >
-                          <span className="h-3.5 w-3.5 rounded-full bg-red-500" />
+                          <span className="h-2.5 w-2.5 sm:h-3.5 sm:w-3.5 rounded-full bg-red-500" />
                         </Button>
                       </div>
                     ) : hasDireccionamiento && canDireccionar ? (
@@ -759,18 +794,18 @@ export function PrescripcionTableBody({
                             <Button
                               variant="ghost"
                               size="icon"
-                              className="h-7 w-7"
+                              className="h-6 w-6 sm:h-7 sm:w-7"
                               onClick={() => { openVerModal(presc); setActiveRow(rowKey); }}
                               title={anulacionStatus[presc.NoPrescripcion] ? "Direccionamiento Anulado - Sin proceso" : "Direccionado - Ver detalles"}
                             >
                               <span
-                                className={`h-3.5 w-3.5 rounded-full ${
+                                className={`h-2.5 w-2.5 sm:h-3.5 sm:w-3.5 rounded-full ${
                                   anulacionStatus[presc.NoPrescripcion] ? "bg-gray-400" : "bg-emerald-500"
                                 }`}
                               />
                             </Button>
                             <span
-                              className="h-3.5 w-3.5 rounded-full bg-gray-400"
+                              className="h-2.5 w-2.5 sm:h-3.5 sm:w-3.5 rounded-full bg-gray-400"
                               title="En revisión de junta - No disponible para direccionar"
                             />
                           </>
@@ -778,7 +813,7 @@ export function PrescripcionTableBody({
                           <Button
                             variant="ghost"
                             size="icon"
-                            className="h-7 w-7"
+                            className="h-6 w-6 sm:h-7 sm:w-7"
                             onClick={() => { openVerModal(presc); setActiveRow(rowKey); }}
                             title={
                               anulacionStatus[presc.NoPrescripcion]
@@ -787,7 +822,7 @@ export function PrescripcionTableBody({
                             }
                           >
                             <span
-                              className={`h-3.5 w-3.5 rounded-full ${
+                              className={`h-2.5 w-2.5 sm:h-3.5 sm:w-3.5 rounded-full ${
                                 anulacionStatus[presc.NoPrescripcion]
                                   ? "bg-gray-400"
                                   : "bg-emerald-500"
@@ -805,14 +840,14 @@ export function PrescripcionTableBody({
                             <Button
                               variant="ghost"
                               size="icon"
-                              className="h-7 w-7"
+                              className="h-6 w-6 sm:h-7 sm:w-7"
                               onClick={() => { openAccionesModal(presc); setActiveRow(rowKey); }}
                               title="Direccionar tecnologías aprobadas"
                             >
-                              <span className="h-3.5 w-3.5 rounded-full bg-gray-400" />
+                              <span className="h-2.5 w-2.5 sm:h-3.5 sm:w-3.5 rounded-full bg-gray-400" />
                             </Button>
                             <span
-                              className="h-3.5 w-3.5 rounded-full bg-gray-400"
+                              className="h-2.5 w-2.5 sm:h-3.5 sm:w-3.5 rounded-full bg-gray-400"
                               title="En revisión de junta - No disponible para direccionar"
                             />
                           </>
@@ -820,11 +855,11 @@ export function PrescripcionTableBody({
                           <Button
                             variant="ghost"
                             size="icon"
-                            className="h-7 w-7"
+                            className="h-6 w-6 sm:h-7 sm:w-7"
                             onClick={() => { openAccionesModal(presc); setActiveRow(rowKey); }}
                             title="Direccionar tecnologías"
                           >
-                            <span className="h-3.5 w-3.5 rounded-full bg-gray-400" />
+                            <span className="h-2.5 w-2.5 sm:h-3.5 sm:w-3.5 rounded-full bg-gray-400" />
                           </Button>
                         )}
                       </div>
@@ -832,44 +867,50 @@ export function PrescripcionTableBody({
                       <div className="flex items-center justify-center">
                         {canDireccionarPrescripcion(presc).status === "warning" ? (
                           <span
-                            className="h-3.5 w-3.5 rounded-full bg-gray-400"
-                            title="Pendiente evaluaciÃ³n de junta - Intente mÃ¡s tarde"
+                            className="h-2.5 w-2.5 sm:h-3.5 sm:w-3.5 rounded-full bg-gray-400"
+                            title="Pendiente evaluación de junta - Intente más tarde"
                           />
                         ) : (
                           <span
-                            className="h-3.5 w-3.5 rounded-full bg-gray-400"
-                            title="TecnologÃ­a rechazada - Contacte con administrador"
+                            className="h-2.5 w-2.5 sm:h-3.5 sm:w-3.5 rounded-full bg-gray-400"
+                            title="Tecnología rechazada - Contacte con administrador"
                           />
                         )}
                       </div>
                     )}
                   </td>
-                  <td className="px-4 py-2.5 text-right">
-                    <div className="flex items-center justify-end">
-                      <div className="w-40 flex justify-center items-center gap-1">
-                        <div className="relative group">
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-7 w-7"
-                            onClick={() => { handlePrintPrescripcion(presc); setActiveRow(rowKey); }}
-                          >
-                            <Printer className="h-3.5 w-3.5 text-muted-foreground" />
-                          </Button>
-                          <span className="pointer-events-none absolute right-full mr-2 top-1/2 -translate-y-1/2 rounded border bg-popover px-2 py-1 text-[10px] text-foreground shadow-sm opacity-0 group-hover:opacity-100 whitespace-nowrap transition-opacity">
-                            Guardar como PDF
-                          </span>
-                        </div>
-
+                  <td className="px-1 py-1.5 sm:px-2 sm:py-2.5 text-center w-10 sm:w-16">
+                    <div className="flex justify-center items-center">
+                      <div className="relative group">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-6 w-6 sm:h-7 sm:w-7"
+                          onClick={() => { handlePrintPrescripcion(presc); setActiveRow(rowKey); }}
+                          title="Guardar como PDF"
+                        >
+                          <Printer className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-muted-foreground hover:text-primary transition-colors" />
+                        </Button>
+                        <span className="pointer-events-none absolute right-full mr-2 top-1/2 -translate-y-1/2 rounded border bg-popover px-2 py-1 text-[10px] text-foreground shadow-sm opacity-0 group-hover:opacity-100 whitespace-nowrap transition-opacity z-10">
+                          Guardar como PDF
+                        </span>
                       </div>
                     </div>
                   </td>
                 </tr>
               )
-            })}
+            }))}
           </tbody>
         </table>
       </div>
+
+      {selectedPacienteForModal && (
+        <InfoMobileModal
+          prescripcion={selectedPacienteForModal}
+          open={Boolean(selectedPacienteForModal)}
+          onClose={() => setSelectedPacienteForModal(null)}
+        />
+      )}
     </Card>
   )
 }
