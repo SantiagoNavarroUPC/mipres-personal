@@ -53,6 +53,8 @@ export function DireccionamientoModule({ credentials }: DireccionamientoModulePr
   const [verModalOpen, setVerModalOpen] = useState(false)
   const [selectedForVer, setSelectedForVer] = useState<any>(null)
   const [verFormOpen, setVerFormOpen] = useState(false)
+  const [formOpen, setFormOpen] = useState(false)
+  const isAnyFormOpen = verFormOpen || formOpen
   const [activeTab, setActiveTab] = useState("fecha")
 
   const { invalidateDireccionamientos } = useMipresQueryClient()
@@ -250,14 +252,22 @@ export function DireccionamientoModule({ credentials }: DireccionamientoModulePr
   }
 
   const renderResults = () => {
-    return <DireccionamientoTable results={results} credentials={credentials} onView={openVerModal} onAnularSuccess={handleAnularSuccess} />
+    return (
+      <DireccionamientoTable
+        results={results}
+        credentials={credentials}
+        onView={openVerModal}
+        onAnularSuccess={handleAnularSuccess}
+        onFormVisibilityChange={setFormOpen}
+      />
+    )
   }
 
   const isConfigured = credentials.nit && credentials.tokenSubsidiado && credentials.tokenContributivo
 
   return (
     <div className="space-y-6">
-      {!verFormOpen && (
+      {!isAnyFormOpen && (
         <>
           <DireccionamientoHeader isConfigured={!!isConfigured} />
 
@@ -329,10 +339,10 @@ export function DireccionamientoModule({ credentials }: DireccionamientoModulePr
               <AlertDescription>{error || success}</AlertDescription>
             </Alert>
           )}
-
-          {renderResults()}
         </>
       )}
+
+      {!verFormOpen && renderResults()}
 
       {selectedForVer && (
         <DireccionamientoLecturaModal

@@ -85,9 +85,12 @@ function isReporteElegibleParaSuministro(reporte: ReporteEntrega) {
 }
 
 import { SuministroModalMasivos } from "../component-suministro/SuministroModalMasivos"
+import { useEmpresaActual } from "@/lib/use-empresa-actual"
 
 export function ReporteEntregaTable({ reportes, loading, onRefreshReportes, onFormVisibilityChange }: ReporteEntregaTableProps) {
   const { toast } = useToast()
+  // El suministro solo aplica a EPS o AMBAS; a una IPS no se le muestra.
+  const { puedeSuministrar: mostrarSuministro } = useEmpresaActual()
   const [selectedReports, setSelectedReports] = useState<ReporteEntrega[]>([])
   const [selectedPrescripcion, setSelectedPrescripcion] = useState<string>("")
   const [selectedSuministros, setSelectedSuministros] = useState<Suministro[]>([])
@@ -114,6 +117,10 @@ export function ReporteEntregaTable({ reportes, loading, onRefreshReportes, onFo
   const [pageSize, setPageSize] = useState<number>(10)
   const [filterText, setFilterText] = useState("")
   const [filterState, setFilterState] = useState<"all" | "vigente" | "vigente_con_anulaciones" | "anulado" | "con_suministro">("all")
+
+  useEffect(() => {
+    if (!mostrarSuministro && filterState === "con_suministro") setFilterState("all")
+  }, [mostrarSuministro, filterState])
 
   // Persistir filtros entre refreshes
   const FILTERS_KEY = "reporteEntrega_filters_v1"
@@ -632,10 +639,11 @@ export function ReporteEntregaTable({ reportes, loading, onRefreshReportes, onFo
               <SelectItem value="vigente">Estado: Vigente</SelectItem>
               <SelectItem value="vigente_con_anulaciones">Estado: Vigente con anulaciones</SelectItem>
               <SelectItem value="anulado">Estado: Anulado</SelectItem>
-              <SelectItem value="con_suministro">Con suministro</SelectItem>
+              {mostrarSuministro && <SelectItem value="con_suministro">Con suministro</SelectItem>}
             </SelectContent>
           </Select>
 
+          {mostrarSuministro && (
           <Button
             variant="outline"
             size="sm"
@@ -650,10 +658,11 @@ export function ReporteEntregaTable({ reportes, loading, onRefreshReportes, onFo
               {reportesElegiblesTodos.length}
             </span>
           </Button>
+          )}
         </div>
       </div>
 
-      {suministroFetchError && (
+      {mostrarSuministro && suministroFetchError && (
         <div className="text-xs text-destructive bg-destructive/10 border border-destructive/20 rounded-md px-3 py-2">
           {suministroFetchError}
         </div>
@@ -718,7 +727,7 @@ export function ReporteEntregaTable({ reportes, loading, onRefreshReportes, onFo
                 const hasEligibleForSuministro = group.reports.some(isReporteElegibleParaSuministro)
                 const isAllAnnulled = annulledCount === totalReports
                 const isAnyAnnulled = annulledCount > 0
-                const showSuministro = hasEligibleForSuministro
+                const showSuministro = mostrarSuministro && hasEligibleForSuministro
 
                 const isActive = activeRow === group.noPrescripcion
                 return (
@@ -811,8 +820,8 @@ export function ReporteEntregaTable({ reportes, loading, onRefreshReportes, onFo
                           <div className="h-7 w-7" aria-hidden />
                         )}
 
-                        {/* Slot 3: Ver suministro (shows loading/placeholder if none) */}
-                        {true ? (
+                        {/* Slot 3: Ver suministro (solo EPS o AMBAS) */}
+                        {mostrarSuministro && (
                           <Button
                             variant="ghost"
                             size="icon"
@@ -826,12 +835,10 @@ export function ReporteEntregaTable({ reportes, loading, onRefreshReportes, onFo
                               {fetchingSuministroFor === group.noPrescripcion ? "Buscando..." : "Ver suministro"}
                             </span>
                           </Button>
-                        ) : (
-                          <div className="h-7 w-7" aria-hidden />
                         )}
 
-                        {/* Slot 4: Hacer suministro automático */}
-                        {showSuministro ? (
+                        {/* Slot 4: Hacer suministro automático (solo EPS o AMBAS) */}
+                        {mostrarSuministro && (showSuministro ? (
                           <Button
                             variant="ghost"
                             size="icon"
@@ -850,7 +857,7 @@ export function ReporteEntregaTable({ reportes, loading, onRefreshReportes, onFo
                           </Button>
                         ) : (
                           <div className="h-7 w-7" aria-hidden />
-                        )}
+                        ))}
                       </div>
                     </td>
                   </tr>
@@ -952,7 +959,7 @@ export function ReporteEntregaTable({ reportes, loading, onRefreshReportes, onFo
         </div>
       </div>
 
-      {suministroMasivoGroup && (
+      {mostrarSuministro && suministroMasivoGroup && (
         <SuministroModalMasivos
           open={suministroMasivoModalOpen}
           onClose={() => setSuministroMasivoModalOpen(false)}

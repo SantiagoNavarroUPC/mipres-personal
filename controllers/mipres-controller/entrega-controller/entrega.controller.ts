@@ -3,6 +3,8 @@ import {
   fetchEntregaPorFecha,
   fetchEntregaPorPaciente,
   fetchEntregaPorPrescripcion,
+  putEntrega,
+  putEntregaCodigos,
   type TipoConsultaEntrega,
 } from "@/requests/mipres-sispro/entrega.request"
 import {
@@ -42,6 +44,82 @@ function extractEntregas(raw: any): any[] {
       ...item,
       ID: item.ID || item.IDEntrega,
     }))
+}
+
+/**
+ * Registrar Entrega
+ */
+export async function registrarEntrega(
+  credentials: MipresCredentials,
+  payload: unknown
+): Promise<{ success: boolean; data?: unknown; error?: string; details?: unknown }> {
+  try {
+    const token = getTokenAcceso(credentials)
+
+    if (!credentials.nit || !token) {
+      return { success: false, error: "NIT y token de acceso son requeridos" }
+    }
+
+    if (!payload || typeof payload !== "object") {
+      return { success: false, error: "Datos de entrega requeridos" }
+    }
+
+    const result = await putEntrega(credentials.nit, token, payload)
+
+    if (result.success) {
+      return { success: true, data: result.data }
+    }
+
+    return {
+      success: false,
+      error: result.error || "Error al registrar entrega",
+      details: result.data,
+    }
+  } catch (error) {
+    return {
+      success: false,
+      error: "Error en el registro de entrega",
+      details: error instanceof Error ? error.message : "Error desconocido",
+    }
+  }
+}
+
+/**
+ * Registrar Entrega Códigos (posterior a la entrega)
+ */
+export async function registrarEntregaCodigos(
+  credentials: MipresCredentials,
+  payload: unknown
+): Promise<{ success: boolean; data?: unknown; error?: string; details?: unknown }> {
+  try {
+    const token = getTokenAcceso(credentials)
+
+    if (!credentials.nit || !token) {
+      return { success: false, error: "NIT y token de acceso son requeridos" }
+    }
+
+    if (!payload || typeof payload !== "object") {
+      return { success: false, error: "Datos de entrega códigos requeridos" }
+    }
+
+    const result = await putEntregaCodigos(credentials.nit, token, payload)
+
+    if (result.success) {
+      return { success: true, data: result.data }
+    }
+
+    return {
+      success: false,
+      error: result.error || "Error al registrar entrega códigos",
+      details: result.data,
+    }
+  } catch (error) {
+    return {
+      success: false,
+      error: "Error en el registro de entrega códigos",
+      details: error instanceof Error ? error.message : "Error desconocido",
+    }
+  }
 }
 
 /**

@@ -49,7 +49,18 @@ export function leerEmpresaDeSesion(): EmpresaSesion {
   }
 }
 
-export function useEmpresaActual(): { empresa: EmpresaSesion; loading: boolean; esIPS: boolean } {
+// id_tipo_empresa: 1=IPS, 2=EPS, 3=AMBAS (ver mipres.tipo_empresa).
+const TIPO_EMPRESA_IPS = 1
+const TIPO_EMPRESA_EPS = 2
+const TIPO_EMPRESA_AMBAS = 3
+
+export function useEmpresaActual(): {
+  empresa: EmpresaSesion
+  loading: boolean
+  esIPS: boolean
+  puedeProgramar: boolean
+  puedeSuministrar: boolean
+} {
   const [empresa, setEmpresa] = useState<EmpresaSesion>(EMPRESA_SESION_VACIA)
   const [loading, setLoading] = useState(true)
 
@@ -58,5 +69,12 @@ export function useEmpresaActual(): { empresa: EmpresaSesion; loading: boolean; 
     setLoading(false)
   }, [])
 
-  return { empresa, loading, esIPS: empresa.idTipoEmpresa === 1 }
+  const esIPS = empresa.idTipoEmpresa === TIPO_EMPRESA_IPS
+  // La programación la registra el proveedor (IPS) después del direccionamiento.
+  const puedeProgramar = esIPS || empresa.idTipoEmpresa === TIPO_EMPRESA_AMBAS
+  // El suministro lo reporta la EPS; una empresa solo IPS no lo gestiona.
+  const puedeSuministrar =
+    empresa.idTipoEmpresa === TIPO_EMPRESA_EPS || empresa.idTipoEmpresa === TIPO_EMPRESA_AMBAS
+
+  return { empresa, loading, esIPS, puedeProgramar, puedeSuministrar }
 }

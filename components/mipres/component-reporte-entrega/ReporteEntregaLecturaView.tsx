@@ -16,6 +16,7 @@ import type { ReporteEntrega } from "@/models/mipres-sispro/reporte-entrega/repo
 import type { Direccionamiento } from "@/models/mipres-sispro/direccionamiento/direccionamiento"
 import { ESTADOS_ENTREGA, TIPOS_TECNOLOGIAS, ESTADOS_REPORTE_ENTREGA, CAUSAS_NO_ENTREGAS } from "@/models/constants"
 import { secureStorageGetItem } from "@/lib/secure-storage"
+import { useEmpresaActual } from "@/lib/use-empresa-actual"
 
 // ── Suministro helpers (from SuministroModal) ─────────────────────────────────
 interface SuministroResult {
@@ -86,6 +87,8 @@ export function ReporteEntregaLecturaModal({
   const [page, setPage] = useState(1)
   const [processing, setProcessing] = useState(false)
   const [suministroResults, setSuministroResults] = useState<SuministroResult[]>([])
+  // El suministro solo aplica a EPS o AMBAS; a una IPS no se le muestra.
+  const { puedeSuministrar: mostrarSuministro } = useEmpresaActual()
 
   useEffect(() => {
     onFormVisibilityChange?.(open)
@@ -346,7 +349,8 @@ export function ReporteEntregaLecturaModal({
         )}
       </div>
 
-      {/* ── Columna derecha: hacer suministro ── */}
+      {/* ── Columna derecha: hacer suministro (solo EPS o AMBAS) ── */}
+      {mostrarSuministro && (
       <div className="w-96 shrink-0 border rounded-lg overflow-hidden self-start sticky top-4">
         <div className="flex items-center gap-1.5 border-b bg-muted/30 px-3 py-2.5">
           <Package className="h-4 w-4 text-primary" />
@@ -438,6 +442,7 @@ export function ReporteEntregaLecturaModal({
           </div>
         </ScrollArea>
       </div>
+      )}
 
     </div>
   )

@@ -4,6 +4,7 @@ import {
   fetchReporteEntregaPorPaciente,
   fetchReporteEntregaPorPrescripcion,
   putAnularReporteEntrega,
+  putReporteEntrega,
   type TipoConsultaReporteEntrega,
 } from "@/requests/mipres-sispro/reporte-entrega.request"
 import {
@@ -26,6 +27,44 @@ function extractReportesEntrega(raw: any): any[] {
   if (raw.root && Array.isArray(raw.root)) return raw.root
   if (raw.reportes && Array.isArray(raw.reportes)) return raw.reportes
   return [raw]
+}
+
+/**
+ * Registrar Reporte de Entrega
+ */
+export async function registrarReporteEntrega(
+  credentials: MipresCredentials,
+  payload: unknown
+): Promise<{ success: boolean; data?: unknown; error?: string; details?: unknown }> {
+  try {
+    const token = getTokenAcceso(credentials)
+
+    if (!credentials.nit || !token) {
+      return { success: false, error: "NIT y token de acceso son requeridos" }
+    }
+
+    if (!payload || typeof payload !== "object") {
+      return { success: false, error: "Datos de reporte de entrega requeridos" }
+    }
+
+    const result = await putReporteEntrega(credentials.nit, token, payload)
+
+    if (result.success) {
+      return { success: true, data: result.data }
+    }
+
+    return {
+      success: false,
+      error: result.error || "Error al registrar reporte de entrega",
+      details: result.data,
+    }
+  } catch (error) {
+    return {
+      success: false,
+      error: "Error en el registro de reporte de entrega",
+      details: error instanceof Error ? error.message : "Error desconocido",
+    }
+  }
 }
 
 /**

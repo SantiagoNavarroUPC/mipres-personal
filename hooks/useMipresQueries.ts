@@ -927,6 +927,7 @@ export function useMipresQueryClient() {
             nit: credentials.nit,
             tokenAccesoSubsidiado: credentials.tokenAccesoSubsidiado || "",
             tokenAccesoContributivo: credentials.tokenAccesoContributivo || "",
+            ...(credentials.tokenAcceso && { tokenAcceso: credentials.tokenAcceso }),
             tipo,
             ...(params.fecha && { fecha: params.fecha }),
             ...(params.fechaInicio && { fechaInicio: params.fechaInicio }),

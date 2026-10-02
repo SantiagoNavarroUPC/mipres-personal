@@ -4,6 +4,10 @@ import { Pool } from "undici"
 const BASE_URL_TOKEN = getRequiredEnv("BASE_URL_TOKEN")
 
 export const REPORTE_ENTREGA_ENDPOINTS = {
+  // PUT api/ReporteEntrega/{nit}/{token}
+  putReporteEntrega: (nit: string, token: string) =>
+    `${BASE_URL_TOKEN}/ReporteEntrega/${nit}/${token}`,
+
   // GET api/ReporteEntregaXFecha/{nit}/{token}/{fecha}
   reporteEntregaPorFecha: (nit: string, token: string, fecha: string) =>
     `${BASE_URL_TOKEN}/ReporteEntregaXFecha/${nit}/${token}/${fecha}`,
@@ -167,4 +171,10 @@ export async function fetchReporteEntregaPorPaciente(nit: string, fecha: string,
 export async function putAnularReporteEntrega(nit: string, token: string, idReporteEntrega: string) {
   const url = REPORTE_ENTREGA_ENDPOINTS.anularReporteEntrega(nit, token, idReporteEntrega)
   return requestToMipres(url, { method: "PUT" })
+}
+
+// PUT Reporte de Entrega
+export async function putReporteEntrega(nit: string, token: string, payload: unknown) {
+  const url = REPORTE_ENTREGA_ENDPOINTS.putReporteEntrega(nit, token)
+  return requestToMipres(url, { method: "PUT", body: payload })
 }

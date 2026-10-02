@@ -13,18 +13,22 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { DireccionamientoModalAnular } from "./DireccionamientoViewAnular"
-import { DireccionamientoModalProgramar } from "./DireccionamientoModalProgramar"
-import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Eye, X, Calendar, ArrowUpDown, ArrowUp, ArrowDown, Pill, Stethoscope, Package as PackageIcon, Sparkles, Activity, Hash, Layers3, ShieldCheck, CalendarClock, Search, Boxes, Shield, Copy, Compass } from "lucide-react"
+import { ProgramacionViewForm, getEstadoProgramacion } from "../component-programacion/ProgramacionViewForm"
+import { ProgramacionLecturaModal } from "../component-programacion/ProgramacionLecturaView"
+import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Eye, X, Calendar, ArrowUpDown, ArrowUp, ArrowDown, Pill, Stethoscope, Package as PackageIcon, Sparkles, Activity, Hash, Layers3, ShieldCheck, CalendarClock, Search, Boxes, Shield, Copy, Compass, Loader2 } from "lucide-react"
 import { toast } from "sonner"
 import type { Direccionamiento } from "@/models/mipres-sispro/direccionamiento"
+import type { Programacion } from "@/models/mipres-sispro/programacion/programacion"
 import type { MipresCredentials } from "@/models/credentials.model"
 import { useEmpresaActual } from "@/lib/use-empresa-actual"
+import { useMipresQueryClient } from "@/hooks/useMipresQueries"
 
 interface DireccionamientoTableProps {
   results: Direccionamiento[]
   credentials: MipresCredentials
   onView: (item: Direccionamiento) => void
   onAnularSuccess?: () => void
+  onFormVisibilityChange?: (open: boolean) => void
 }
 
 function formatFechaDireccionamiento(value?: string) {
@@ -39,7 +43,21 @@ function formatFechaDireccionamiento(value?: string) {
   }
 }
 
-export function DireccionamientoTable({ results, credentials, onView, onAnularSuccess }: DireccionamientoTableProps) {
+// Semáforo del grupo (mismo patrón que Prescripción): gris = sin programar,
+// ámbar = parcial, verde = todo programado.
+function getSemaforoProgramacion(programados: number, pendientes: number) {
+  if (pendientes === 0) return { dot: "bg-emerald-500", title: "Programado - Clic para ver detalles" }
+  if (programados === 0) return { dot: "bg-gray-400", title: "Sin programar - Clic para programar" }
+  return { dot: "bg-amber-500", title: `Programación parcial (${programados}/${programados + pendientes}) - Clic para programar` }
+}
+
+export function DireccionamientoTable({
+  results,
+  credentials,
+  onView,
+  onAnularSuccess,
+  onFormVisibilityChange,
+}: DireccionamientoTableProps) {
   const grouped = new Map<string, { items: Direccionamiento[]; total: number; last: Direccionamiento }>()
 
   results.forEach((item) => {
@@ -101,6 +119,13 @@ export function DireccionamientoTable({ results, credentials, onView, onAnularSu
     const hasDuplicatesFromBackend = data.items.some((d: any) => d?.esDuplicado === true)
     const hasDuplicates = hasDuplicatesFromBackend || duplicateDeliveries.size > 0
 
+    const programacion = { programados: 0, pendientes: 0 }
+    for (const d of data.items) {
+      const estado = getEstadoProgramacion(d)
+      if (estado === "programado") programacion.programados++
+      else if (estado === "pendiente") programacion.pendientes++
+    }
+
     const techCounts = {
       M: byTipo.M.size,
       P: byTipo.P.size,
@@ -115,6 +140,8 @@ export function DireccionamientoTable({ results, credentials, onView, onAnularSu
       fechaFinal: data.last.FecDireccionamiento,
       total: data.total,
       last: data.last,
+      items: data.items,
+      programacion,
       techCounts,
       hasDuplicates,
       duplicateDeliveries: Array.from(duplicateDeliveries).sort(),
@@ -125,10 +152,20 @@ export function DireccionamientoTable({ results, credentials, onView, onAnularSu
   const [pageSize, setPageSize] = useState(10)
   const [anularModalOpen, setAnularModalOpen] = useState(false)
   const [selectedItemsForAnular, setSelectedItemsForAnular] = useState<Direccionamiento[]>([])
-  const [programarModalOpen, setProgramarModalOpen] = useState(false)
-  const [selectedItemForProgramar, setSelectedItemForProgramar] = useState<Direccionamiento | null>(null)
+  const [programarViewOpen, setProgramarViewOpen] = useState(false)
+  const [selectedItemsForProgramar, setSelectedItemsForProgramar] = useState<Direccionamiento[]>([])
+  const [lecturaViewOpen, setLecturaViewOpen] = useState(false)
+  const [lecturaProgramaciones, setLecturaProgramaciones] = useState<Programacion[]>([])
+  const [lecturaNoPrescripcion, setLecturaNoPrescripcion] = useState("")
+  const [loadingProgPresc, setLoadingProgPresc] = useState<string | null>(null)
   const [showDuplicatesOnly, setShowDuplicatesOnly] = useState(false)
-  const { esIPS: mostrarProgramacion } = useEmpresaActual()
+  const { puedeProgramar: mostrarProgramacion } = useEmpresaActual()
+  const { fetchProgramaciones } = useMipresQueryClient()
+
+  const isAnyProgramacionViewOpen = programarViewOpen || lecturaViewOpen
+  useEffect(() => {
+    onFormVisibilityChange?.(isAnyProgramacionViewOpen)
+  }, [isAnyProgramacionViewOpen, onFormVisibilityChange])
 
   const [searchPrescripcion, setSearchPrescripcion] = useState("")
   const [filterTipoTec, setFilterTipoTec] = useState("todos")
@@ -204,9 +241,101 @@ export function DireccionamientoTable({ results, credentials, onView, onAnularSu
     setAnularModalOpen(true)
   }
 
+  const handleSemaforoClick = async (row: (typeof rows)[0]) => {
+    setActiveRow(`${row.noPrescripcion}|${row.tipoRegimen || "SinRegimen"}`)
+    const isVerde = row.programacion.pendientes === 0 && row.programacion.programados > 0
+
+    if (isVerde) {
+      setLoadingProgPresc(row.noPrescripcion)
+      try {
+        const progs = await fetchProgramaciones(credentials, "prescripcion", {
+          noPrescripcion: row.noPrescripcion,
+        })
+
+        if (progs && progs.length > 0) {
+          setLecturaProgramaciones(progs)
+          setLecturaNoPrescripcion(row.noPrescripcion)
+          setLecturaViewOpen(true)
+          return
+        }
+      } catch (err) {
+        console.warn("fetchProgramaciones falló, intentando construir desde datos de direccionamiento:", err)
+      } finally {
+        setLoadingProgPresc(null)
+      }
+
+      // Fallback con los datos del direccionamiento si la consulta no retornó registros
+      const fallbackProgs: Programacion[] = row.items
+        .filter((d) => !d.FecAnulacion)
+        .map((d: any) => ({
+          ID: d.ID || d.IDDireccionamiento || 0,
+          IDProgramacion: d.IDProgramacion || d.ID || 0,
+          NoPrescripcion: d.NoPrescripcion,
+          TipoTec: d.TipoTec,
+          ConTec: d.ConTec,
+          TipoIDPaciente: d.TipoIDPaciente,
+          NoIDPaciente: d.NoIDPaciente,
+          NoEntrega: d.NoEntrega,
+          FecMaxEnt: d.FecMaxEnt,
+          TipoIDSedeProv: d.TipoIDProv || d.TipoIDSedeProv || "NI",
+          NoIDSedeProv: d.NoIDProv || d.NoIDSedeProv || "",
+          CodSedeProv: d.CodSedeProv || "PROV007189",
+          CodSerTecAEntregar: d.CodSerTecAEntregar,
+          CantTotAEntregar: d.CantTotAEntregar,
+          FecProgramacion: d.FecProgramacion || d.FecDireccionamiento || "",
+          EstProgramacion: 2,
+          FecAnulacion: d.FecAnulacion || null,
+        }))
+
+      if (fallbackProgs.length > 0) {
+        setLecturaProgramaciones(fallbackProgs)
+        setLecturaNoPrescripcion(row.noPrescripcion)
+        setLecturaViewOpen(true)
+      } else {
+        toast.error("No se encontraron registros de programación para esta prescripción.")
+      }
+    } else {
+      setSelectedItemsForProgramar(row.items)
+      setProgramarViewOpen(true)
+    }
+  }
+
   useEffect(() => {
     setPage(1)
   }, [results, pageSize, searchPrescripcion, filterTipoTec, regimenFilter, dateSort, showDuplicatesOnly])
+
+  if (lecturaViewOpen) {
+    return (
+      <ProgramacionLecturaModal
+        open={lecturaViewOpen}
+        onClose={() => {
+          setLecturaViewOpen(false)
+          setLecturaProgramaciones([])
+          setLecturaNoPrescripcion("")
+        }}
+        programaciones={lecturaProgramaciones}
+        noPrescripcion={lecturaNoPrescripcion}
+        onFormVisibilityChange={onFormVisibilityChange}
+      />
+    )
+  }
+
+  if (programarViewOpen && selectedItemsForProgramar.length > 0) {
+    return (
+      <ProgramacionViewForm
+        items={selectedItemsForProgramar}
+        credentials={credentials}
+        onClose={() => {
+          setProgramarViewOpen(false)
+          setSelectedItemsForProgramar([])
+        }}
+        onSuccess={() => {
+          onAnularSuccess?.()
+        }}
+        onFormVisibilityChange={onFormVisibilityChange}
+      />
+    )
+  }
 
   if (!results || results.length === 0) {
     return (
@@ -227,10 +356,21 @@ export function DireccionamientoTable({ results, credentials, onView, onAnularSu
           <Badge variant="secondary" className="text-xs">
             {filteredTotal}
           </Badge>
+          {regimenFilter !== "todos" && (
+            <Badge
+              variant="outline"
+              className="text-[11px] h-6 px-2 bg-primary/10 border-primary/30 text-primary cursor-pointer gap-1 select-none hover:bg-primary/20"
+              onClick={() => setRegimenFilter("todos")}
+              title="Quitar filtro de régimen"
+            >
+              <span>Régimen: {regimenFilter}</span>
+              <span className="font-bold text-xs">×</span>
+            </Badge>
+          )}
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
-          <div className="relative w-[190px] group">
+          <div className="relative w-full sm:w-[190px] group">
             <Search className="pointer-events-none absolute left-2.5 top-1/2 size-3.5 -translate-y-1/2 text-muted-foreground transition-colors group-focus-within:text-primary" />
             <input
               type="text"
@@ -310,7 +450,7 @@ export function DireccionamientoTable({ results, credentials, onView, onAnularSu
                   {dateSort === "desc" && <ArrowDown className="h-3.5 w-3.5 text-white shrink-0" />}
                 </button>
               </th>
-              <th className="text-center text-[11px] sm:text-xs font-semibold text-white px-2 sm:px-4 py-2 sm:py-3 whitespace-nowrap hidden sm:table-cell">
+              <th className="text-center text-[11px] sm:text-xs font-semibold text-white px-2 sm:px-4 py-2 sm:py-3 whitespace-nowrap hidden xl:table-cell">
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <button
@@ -377,6 +517,14 @@ export function DireccionamientoTable({ results, credentials, onView, onAnularSu
                   <span>Estado de Anulación</span>
                 </div>
               </th>
+              {mostrarProgramacion && (
+                <th className="text-center text-[11px] sm:text-xs font-semibold text-white px-1 sm:px-4 py-2 sm:py-3 whitespace-nowrap hidden sm:table-cell">
+                  <div className="flex items-center justify-center gap-1.5 whitespace-nowrap">
+                    <CalendarClock className="h-3.5 w-3.5 text-white shrink-0" />
+                    <span>Programación</span>
+                  </div>
+                </th>
+              )}
               <th className="text-center text-[11px] sm:text-xs font-semibold text-white px-2 sm:px-4 py-2 sm:py-3 whitespace-nowrap w-24 sm:w-28">
                 <span>Acciones</span>
               </th>
@@ -406,6 +554,24 @@ export function DireccionamientoTable({ results, credentials, onView, onAnularSu
                           ))}
                         </div>
                       )}
+                      {row.tipoRegimen && (
+                        <Badge
+                          variant="secondary"
+                          onClick={() => {
+                            setRegimenFilter(row.tipoRegimen === regimenFilter ? "todos" : (row.tipoRegimen as any))
+                          }}
+                          title={`Filtrar por régimen ${row.tipoRegimen}`}
+                          className={`hidden sm:inline-flex xl:hidden text-[9px] h-4.5 px-1.5 cursor-pointer hover:scale-105 active:scale-95 transition-all select-none ${
+                            row.tipoRegimen === "Contributivo"
+                              ? "bg-blue-100 text-blue-700 hover:bg-blue-200/80 dark:bg-blue-900/50 dark:text-blue-300"
+                              : row.tipoRegimen === "Subsidiado"
+                              ? "bg-emerald-100 text-emerald-700 hover:bg-emerald-200/80 dark:bg-emerald-900/50 dark:text-emerald-300"
+                              : "bg-muted text-muted-foreground"
+                          }`}
+                        >
+                          {row.tipoRegimen}
+                        </Badge>
+                      )}
                     </div>
                   </td>
                   <td className="px-4 py-2.5 text-center hidden xl:table-cell">
@@ -423,7 +589,7 @@ export function DireccionamientoTable({ results, credentials, onView, onAnularSu
                       <div className="text-[10px]">{hora}</div>
                     </div>
                   </td>
-                  <td className="px-4 py-2.5 text-center hidden sm:table-cell">
+                  <td className="px-4 py-2.5 text-center hidden xl:table-cell">
                     <Badge
                       variant="secondary"
                       onClick={() => {
@@ -454,9 +620,70 @@ export function DireccionamientoTable({ results, credentials, onView, onAnularSu
                       {row.last.FecAnulacion ? "Anulada" : "Vigente"}
                     </Badge>
                   </td>
+                  {mostrarProgramacion && (
+                    <td className="px-1 sm:px-4 py-1.5 sm:py-2.5 text-center hidden sm:table-cell">
+                      {row.programacion.programados + row.programacion.pendientes > 0 ? (
+                        (() => {
+                          const semaforo = getSemaforoProgramacion(row.programacion.programados, row.programacion.pendientes)
+                          const isLoadingThis = loadingProgPresc === row.noPrescripcion
+                          return (
+                            <div className="flex items-center justify-center gap-1">
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-6 w-6 sm:h-7 sm:w-7 relative"
+                                disabled={isLoadingThis}
+                                onClick={() => handleSemaforoClick(row)}
+                                title={semaforo.title}
+                              >
+                                {isLoadingThis ? (
+                                  <Loader2 className="h-3.5 w-3.5 animate-spin text-primary" />
+                                ) : (
+                                  <span className={`h-2.5 w-2.5 sm:h-3.5 sm:w-3.5 rounded-full ${semaforo.dot}`} />
+                                )}
+                              </Button>
+                            </div>
+                          )
+                        })()
+                      ) : (
+                        <div className="flex items-center justify-center">
+                          <span className="h-2.5 w-2.5 sm:h-3.5 sm:w-3.5 rounded-full bg-gray-300 dark:bg-zinc-600" title="Sin direccionamientos vigentes" />
+                        </div>
+                      )}
+                    </td>
+                  )}
                   <td className="px-2 sm:px-4 py-2 sm:py-2.5 text-center">
                     <div className="flex items-center justify-center">
                       <div className="flex justify-center items-center gap-1">
+                        {mostrarProgramacion && (
+                          <div className="sm:hidden flex items-center justify-center">
+                            {row.programacion.programados + row.programacion.pendientes > 0 ? (
+                              (() => {
+                                const semaforo = getSemaforoProgramacion(row.programacion.programados, row.programacion.pendientes)
+                                const isLoadingThis = loadingProgPresc === row.noPrescripcion
+                                return (
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className="h-7 w-7 relative"
+                                    disabled={isLoadingThis}
+                                    onClick={() => handleSemaforoClick(row)}
+                                    title={semaforo.title}
+                                  >
+                                    {isLoadingThis ? (
+                                      <Loader2 className="h-3.5 w-3.5 animate-spin text-primary" />
+                                    ) : (
+                                      <span className={`h-2.5 w-2.5 rounded-full ${semaforo.dot}`} />
+                                    )}
+                                  </Button>
+                                )
+                              })()
+                            ) : (
+                              <span className="h-2.5 w-2.5 rounded-full bg-gray-300 dark:bg-zinc-600 inline-block m-2" title="Sin direccionamientos vigentes" />
+                            )}
+                          </div>
+                        )}
+
                         <div className="relative group">
                           <Button
                             variant="ghost"
@@ -487,21 +714,6 @@ export function DireccionamientoTable({ results, credentials, onView, onAnularSu
                           </div>
                         )}
 
-                        {mostrarProgramacion && !row.last.FecAnulacion && (
-                          <div className="relative group">
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="h-7 w-7 text-primary hover:text-primary"
-                              onClick={() => { setSelectedItemForProgramar(row.last); setProgramarModalOpen(true); setActiveRow(rowKey); }}
-                            >
-                              <CalendarClock className="h-3.5 w-3.5" />
-                            </Button>
-                            <span className="pointer-events-none absolute right-full mr-2 top-1/2 -translate-y-1/2 rounded border bg-popover px-2 py-1 text-[10px] text-foreground shadow-sm opacity-0 group-hover:opacity-100 whitespace-nowrap transition-opacity">
-                              Programar
-                            </span>
-                          </div>
-                        )}
                       </div>
                     </div>
                   </td>
@@ -610,14 +822,7 @@ export function DireccionamientoTable({ results, credentials, onView, onAnularSu
         onSuccess={onAnularSuccess}
       />
 
-      {mostrarProgramacion && (
-        <DireccionamientoModalProgramar
-          open={programarModalOpen}
-          onClose={() => setProgramarModalOpen(false)}
-          item={selectedItemForProgramar}
-          credentials={credentials}
-        />
-      )}
+
     </div>
   )
 }

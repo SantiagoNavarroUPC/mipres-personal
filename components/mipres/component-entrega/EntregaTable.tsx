@@ -43,6 +43,8 @@ import {
 import { DireccionamientoLecturaModal } from "@/components/mipres/component-direccionamiento/DireccionamientoLecturaView"
 import { CategoryBadge } from "@/components/mipres/component-prescripcion/CategoryBadge"
 import { secureStorageGetItem } from "@/lib/secure-storage"
+import { useEmpresaActual } from "@/lib/use-empresa-actual"
+import { ReporteEntregaPopover } from "./ReporteEntregaPopover"
 
 interface EntregaTableProps {
   entregas: Entrega[]
@@ -108,6 +110,11 @@ export function EntregaTable({ entregas, loading, credentials, onFormVisibilityC
   const [filterEstado, setFilterEstado] = useState<EstadoFilter>("all")
   const [dateSort, setDateSort] = useState<"none" | "asc" | "desc">("none")
   const [techCountsByPrescripcion, setTechCountsByPrescripcion] = useState<Record<string, TechCountByTipo>>({})
+
+  // El reporte de entrega lo registra el proveedor (IPS o AMBAS), igual que programación y entrega.
+  const { puedeProgramar: mostrarReporte } = useEmpresaActual()
+  // Entregas reportadas en esta sesión, para marcar el botón sin volver a consultar.
+  const [reportadosLocal, setReportadosLocal] = useState<Set<string>>(new Set())
 
   const anyViewOpen = entregaViewOpen || dirViewOpen
 
@@ -263,6 +270,7 @@ export function EntregaTable({ entregas, loading, credentials, onFormVisibilityC
   const openModal = (group: EntregaGroup) => {
     setSelectedEntregas(group.entregas)
     setSelectedPrescripcion(group.noPrescripcion)
+    setEntregaViewOpen(true)
     setModalOpen(true)
     setActiveRow(group.noPrescripcion)
   }
@@ -274,6 +282,7 @@ export function EntregaTable({ entregas, loading, credentials, onFormVisibilityC
       TipoIDPaciente: sample?.TipoIDPaciente,
       NoIDPaciente: sample?.NoIDPaciente,
     })
+    setDirViewOpen(true)
     setDireccionamientoOpen(true)
     setActiveRow(group.noPrescripcion)
   }
@@ -446,6 +455,15 @@ export function EntregaTable({ entregas, loading, credentials, onFormVisibilityC
                                 Ver entrega
                               </span>
                             </Button>
+                            {mostrarReporte && (
+                              <ReporteEntregaPopover
+                                entregas={group.entregas}
+                                credentials={direccionamientoCredentials}
+                                reportados={reportadosLocal}
+                                onReportado={(key) => setReportadosLocal((prev) => new Set(prev).add(key))}
+                                onOpen={() => setActiveRow(group.noPrescripcion)}
+                              />
+                            )}
                           </div>
                         </td>
                       </tr>

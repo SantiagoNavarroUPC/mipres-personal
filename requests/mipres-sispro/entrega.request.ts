@@ -4,6 +4,14 @@ import { Pool } from "undici"
 const BASE_URL_TOKEN = getRequiredEnv("BASE_URL_TOKEN")
 
 export const ENTREGA_ENDPOINTS = {
+  // PUT api/Entrega/{nit}/{token}
+  putEntrega: (nit: string, token: string) =>
+    `${BASE_URL_TOKEN}/Entrega/${nit}/${token}`,
+
+  // PUT api/EntregaCodigos/{nit}/{token}
+  putEntregaCodigos: (nit: string, token: string) =>
+    `${BASE_URL_TOKEN}/EntregaCodigos/${nit}/${token}`,
+
   // GET api/EntregaXFecha/{nit}/{token}/{fecha}
   entregaPorFecha: (nit: string, token: string, fecha: string) =>
     `${BASE_URL_TOKEN}/EntregaXFecha/${nit}/${token}/${fecha}`,
@@ -116,6 +124,18 @@ async function requestToMipres<T>(
   }
 
   return { success: false, error: "Unknown error" }
+}
+
+// PUT Entrega
+export async function putEntrega(nit: string, token: string, payload: unknown) {
+  const url = ENTREGA_ENDPOINTS.putEntrega(nit, token)
+  return requestToMipres(url, { method: "PUT", body: payload })
+}
+
+// PUT EntregaCodigos (se reporta después de registrar la entrega, sobre su IDEntrega)
+export async function putEntregaCodigos(nit: string, token: string, payload: unknown) {
+  const url = ENTREGA_ENDPOINTS.putEntregaCodigos(nit, token)
+  return requestToMipres(url, { method: "PUT", body: payload })
 }
 
 // GET Entrega por fecha

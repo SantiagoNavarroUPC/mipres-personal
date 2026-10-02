@@ -43,6 +43,8 @@ import {
 import { DireccionamientoLecturaModal } from "@/components/mipres/component-direccionamiento/DireccionamientoLecturaView"
 import { CategoryBadge } from "@/components/mipres/component-prescripcion/CategoryBadge"
 import { secureStorageGetItem } from "@/lib/secure-storage"
+import { useEmpresaActual } from "@/lib/use-empresa-actual"
+import { EntregaViewForm, getEstadoEntrega } from "@/components/mipres/component-entrega/EntregaViewForm"
 
 interface ProgramacionTableProps {
   programaciones: Programacion[]
@@ -84,6 +86,14 @@ function readStoredCredentials(credentials?: MipresCredentials) {
   return { nit, tokenAcceso, tokenAccesoSubsidiado, tokenAccesoContributivo }
 }
 
+// Semáforo del grupo (mismo patrón que Prescripción): gris = sin entregar,
+// ámbar = parcial, verde = todo entregado.
+function getSemaforoEntrega(entregados: number, pendientes: number) {
+  if (pendientes === 0) return { dot: "bg-emerald-500", title: "Entregado - Clic para ver detalles" }
+  if (entregados === 0) return { dot: "bg-gray-400", title: "Sin entregar - Clic para registrar entrega" }
+  return { dot: "bg-amber-500", title: `Entrega parcial (${entregados}/${entregados + pendientes}) - Clic para registrar entrega` }
+}
+
 export function ProgramacionTable({ programaciones, loading, credentials, onFormVisibilityChange }: ProgramacionTableProps) {
   const [page, setPage] = useState(1)
   const [selectedProgramaciones, setSelectedProgramaciones] = useState<Programacion[]>([])
@@ -109,7 +119,26 @@ export function ProgramacionTable({ programaciones, loading, credentials, onForm
   const [dateSort, setDateSort] = useState<"none" | "asc" | "desc">("none")
   const [techCountsByPrescripcion, setTechCountsByPrescripcion] = useState<Record<string, TechCountByTipo>>({})
 
-  const anyViewOpen = programacionViewOpen || dirViewOpen
+  // La entrega la registra el proveedor (IPS o AMBAS), igual que la programación.
+  const { puedeProgramar: mostrarEntrega } = useEmpresaActual()
+  const [entregaViewOpen, setEntregaViewOpen] = useState(false)
+  const [selectedForEntrega, setSelectedForEntrega] = useState<Programacion[]>([])
+  // IDs entregados en esta sesión, para actualizar el semáforo sin volver a consultar.
+  const [entregadosLocal, setEntregadosLocal] = useState<Set<string>>(new Set())
+
+  const getEntregaCounts = (group: ProgramacionGroup) => {
+    let entregados = 0
+    let pendientes = 0
+    for (const p of group.programaciones) {
+      const estado = getEstadoEntrega(p)
+      if (estado === "anulado") continue
+      if (estado === "entregado" || entregadosLocal.has(String(p.ID ?? p.IDProgramacion))) entregados++
+      else pendientes++
+    }
+    return { entregados, pendientes }
+  }
+
+  const anyViewOpen = programacionViewOpen || dirViewOpen || entregaViewOpen
 
   useEffect(() => {
     onFormVisibilityChange?.(anyViewOpen)
@@ -379,6 +408,14 @@ export function ProgramacionTable({ programaciones, loading, credentials, onForm
                         {dateSort === "desc" && <ArrowDown className="h-3.5 w-3.5 text-white shrink-0" />}
                       </button>
                     </th>
+                    {mostrarEntrega && (
+                      <th className="text-center text-[11px] sm:text-xs font-semibold text-white px-1 sm:px-4 py-2 sm:py-3 whitespace-nowrap">
+                        <div className="flex items-center justify-center gap-1.5 whitespace-nowrap">
+                          <Package className="h-3.5 w-3.5 text-white shrink-0" />
+                          <span className="hidden sm:inline">Entrega</span>
+                        </div>
+                      </th>
+                    )}
                     <th className="text-center text-[11px] sm:text-xs font-semibold text-white px-2 sm:px-4 py-2 sm:py-3 whitespace-nowrap w-24 sm:w-28">
                       <span>Acciones</span>
                     </th>
@@ -420,6 +457,34 @@ export function ProgramacionTable({ programaciones, loading, credentials, onForm
                             {group.latestProgramacion?.FecProgramacion || "N/A"}
                           </span>
                         </td>
+                        {mostrarEntrega && (
+                          <td className="px-1 sm:px-4 py-1.5 sm:py-2.5 text-center">
+                            {(() => {
+                              const { entregados, pendientes } = getEntregaCounts(group)
+                              if (entregados + pendientes === 0) {
+                                return (
+                                  <div className="flex items-center justify-center">
+                                    <span className="h-2.5 w-2.5 sm:h-3.5 sm:w-3.5 rounded-full bg-gray-300 dark:bg-zinc-600" title="Sin programaciones vigentes" />
+                                  </div>
+                                )
+                              }
+                              const semaforo = getSemaforoEntrega(entregados, pendientes)
+                              return (
+                                <div className="flex items-center justify-center gap-1">
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className="h-6 w-6 sm:h-7 sm:w-7"
+                                    onClick={() => { setSelectedForEntrega(group.programaciones); setEntregaViewOpen(true); setActiveRow(group.noPrescripcion) }}
+                                    title={semaforo.title}
+                                  >
+                                    <span className={`h-2.5 w-2.5 sm:h-3.5 sm:w-3.5 rounded-full ${semaforo.dot}`} />
+                                  </Button>
+                                </div>
+                              )
+                            })()}
+                          </td>
+                        )}
                         <td className="px-2 sm:px-4 py-2 sm:py-2.5 text-center align-middle">
                           <div className="flex items-center justify-center gap-1">
                             <Button
@@ -556,6 +621,20 @@ export function ProgramacionTable({ programaciones, loading, credentials, onForm
         noPrescripcion={selectedPrescripcion}
         onFormVisibilityChange={setProgramacionViewOpen}
       />
+
+      {mostrarEntrega && (
+        <EntregaViewForm
+          open={entregaViewOpen}
+          onClose={() => {
+            setEntregaViewOpen(false)
+            setSelectedForEntrega([])
+          }}
+          items={selectedForEntrega}
+          credentials={direccionamientoCredentials}
+          onSuccess={(id) => setEntregadosLocal((prev) => new Set(prev).add(id))}
+          onFormVisibilityChange={setEntregaViewOpen}
+        />
+      )}
 
       {selectedDireccionamientoPrescripcion && (
         <DireccionamientoLecturaModal
