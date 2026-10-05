@@ -1,6 +1,6 @@
 import { getRequiredEnv } from "@/lib/env"
 
-const DUSAKAWI_API_URL = getRequiredEnv("DUSAKAWI_API_URL").trim()
+const MIPRES_API_URL = getRequiredEnv("MIPRES_API_URL").trim()
 
 export interface IpsItem {
   id_empresa_prestador?: number
@@ -62,7 +62,7 @@ export async function fetchIpsByNit(nit: string): Promise<RequestResult<IpsItem[
 
   for (const search of searches) {
     try {
-      const url = new URL(`${DUSAKAWI_API_URL}/api/mipres/ips`)
+      const url = new URL(`${MIPRES_API_URL}/api/mipres/ips`)
       url.searchParams.set("search", search)
 
       const response = await fetch(url.toString(), {

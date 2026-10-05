@@ -1,4 +1,4 @@
-const DUSAKAWI_API_URL = process.env.DUSAKAWI_API_URL;
+const MIPRES_API_URL = process.env.MIPRES_API_URL;
 
 export interface EmpresaApiItem {
   id_empresa: number;
@@ -60,7 +60,7 @@ async function parseResult<T>(response: Response): Promise<RequestResult<T>> {
 }
 
 export async function listarEmpresasRequest(authToken: string): Promise<RequestResult<EmpresaApiItem[]>> {
-  const response = await fetch(`${DUSAKAWI_API_URL}/api/empresa`, {
+  const response = await fetch(`${MIPRES_API_URL}/api/empresa`, {
     method: "GET",
     headers: withAuthHeader(authToken),
     cache: "no-store",
@@ -69,7 +69,7 @@ export async function listarEmpresasRequest(authToken: string): Promise<RequestR
 }
 
 export async function listarMunicipiosRequest(authToken: string): Promise<RequestResult<MunicipioApiItem[]>> {
-  const response = await fetch(`${DUSAKAWI_API_URL}/api/empresa/municipios`, {
+  const response = await fetch(`${MIPRES_API_URL}/api/empresa/municipios`, {
     method: "GET",
     headers: withAuthHeader(authToken),
     cache: "no-store",
@@ -79,7 +79,7 @@ export async function listarMunicipiosRequest(authToken: string): Promise<Reques
 
 // Empresas asignables al crear un usuario: excluye la reservada al super_admin.
 export async function listarEmpresasAsignablesRequest(authToken: string): Promise<RequestResult<EmpresaApiItem[]>> {
-  const response = await fetch(`${DUSAKAWI_API_URL}/api/empresa/asignables`, {
+  const response = await fetch(`${MIPRES_API_URL}/api/empresa/asignables`, {
     method: "GET",
     headers: withAuthHeader(authToken),
     cache: "no-store",
@@ -100,7 +100,7 @@ export interface CredencialesMipresApiItem {
 // Credenciales MIPRES (Sispro) de la empresa del usuario autenticado. El
 // backend resuelve la empresa desde el token, nunca desde el cliente.
 export async function obtenerMisCredencialesMipresRequest(authToken: string): Promise<RequestResult<CredencialesMipresApiItem>> {
-  const response = await fetch(`${DUSAKAWI_API_URL}/api/empresa/mis-credenciales-mipres`, {
+  const response = await fetch(`${MIPRES_API_URL}/api/empresa/mis-credenciales-mipres`, {
     method: "GET",
     headers: withAuthHeader(authToken),
     cache: "no-store",
@@ -112,7 +112,7 @@ export async function guardarTokensFuenteRequest(
   payload: { token_subsidiado?: string | null; token_contributivo?: string | null },
   authToken: string
 ): Promise<RequestResult<CredencialesMipresApiItem>> {
-  const response = await fetch(`${DUSAKAWI_API_URL}/api/empresa/mis-credenciales-mipres/fuente`, {
+  const response = await fetch(`${MIPRES_API_URL}/api/empresa/mis-credenciales-mipres/fuente`, {
     method: "PUT",
     headers: { ...withAuthHeader(authToken), "Content-Type": "application/json" },
     body: JSON.stringify(payload),
@@ -125,7 +125,7 @@ export async function guardarTokensValidadosRequest(
   payload: { token_subsidiado_validado?: string | null; token_contributivo_validado?: string | null },
   authToken: string
 ): Promise<RequestResult<CredencialesMipresApiItem>> {
-  const response = await fetch(`${DUSAKAWI_API_URL}/api/empresa/mis-credenciales-mipres/validados`, {
+  const response = await fetch(`${MIPRES_API_URL}/api/empresa/mis-credenciales-mipres/validados`, {
     method: "PUT",
     headers: { ...withAuthHeader(authToken), "Content-Type": "application/json" },
     body: JSON.stringify(payload),
@@ -146,7 +146,7 @@ export async function crearEmpresaRequest(
   payload: EmpresaPayload,
   authToken: string
 ): Promise<RequestResult<EmpresaApiItem>> {
-  const response = await fetch(`${DUSAKAWI_API_URL}/api/empresa`, {
+  const response = await fetch(`${MIPRES_API_URL}/api/empresa`, {
     method: "POST",
     headers: {
       ...withAuthHeader(authToken),
@@ -163,7 +163,7 @@ export async function actualizarEmpresaRequest(
   payload: EmpresaPayload,
   authToken: string
 ): Promise<RequestResult<EmpresaApiItem>> {
-  const response = await fetch(`${DUSAKAWI_API_URL}/api/empresa/${idEmpresa}`, {
+  const response = await fetch(`${MIPRES_API_URL}/api/empresa/${idEmpresa}`, {
     method: "PUT",
     headers: {
       ...withAuthHeader(authToken),
@@ -179,7 +179,7 @@ export async function eliminarEmpresaRequest(
   idEmpresa: number,
   authToken: string
 ): Promise<RequestResult<null>> {
-  const response = await fetch(`${DUSAKAWI_API_URL}/api/empresa/${idEmpresa}`, {
+  const response = await fetch(`${MIPRES_API_URL}/api/empresa/${idEmpresa}`, {
     method: "DELETE",
     headers: withAuthHeader(authToken),
     cache: "no-store",

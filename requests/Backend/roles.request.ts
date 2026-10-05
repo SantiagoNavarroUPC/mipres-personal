@@ -1,4 +1,4 @@
-const DUSAKAWI_API_URL = process.env.DUSAKAWI_API_URL;
+const MIPRES_API_URL = process.env.MIPRES_API_URL;
 
 export interface CrearRolApiResponse {
   success: boolean;
@@ -44,7 +44,7 @@ export async function crearRolRequest(
   idTipoEmpresa: number,
   authToken: string
 ): Promise<RequestResult<CrearRolApiResponse>> {
-  const response = await fetch(`${DUSAKAWI_API_URL}/api/usuarios/roles`, {
+  const response = await fetch(`${MIPRES_API_URL}/api/usuarios/roles`, {
     method: "POST",
     headers: {
       ...withAuthHeader(authToken),
@@ -77,7 +77,7 @@ export async function patchRolEstadoRequest(
   estado: boolean,
   authToken: string
 ): Promise<RequestResult<ActualizarEstadoRolApiResponse>> {
-  const response = await fetch(`${DUSAKAWI_API_URL}/api/usuarios/roles`, {
+  const response = await fetch(`${MIPRES_API_URL}/api/usuarios/roles`, {
     method: "PATCH",
     headers: {
       ...withAuthHeader(authToken),

@@ -1,4 +1,4 @@
-const DUSAKAWI_API_URL = process.env.DUSAKAWI_API_URL
+const MIPRES_API_URL = process.env.MIPRES_API_URL
 
 export interface RolUsuario {
   consecutivo_rol: number
@@ -52,7 +52,7 @@ function tryParseJson(raw: string): unknown {
 }
 
 export async function fetchUsuarios(authToken: string): Promise<RequestResult<UsuariosApiResponse>> {
-  const response = await fetch(`${DUSAKAWI_API_URL}/api/usuarios`, {
+  const response = await fetch(`${MIPRES_API_URL}/api/usuarios`, {
     method: "GET",
     headers: withAuthHeader(authToken),
     cache: "no-store",
@@ -76,7 +76,7 @@ export async function patchUsuarioActivo(
   usuarioActivo: boolean,
   authToken: string
 ): Promise<RequestResult<UsuariosApiResponse>> {
-  const response = await fetch(`${DUSAKAWI_API_URL}/api/usuarios/${encodeURIComponent(idUsuarioMipres)}/estado`, {
+  const response = await fetch(`${MIPRES_API_URL}/api/usuarios/${encodeURIComponent(idUsuarioMipres)}/estado`, {
     method: "PATCH",
     headers: {
       ...withAuthHeader(authToken),
@@ -102,7 +102,7 @@ export async function patchUsuarioActivo(
 }
 
 export async function fetchRolesUsuarios(authToken: string): Promise<RequestResult<RolesApiResponse>> {
-  const response = await fetch(`${DUSAKAWI_API_URL}/api/usuarios/roles`, {
+  const response = await fetch(`${MIPRES_API_URL}/api/usuarios/roles`, {
     method: "GET",
     headers: withAuthHeader(authToken),
     cache: "no-store",
@@ -126,7 +126,7 @@ export async function patchUsuarioRol(
   consecutivoRol: number,
   authToken: string
 ): Promise<RequestResult<RolesApiResponse>> {
-  const response = await fetch(`${DUSAKAWI_API_URL}/api/usuarios/${encodeURIComponent(idUsuarioMipres)}/rol`, {
+  const response = await fetch(`${MIPRES_API_URL}/api/usuarios/${encodeURIComponent(idUsuarioMipres)}/rol`, {
     method: "PATCH",
     headers: {
       ...withAuthHeader(authToken),

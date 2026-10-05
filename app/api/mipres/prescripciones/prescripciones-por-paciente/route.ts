@@ -12,7 +12,7 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    const baseUrl = getRequiredEnv("DUSAKAWI_API_URL")
+    const baseUrl = getRequiredEnv("MIPRES_API_URL")
     const upstreamUrl = `${baseUrl}/api/mipres/prescripciones-por-paciente?numero_documento=${encodeURIComponent(numeroDocumento)}`
 
     const response = await fetch(upstreamUrl, {

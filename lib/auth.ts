@@ -108,7 +108,7 @@ function isRefreshTokenExpired(creds: Credentials | null): boolean {
  * Renueva la sesion usando el refresh token guardado (nunca la contrasena).
  * Reemplaza el mecanismo anterior de "reautenticar con la contrasena guardada
  * en el navegador", que ademas de exponer la contrasena en claro en
- * localStorage, dependia de DUSAKAWI_API_URL -> una variable de entorno sin
+ * localStorage, dependia de MIPRES_API_URL -> una variable de entorno sin
  * prefijo NEXT_PUBLIC_ que en el navegador siempre resuelve a undefined, por
  * lo que ese refresh en realidad nunca llegaba a funcionar.
  *

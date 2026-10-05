@@ -36,7 +36,7 @@ export interface ReporteDashboardRequestResult {
 	error?: string
 }
 
-const DUSAKAWI_API_URL = getRequiredEnv("DUSAKAWI_API_URL").trim()
+const MIPRES_API_URL = getRequiredEnv("MIPRES_API_URL").trim()
 
 const REPORTES_ENDPOINTS: Record<ReporteExcelTipo, string> = {
 	general: "/api/reportes/general/excel",
@@ -74,7 +74,7 @@ export async function descargarReporteExcelRequest(
 	authToken?: string
 ): Promise<ReporteExcelRequestResult> {
 	const endpointPath = REPORTES_ENDPOINTS[tipo]
-	const endpoint = `${DUSAKAWI_API_URL}${endpointPath}`
+	const endpoint = `${MIPRES_API_URL}${endpointPath}`
 
 	const url = new URL(endpoint)
 	url.searchParams.set("fecha_inicio", params.fechaInicio)
@@ -130,7 +130,7 @@ export async function obtenerDashboardRequest(
 	params: ReporteExcelRequestParams,
 	authToken?: string
 ): Promise<ReporteDashboardRequestResult> {
-	const endpoint = `${DUSAKAWI_API_URL}/api/reportes/dashboard`
+	const endpoint = `${MIPRES_API_URL}/api/reportes/dashboard`
 	const url = new URL(endpoint)
 	url.searchParams.set("fecha_inicio", params.fechaInicio)
 	url.searchParams.set("fecha_fin", params.fechaFin || params.fechaInicio)

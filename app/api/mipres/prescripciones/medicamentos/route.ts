@@ -88,7 +88,7 @@ export async function GET(request: NextRequest) {
 
     // Fallback: si no hay coincidencias para el search en fuentes publicas, consultar backend DUSAKAWI.
     if (filteredBySearch.length === 0 && search) {
-      const dusakawiBaseUrl = getRequiredEnv("DUSAKAWI_API_URL").trim()
+      const dusakawiBaseUrl = getRequiredEnv("MIPRES_API_URL").trim()
       const fallbackUrl = `${dusakawiBaseUrl}/api/mipres/medicamentos?search=${encodeURIComponent(search)}`
 
       const fallbackResponse = await fetch(fallbackUrl, {

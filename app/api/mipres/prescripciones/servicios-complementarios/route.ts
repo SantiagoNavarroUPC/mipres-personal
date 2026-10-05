@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { getRequiredEnv } from "../../../../../lib/env"
 
-const DUSAKAWI_API_URL = getRequiredEnv("DUSAKAWI_API_URL").trim()
+const MIPRES_API_URL = getRequiredEnv("MIPRES_API_URL").trim()
 
 export async function GET(request: NextRequest) {
   try {
@@ -15,7 +15,7 @@ export async function GET(request: NextRequest) {
       )
     }
     
-    const url = new URL(`${DUSAKAWI_API_URL}/api/mipres/servicios-complementarios`)
+    const url = new URL(`${MIPRES_API_URL}/api/mipres/servicios-complementarios`)
     url.searchParams.set("codigo", codigo)
     
     const response = await fetch(url.toString(), {

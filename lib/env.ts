@@ -7,10 +7,10 @@ export function getRequiredEnv(name: string): string {
 }
 
 export function getBackendApiUrl(): string {
-  const value = process.env.DUSAKAWI_API_URL?.trim()
+  const value = process.env.MIPRES_API_URL?.trim()
 
   if (!value) {
-    throw new Error("Missing required env var: DUSAKAWI_API_URL")
+    throw new Error("Missing required env var: MIPRES_API_URL")
   }
   return value
 }

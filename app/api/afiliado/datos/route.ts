@@ -3,7 +3,7 @@ import { NextResponse } from "next/server"
 export async function POST(request: Request) {
   try {
     const body = await request.json()
-    const baseUrl = process.env.DUSAKAWI_API_URL
+    const baseUrl = process.env.MIPRES_API_URL
     const url = `${baseUrl}/api/afiliado/datos`
 
     const response = await fetch(url, {

@@ -6,13 +6,13 @@ import type {
   AuthRestablecerPasswordRequest,
 } from "@/models/credentials.model"
 
-const DUSAKAWI_API_URL = process.env.DUSAKAWI_API_URL
+const MIPRES_API_URL = process.env.MIPRES_API_URL
 
 export const AUTH_ENDPOINTS = {
-  login: `${DUSAKAWI_API_URL}/api/auth/login`,
-  refresh: `${DUSAKAWI_API_URL}/api/auth/refresh`,
-  registerMipres: `${DUSAKAWI_API_URL}/api/auth/registro-mipres`,
-  restablecerPassword: `${DUSAKAWI_API_URL}/api/auth/restablecer-password`,
+  login: `${MIPRES_API_URL}/api/auth/login`,
+  refresh: `${MIPRES_API_URL}/api/auth/refresh`,
+  registerMipres: `${MIPRES_API_URL}/api/auth/registro-mipres`,
+  restablecerPassword: `${MIPRES_API_URL}/api/auth/restablecer-password`,
 }
 
 function tryParseJson<T>(rawData: string): T | undefined {
@@ -195,7 +195,7 @@ export async function fetchAuthRestablecerPassword(payload: AuthRestablecerPassw
   status?: number
 }> {
   try {
-    const baseUrl = process.env.DUSAKAWI_API_URL
+    const baseUrl = process.env.MIPRES_API_URL
     if (!baseUrl) {
       return { success: false, error: "URL del backend no configurada", status: 500 }
     }
